@@ -7,40 +7,40 @@
 	objects = {
 
 /* Begin PBXContainerItemProxy section */
-		CD2B57092D60B0A000E18194 /* PBXContainerItemProxy */ = {
+		CD2B573F2D60B0E600E18194 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = CD2B56F02D60B09E00E18194 /* Project object */;
+			containerPortal = CD2B57262D60B0E400E18194 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CD2B56F72D60B09E00E18194;
+			remoteGlobalIDString = CD2B572D2D60B0E400E18194;
 			remoteInfo = FinancialFlow;
 		};
-		CD2B57132D60B0A000E18194 /* PBXContainerItemProxy */ = {
+		CD2B57492D60B0E600E18194 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = CD2B56F02D60B09E00E18194 /* Project object */;
+			containerPortal = CD2B57262D60B0E400E18194 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CD2B56F72D60B09E00E18194;
+			remoteGlobalIDString = CD2B572D2D60B0E400E18194;
 			remoteInfo = FinancialFlow;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CD2B56F82D60B09E00E18194 /* FinancialFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinancialFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		CD2B57082D60B0A000E18194 /* FinancialFlowTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinancialFlowTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		CD2B57122D60B0A000E18194 /* FinancialFlowUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinancialFlowUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD2B572E2D60B0E400E18194 /* FinancialFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinancialFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD2B573E2D60B0E600E18194 /* FinancialFlowTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinancialFlowTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD2B57482D60B0E600E18194 /* FinancialFlowUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinancialFlowUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		CD2B56FA2D60B09E00E18194 /* FinancialFlow */ = {
+		CD2B57302D60B0E400E18194 /* FinancialFlow */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FinancialFlow;
 			sourceTree = "<group>";
 		};
-		CD2B570B2D60B0A000E18194 /* FinancialFlowTests */ = {
+		CD2B57412D60B0E600E18194 /* FinancialFlowTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FinancialFlowTests;
 			sourceTree = "<group>";
 		};
-		CD2B57152D60B0A000E18194 /* FinancialFlowUITests */ = {
+		CD2B574B2D60B0E600E18194 /* FinancialFlowUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FinancialFlowUITests;
 			sourceTree = "<group>";
@@ -48,21 +48,21 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		CD2B56F52D60B09E00E18194 /* Frameworks */ = {
+		CD2B572B2D60B0E400E18194 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CD2B57052D60B0A000E18194 /* Frameworks */ = {
+		CD2B573B2D60B0E600E18194 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CD2B570F2D60B0A000E18194 /* Frameworks */ = {
+		CD2B57452D60B0E600E18194 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -72,22 +72,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		CD2B56EF2D60B09E00E18194 = {
+		CD2B57252D60B0E400E18194 = {
 			isa = PBXGroup;
 			children = (
-				CD2B56FA2D60B09E00E18194 /* FinancialFlow */,
-				CD2B570B2D60B0A000E18194 /* FinancialFlowTests */,
-				CD2B57152D60B0A000E18194 /* FinancialFlowUITests */,
-				CD2B56F92D60B09E00E18194 /* Products */,
+				CD2B57302D60B0E400E18194 /* FinancialFlow */,
+				CD2B57412D60B0E600E18194 /* FinancialFlowTests */,
+				CD2B574B2D60B0E600E18194 /* FinancialFlowUITests */,
+				CD2B572F2D60B0E400E18194 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		CD2B56F92D60B09E00E18194 /* Products */ = {
+		CD2B572F2D60B0E400E18194 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CD2B56F82D60B09E00E18194 /* FinancialFlow.app */,
-				CD2B57082D60B0A000E18194 /* FinancialFlowTests.xctest */,
-				CD2B57122D60B0A000E18194 /* FinancialFlowUITests.xctest */,
+				CD2B572E2D60B0E400E18194 /* FinancialFlow.app */,
+				CD2B573E2D60B0E600E18194 /* FinancialFlowTests.xctest */,
+				CD2B57482D60B0E600E18194 /* FinancialFlowUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,134 +95,134 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		CD2B56F72D60B09E00E18194 /* FinancialFlow */ = {
+		CD2B572D2D60B0E400E18194 /* FinancialFlow */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CD2B571C2D60B0A000E18194 /* Build configuration list for PBXNativeTarget "FinancialFlow" */;
+			buildConfigurationList = CD2B57522D60B0E600E18194 /* Build configuration list for PBXNativeTarget "FinancialFlow" */;
 			buildPhases = (
-				CD2B56F42D60B09E00E18194 /* Sources */,
-				CD2B56F52D60B09E00E18194 /* Frameworks */,
-				CD2B56F62D60B09E00E18194 /* Resources */,
+				CD2B572A2D60B0E400E18194 /* Sources */,
+				CD2B572B2D60B0E400E18194 /* Frameworks */,
+				CD2B572C2D60B0E400E18194 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				CD2B56FA2D60B09E00E18194 /* FinancialFlow */,
+				CD2B57302D60B0E400E18194 /* FinancialFlow */,
 			);
 			name = FinancialFlow;
 			packageProductDependencies = (
 			);
 			productName = FinancialFlow;
-			productReference = CD2B56F82D60B09E00E18194 /* FinancialFlow.app */;
+			productReference = CD2B572E2D60B0E400E18194 /* FinancialFlow.app */;
 			productType = "com.apple.product-type.application";
 		};
-		CD2B57072D60B0A000E18194 /* FinancialFlowTests */ = {
+		CD2B573D2D60B0E600E18194 /* FinancialFlowTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CD2B571F2D60B0A000E18194 /* Build configuration list for PBXNativeTarget "FinancialFlowTests" */;
+			buildConfigurationList = CD2B57552D60B0E600E18194 /* Build configuration list for PBXNativeTarget "FinancialFlowTests" */;
 			buildPhases = (
-				CD2B57042D60B0A000E18194 /* Sources */,
-				CD2B57052D60B0A000E18194 /* Frameworks */,
-				CD2B57062D60B0A000E18194 /* Resources */,
+				CD2B573A2D60B0E600E18194 /* Sources */,
+				CD2B573B2D60B0E600E18194 /* Frameworks */,
+				CD2B573C2D60B0E600E18194 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				CD2B570A2D60B0A000E18194 /* PBXTargetDependency */,
+				CD2B57402D60B0E600E18194 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				CD2B570B2D60B0A000E18194 /* FinancialFlowTests */,
+				CD2B57412D60B0E600E18194 /* FinancialFlowTests */,
 			);
 			name = FinancialFlowTests;
 			packageProductDependencies = (
 			);
 			productName = FinancialFlowTests;
-			productReference = CD2B57082D60B0A000E18194 /* FinancialFlowTests.xctest */;
+			productReference = CD2B573E2D60B0E600E18194 /* FinancialFlowTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		CD2B57112D60B0A000E18194 /* FinancialFlowUITests */ = {
+		CD2B57472D60B0E600E18194 /* FinancialFlowUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CD2B57222D60B0A000E18194 /* Build configuration list for PBXNativeTarget "FinancialFlowUITests" */;
+			buildConfigurationList = CD2B57582D60B0E600E18194 /* Build configuration list for PBXNativeTarget "FinancialFlowUITests" */;
 			buildPhases = (
-				CD2B570E2D60B0A000E18194 /* Sources */,
-				CD2B570F2D60B0A000E18194 /* Frameworks */,
-				CD2B57102D60B0A000E18194 /* Resources */,
+				CD2B57442D60B0E600E18194 /* Sources */,
+				CD2B57452D60B0E600E18194 /* Frameworks */,
+				CD2B57462D60B0E600E18194 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				CD2B57142D60B0A000E18194 /* PBXTargetDependency */,
+				CD2B574A2D60B0E600E18194 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				CD2B57152D60B0A000E18194 /* FinancialFlowUITests */,
+				CD2B574B2D60B0E600E18194 /* FinancialFlowUITests */,
 			);
 			name = FinancialFlowUITests;
 			packageProductDependencies = (
 			);
 			productName = FinancialFlowUITests;
-			productReference = CD2B57122D60B0A000E18194 /* FinancialFlowUITests.xctest */;
+			productReference = CD2B57482D60B0E600E18194 /* FinancialFlowUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		CD2B56F02D60B09E00E18194 /* Project object */ = {
+		CD2B57262D60B0E400E18194 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1610;
 				LastUpgradeCheck = 1610;
 				TargetAttributes = {
-					CD2B56F72D60B09E00E18194 = {
+					CD2B572D2D60B0E400E18194 = {
 						CreatedOnToolsVersion = 16.1;
 					};
-					CD2B57072D60B0A000E18194 = {
+					CD2B573D2D60B0E600E18194 = {
 						CreatedOnToolsVersion = 16.1;
-						TestTargetID = CD2B56F72D60B09E00E18194;
+						TestTargetID = CD2B572D2D60B0E400E18194;
 					};
-					CD2B57112D60B0A000E18194 = {
+					CD2B57472D60B0E600E18194 = {
 						CreatedOnToolsVersion = 16.1;
-						TestTargetID = CD2B56F72D60B09E00E18194;
+						TestTargetID = CD2B572D2D60B0E400E18194;
 					};
 				};
 			};
-			buildConfigurationList = CD2B56F32D60B09E00E18194 /* Build configuration list for PBXProject "FinancialFlow" */;
+			buildConfigurationList = CD2B57292D60B0E400E18194 /* Build configuration list for PBXProject "FinancialFlow" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = CD2B56EF2D60B09E00E18194;
+			mainGroup = CD2B57252D60B0E400E18194;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = CD2B56F92D60B09E00E18194 /* Products */;
+			productRefGroup = CD2B572F2D60B0E400E18194 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				CD2B56F72D60B09E00E18194 /* FinancialFlow */,
-				CD2B57072D60B0A000E18194 /* FinancialFlowTests */,
-				CD2B57112D60B0A000E18194 /* FinancialFlowUITests */,
+				CD2B572D2D60B0E400E18194 /* FinancialFlow */,
+				CD2B573D2D60B0E600E18194 /* FinancialFlowTests */,
+				CD2B57472D60B0E600E18194 /* FinancialFlowUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		CD2B56F62D60B09E00E18194 /* Resources */ = {
+		CD2B572C2D60B0E400E18194 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CD2B57062D60B0A000E18194 /* Resources */ = {
+		CD2B573C2D60B0E600E18194 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CD2B57102D60B0A000E18194 /* Resources */ = {
+		CD2B57462D60B0E600E18194 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -232,21 +232,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		CD2B56F42D60B09E00E18194 /* Sources */ = {
+		CD2B572A2D60B0E400E18194 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CD2B57042D60B0A000E18194 /* Sources */ = {
+		CD2B573A2D60B0E600E18194 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CD2B570E2D60B0A000E18194 /* Sources */ = {
+		CD2B57442D60B0E600E18194 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -256,20 +256,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		CD2B570A2D60B0A000E18194 /* PBXTargetDependency */ = {
+		CD2B57402D60B0E600E18194 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = CD2B56F72D60B09E00E18194 /* FinancialFlow */;
-			targetProxy = CD2B57092D60B0A000E18194 /* PBXContainerItemProxy */;
+			target = CD2B572D2D60B0E400E18194 /* FinancialFlow */;
+			targetProxy = CD2B573F2D60B0E600E18194 /* PBXContainerItemProxy */;
 		};
-		CD2B57142D60B0A000E18194 /* PBXTargetDependency */ = {
+		CD2B574A2D60B0E600E18194 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = CD2B56F72D60B09E00E18194 /* FinancialFlow */;
-			targetProxy = CD2B57132D60B0A000E18194 /* PBXContainerItemProxy */;
+			target = CD2B572D2D60B0E400E18194 /* FinancialFlow */;
+			targetProxy = CD2B57492D60B0E600E18194 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		CD2B571A2D60B0A000E18194 /* Debug */ = {
+		CD2B57502D60B0E600E18194 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -332,7 +332,7 @@
 			};
 			name = Debug;
 		};
-		CD2B571B2D60B0A000E18194 /* Release */ = {
+		CD2B57512D60B0E600E18194 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -388,7 +388,7 @@
 			};
 			name = Release;
 		};
-		CD2B571D2D60B0A000E18194 /* Debug */ = {
+		CD2B57532D60B0E600E18194 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -404,6 +404,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -417,7 +418,7 @@
 			};
 			name = Debug;
 		};
-		CD2B571E2D60B0A000E18194 /* Release */ = {
+		CD2B57542D60B0E600E18194 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -433,6 +434,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -446,7 +448,7 @@
 			};
 			name = Release;
 		};
-		CD2B57202D60B0A000E18194 /* Debug */ = {
+		CD2B57562D60B0E600E18194 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -465,7 +467,7 @@
 			};
 			name = Debug;
 		};
-		CD2B57212D60B0A000E18194 /* Release */ = {
+		CD2B57572D60B0E600E18194 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -484,7 +486,7 @@
 			};
 			name = Release;
 		};
-		CD2B57232D60B0A000E18194 /* Debug */ = {
+		CD2B57592D60B0E600E18194 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -501,7 +503,7 @@
 			};
 			name = Debug;
 		};
-		CD2B57242D60B0A000E18194 /* Release */ = {
+		CD2B575A2D60B0E600E18194 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -521,43 +523,43 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		CD2B56F32D60B09E00E18194 /* Build configuration list for PBXProject "FinancialFlow" */ = {
+		CD2B57292D60B0E400E18194 /* Build configuration list for PBXProject "FinancialFlow" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CD2B571A2D60B0A000E18194 /* Debug */,
-				CD2B571B2D60B0A000E18194 /* Release */,
+				CD2B57502D60B0E600E18194 /* Debug */,
+				CD2B57512D60B0E600E18194 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CD2B571C2D60B0A000E18194 /* Build configuration list for PBXNativeTarget "FinancialFlow" */ = {
+		CD2B57522D60B0E600E18194 /* Build configuration list for PBXNativeTarget "FinancialFlow" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CD2B571D2D60B0A000E18194 /* Debug */,
-				CD2B571E2D60B0A000E18194 /* Release */,
+				CD2B57532D60B0E600E18194 /* Debug */,
+				CD2B57542D60B0E600E18194 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CD2B571F2D60B0A000E18194 /* Build configuration list for PBXNativeTarget "FinancialFlowTests" */ = {
+		CD2B57552D60B0E600E18194 /* Build configuration list for PBXNativeTarget "FinancialFlowTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CD2B57202D60B0A000E18194 /* Debug */,
-				CD2B57212D60B0A000E18194 /* Release */,
+				CD2B57562D60B0E600E18194 /* Debug */,
+				CD2B57572D60B0E600E18194 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CD2B57222D60B0A000E18194 /* Build configuration list for PBXNativeTarget "FinancialFlowUITests" */ = {
+		CD2B57582D60B0E600E18194 /* Build configuration list for PBXNativeTarget "FinancialFlowUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CD2B57232D60B0A000E18194 /* Debug */,
-				CD2B57242D60B0A000E18194 /* Release */,
+				CD2B57592D60B0E600E18194 /* Debug */,
+				CD2B575A2D60B0E600E18194 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = CD2B56F02D60B09E00E18194 /* Project object */;
+	rootObject = CD2B57262D60B0E400E18194 /* Project object */;
 }
