@@ -96,14 +96,6 @@ public struct Device: Codable, Equatable, Identifiable, Sendable, FetchableRecor
     }
 }
 
-//extension Device {
-//    // Define that a Device belongs to a Currency
-//    public static let currency = belongsTo(Currency.self, key: "currencyId")
-//    
-//    // Define that a Device belongs to a UsageRatePeriod
-//    public static let usageRatePeriod = belongsTo(UsageRatePeriod.self, key: "usageRatePeriodId")
-//}
-
 extension Device {
     public static let currency = belongsTo(Currency.self, using: ForeignKey(["currencyId"]))
     public static let usageRatePeriod = belongsTo(UsageRatePeriod.self, using: ForeignKey(["usageRatePeriodId"]))
@@ -144,7 +136,7 @@ extension DatabaseWriter where Self == DatabaseQueue {
         let databaseQueue: DatabaseQueue
         var configuration = Configuration()
         configuration.prepareDatabase { db in
-
+            
             db.trace(options: .profile) {
 #if DEBUG
                 print($0.expandedDescription)
@@ -217,37 +209,110 @@ extension DatabaseWriter where Self == DatabaseQueue {
             }
             
             _ = try Device(
-                    name: "iPhone 14 Pro Max",
-                    currencyId: eurId.value!,
-                    purchasePrice: 1599.99,
-                    purchaseDate: Date(year: 2022, month: 9, day: 16),
-                    usageRate: 1,
-                    usageRatePeriodId: 1
-                ).inserted(db)
-            
-            
-        }
-        
-        migrator.registerMigration("Add iPhone 13") { db in
-            _ = try Device(
-                name: "iPhone 13 Pro Max",
-                currencyId: usdId.value!,
-                purchasePrice: 1099.0,
-                purchaseDate: Date(timeInterval: -100000, since: Date()),
-                usageRate: 1.5,
+                name: "iPhone 14 Pro Max",
+                currencyId: eurId.value!,
+                purchasePrice: 1599.99,
+                purchaseDate: Date(year: 2022, month: 9, day: 16),
+                usageRate: 1,
                 usageRatePeriodId: 1
             ).inserted(db)
+            
+            
         }
         
+        migrator.insertSampleData()
+        
         do {
-            #if DEBUG
+#if DEBUG
             migrator.eraseDatabaseOnSchemaChange = true
-            #endif
+#endif
             
             try migrator.migrate(databaseQueue)
         } catch {
             reportIssue(error)
         }
         return databaseQueue
+    }
+}
+
+extension DatabaseMigrator {
+    mutating func insertSampleData() {
+        
+        self.registerMigration("Add Sennheiser PXC 550") { db in
+            _ = try Device(
+                name: "Sennheiser PXC 550",
+                currencyId: 1,
+                purchasePrice: 500,
+                purchaseDate: Date(year: 2016, month: 7, day: 10),
+                usageRate: 10,
+                usageRatePeriodId: UsageRatePeriod.month.id!
+            ).inserted(db)
+        }
+        
+        self.registerMigration("Add Anker 737 Power Bank") { db in
+            _ = try Device(
+                name: "Anker 737 Power Bank ",
+                currencyId: 2,
+                purchasePrice: 132.00,
+                purchaseDate: Date(year: 2022, month: 11, day: 22),
+                usageRate: 0.2,
+                usageRatePeriodId: UsageRatePeriod.day.id!
+            ).inserted(db)
+        }
+        
+        self.registerMigration("Add Flow Mini Silver") { db in
+            _ = try Device(
+                name: "Flow Mini Silver",
+                currencyId: 1,
+                purchasePrice: 16.90,
+                purchaseDate: Date(year: 2024, month: 11, day: 20),
+                usageRate: 0.1,
+                usageRatePeriodId: UsageRatePeriod.day.id!
+            ).inserted(db)
+        }
+        
+        self.registerMigration("Add ICEMAG 2") { db in
+            _ = try Device(
+                name: "ICEMAG 2 MagSafe Power Bank",
+                currencyId: 1,
+                purchasePrice: 69.90,
+                purchaseDate: Date(year: 2024, month: 11, day: 20),
+                usageRate: 0.1,
+                usageRatePeriodId: UsageRatePeriod.day.id!
+            ).inserted(db)
+        }
+        
+        self.registerMigration("Add ICEMAG 1") { db in
+            _ = try Device(
+                name: "ICEMAG 1 MagSafe Power Bank",
+                currencyId: 1,
+                purchasePrice: 35.90,
+                purchaseDate: Date(year: 2024, month: 11, day: 20),
+                usageRate: 0.1,
+                usageRatePeriodId: UsageRatePeriod.day.id!
+            ).inserted(db)
+        }
+        
+        self.registerMigration("Add Space Elevator") { db in
+            _ = try Device(
+                name: "Space Elevator Power Bank",
+                currencyId: 1,
+                purchasePrice: 19.99,
+                purchaseDate: Date(year: 2024, month: 11, day: 20),
+                usageRate: 0.1,
+                usageRatePeriodId: UsageRatePeriod.day.id!
+            ).inserted(db)
+        }
+        
+        self.registerMigration("Add Shargeek 100") { db in
+            _ = try Device(
+                name: "Shargeek 100",
+                currencyId: 1,
+                purchasePrice: 159.00,
+                purchaseDate: Date(year: 2023, month: 12, day: 09),
+                usageRate: 0.2,
+                usageRatePeriodId: UsageRatePeriod.day.id!
+            ).inserted(db)
+        }
     }
 }

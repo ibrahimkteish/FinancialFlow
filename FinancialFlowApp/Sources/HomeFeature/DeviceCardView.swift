@@ -10,31 +10,12 @@ import Models
 import Utils
 import GRDB
 
-public struct DeviceCard: Equatable, Sendable  {
-    
-    public var id: Int64? {
-        self.device.id
-    }
-    public let device: Device
-    public let currency: Currency
-    public let usageRatePeriod: UsageRatePeriod
-    
-    public init(
-        device: Device,
-        currency: Currency,
-        usageRatePeriod: UsageRatePeriod
-    ) {
-        self.device = device
-        self.currency = currency
-        self.usageRatePeriod = usageRatePeriod
-    }
-}
 
 public struct DeviceCardView: View {
     
-    public let data: DeviceCard
+    public let data: HomeReducer.Items.State
     
-    init(data: DeviceCard) {
+    init(data: HomeReducer.Items.State) {
         self.data = data
     }
 
@@ -61,6 +42,17 @@ public struct DeviceCardView: View {
         min(accumulatedCost / data.device.purchasePrice, 1.0)
     }
     
+    @ViewBuilder
+    private var remainingDays: some View {
+        let perDay = Double(data.device.usageRate / Double(data.usageRatePeriod.daysMultiplier))
+        let days = (data.device.purchasePrice / perDay) - Double(data.device.elapsedDays)
+        if days > 0 {
+            Text("Remaining days: \(days.formatted(.number))")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+        }
+    }
+    
     public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -69,7 +61,7 @@ public struct DeviceCardView: View {
                         .font(.title2)
                         .fontWeight(.bold)
                     
-                    Text("Purchased for \(data.currency.symbol)\(data.device.purchasePrice, specifier: "%.2f")")
+                    Text("Purchased for \(data.device.purchasePrice.formatted(.currency(code: data.currency.code)))")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     
@@ -77,9 +69,16 @@ public struct DeviceCardView: View {
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     
-                    Text("Remaining Cost: \(data.currency.symbol)\(remainingCost, specifier: "%.2f")")
+                    // show rate
+                    Text("Rate: \(data.device.usageRate.formatted(.currency(code: data.currency.code)))/\(data.usageRatePeriod.name)")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    
+                    remainingDays
+                    
+                    Text("Remaining Cost: \(remainingCost.formatted(.currency(code: data.currency.code)))")
                         .font(.headline)
-                        .foregroundColor(.blue)
+                        .foregroundColor(remainingCost == 0 ? .green : .blue)
                 }
                 Spacer()
                 

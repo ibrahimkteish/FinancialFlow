@@ -25,27 +25,42 @@ public struct HomeReducer: Sendable {
         var path = StackState<Path.State>()
         
         @SharedReader(.fetch(Items(), animation: .default))
-        public var devices: [DeviceCard]
+        var devices: [Items.State]
         
         public init() {}
+    }
+    
+    
+    public struct Items: FetchKeyRequest {
+        public struct State: Equatable, Sendable  {
+            
+            public var id: Int64? {
+                self.device.id
+            }
+            public let device: Device
+            public let currency: Currency
+            public let usageRatePeriod: UsageRatePeriod
+            
+            public init(
+                device: Device,
+                currency: Currency,
+                usageRatePeriod: UsageRatePeriod
+            ) {
+                self.device = device
+                self.currency = currency
+                self.usageRatePeriod = usageRatePeriod
+            }
+        }
         
-        
-        private struct Items: FetchKeyRequest {
-            func fetch(_ db: Database) throws -> [DeviceCard] {
-                var retDevices = [DeviceCard]()
-                
-                let devices =  try Device
-                    .fetchAll(db)
-                for device in devices {
-                    guard let currency = try Currency.fetchOne(db, key: device.currencyId),
-                          let usageRatePeriod = try UsageRatePeriod.fetchOne(db, key: device.usageRatePeriodId) else {
-                        continue
-                    }
-                    
-                    let deviceCard = DeviceCard(device: device, currency: currency, usageRatePeriod: usageRatePeriod)
-                    retDevices.append(deviceCard)
-                }
-                return retDevices
+        public func fetch(_ db: Database) throws -> [State] {
+            // Use raw SQL to join the tables
+            let sql = Device.all()
+                .including(required: Device.currency)
+                .including(required: Device.usageRatePeriod)
+            
+            // Execute the query and map results
+            return try Row.fetchAll(db, sql).map { row in
+                State(device: try Device(row: row), currency: row["currency"], usageRatePeriod: row["usage_rate_period"])
             }
         }
     }
@@ -80,10 +95,10 @@ public struct HomeReducer: Sendable {
                 }
             case .onAppear:
                 return .none
-            
+                
             case .path:
                 return .none
-        }
+            }
         }
         .forEach(\.path, action: \.path)
     }

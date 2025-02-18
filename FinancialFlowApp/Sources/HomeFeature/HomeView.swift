@@ -20,6 +20,16 @@ public struct HomeView: View {
                     }
                 }
             }
+            .toolbar {
+              ToolbarItem(placement: .confirmationAction) {
+                  Button {/* self.store.send(.addDevice)*/
+                  } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
+            .navigationTitle("Items")
+            
         } destination: { store in
             switch store.case {
                 case let .addDevice(store):
