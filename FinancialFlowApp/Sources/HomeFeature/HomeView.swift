@@ -1,6 +1,7 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 
+import AddDeviceFeature
 import ComposableArchitecture
 import SwiftUI
 
@@ -12,7 +13,7 @@ public struct HomeView: View {
     }
     
     public var body: some View {
-        NavigationStack(path: self.$store.scope(state: \.path, action: \.path)) {
+        NavigationStack/*(path: self.$store.scope(state: \.path, action: \.path))*/ {
             ScrollView {
                 VStack {
                     ForEach(self.store.state.devices, id: \.id) { device in
@@ -21,32 +22,22 @@ public struct HomeView: View {
                 }
             }
             .toolbar {
-              ToolbarItem(placement: .confirmationAction) {
-                  Button {/* self.store.send(.addDevice)*/
-                  } label: {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button { self.store.send(.addDeviceButtonTapped)
+                    } label: {
                         Image(systemName: "plus")
                     }
                 }
             }
-            .navigationTitle("Items")
-            
-        } destination: { store in
-            switch store.case {
-                case let .addDevice(store):
+            .sheet(
+                item: self.$store.scope(state: \.destination?.addDevice, action: \.destination.addDevice)
+            ) { store in
+                NavigationStack {
                     AddDeviceView(store: store)
+                }
+                .presentationDetents([.medium])
             }
+            .navigationTitle("Items")
         }
-    }
-}
-
-public struct AddDeviceView: View {
-    @Bindable var store: StoreOf<AddDeviceReducer>
-    
-    public init(store: StoreOf<AddDeviceReducer>) {
-        self.store = store
-    }
-    
-    public var body: some View {
-        EmptyView()
     }
 }

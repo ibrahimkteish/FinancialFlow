@@ -9,7 +9,11 @@ let package = Package(
         .iOS(.v17),
     ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
+
+        .library(
+            name: "AddDeviceFeature",
+            targets: ["AddDeviceFeature"]
+        ),
         .library(
             name: "HomeFeature",
             targets: ["HomeFeature"]
@@ -40,9 +44,22 @@ let package = Package(
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
+       
+        .target(
+            name: "AddDeviceFeature",
+            dependencies: [
+                "Models",
+                "Utils",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "GRDB", package: "GRDB.swift"),
+                .product(name: "SharingGRDB", package: "sharing-grdb"),
+
+            ]
+        ),
         .target(
             name: "HomeFeature",
             dependencies: [
+                "AddDeviceFeature",
                 "Models",
                 "Utils",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),

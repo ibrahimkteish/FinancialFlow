@@ -8,22 +8,28 @@
 import ComposableArchitecture
 import Models
 import SharingGRDB
-
-@Reducer
-public struct AddDeviceReducer {}
+import AddDeviceFeature
 
 @Reducer
 public struct HomeReducer: Sendable {
-    
+//    
+//    @Reducer(state: .equatable, .sendable, action: .equatable, .sendable)
+//    public enum Path {
+//        case addDevice(AddDeviceReducer)
+//    }
+
     @Reducer(state: .equatable, .sendable, action: .equatable, .sendable)
-    public enum Path {
+    public enum Destination {
         case addDevice(AddDeviceReducer)
     }
     
     @ObservableState
     public struct State: Equatable {
-        var path = StackState<Path.State>()
+//        var path = StackState<Path.State>()
         
+        @Presents
+        public var destination: Destination.State?
+
         @SharedReader(.fetch(Items(), animation: .default))
         var devices: [Items.State]
         
@@ -66,10 +72,13 @@ public struct HomeReducer: Sendable {
     }
     
     public enum Action: Equatable {
-        case addDevice(Device)
+        case addDeviceButtonTapped
+        case cancelAddDeviceButtonTapped
+        case destination(PresentationAction<Destination.Action>)
+        case submitButtonTapped
         case removeDevice(Int64)
         case onAppear
-        case path(StackAction<Path.State, Path.Action>)
+//        case path(StackAction<Path.State, Path.Action>)
 
     }
     
@@ -80,13 +89,12 @@ public struct HomeReducer: Sendable {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .addDevice(let device):
-                return .run { _ in
-                    try await database.write { db in
-                        var device_ = device
-                        _ = try device_.insert(db)
-                    }
-                }
+                case .addDeviceButtonTapped:
+                    state.destination = .addDevice(AddDeviceReducer.State())
+                    return .none
+                case .cancelAddDeviceButtonTapped:
+                    state.destination = nil
+                    return .none
             case let .removeDevice(id):
                 return .run { _ in
                     _ = try await database.write { db in
@@ -95,11 +103,20 @@ public struct HomeReducer: Sendable {
                 }
             case .onAppear:
                 return .none
-                
-            case .path:
+            case .submitButtonTapped:
+                state.destination = nil
                 return .none
+                
+            case .destination:
+                return .none
+                
+//            case .path:
+//                return .none
             }
         }
-        .forEach(\.path, action: \.path)
+        .ifLet(\.$destination, action: \.destination)
+
+
+//        .forEach(\.path, action: \.path)
     }
 }
