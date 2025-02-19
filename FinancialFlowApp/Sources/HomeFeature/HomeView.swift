@@ -12,6 +12,21 @@ public struct HomeView: View {
         self.store = store
     }
     
+    @ViewBuilder
+    private var menu: some View {
+        Menu {
+            ForEach(HomeReducer.Ordering.allCases, id: \.self) { ordering in
+            Button {
+                store.send(.onSortChanged(ordering))
+            } label: {
+                Text(ordering.rawValue)
+            }
+          }
+        } label: {
+            Image(systemName: "line.horizontal.3.decrease.circle")
+        }
+    }
+    
     public var body: some View {
         NavigationStack/*(path: self.$store.scope(state: \.path, action: \.path))*/ {
             ScrollView {
@@ -22,8 +37,12 @@ public struct HomeView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button { self.store.send(.addDeviceButtonTapped)
+                ToolbarItemGroup(placement: .confirmationAction) {
+                   
+                    menu
+                    
+                    Button {
+                        self.store.send(.addDeviceButtonTapped)
                     } label: {
                         Image(systemName: "plus")
                     }

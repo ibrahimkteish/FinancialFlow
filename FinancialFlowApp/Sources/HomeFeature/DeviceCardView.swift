@@ -127,35 +127,34 @@ public struct DeviceCardView: View {
             )
         )
         
-        
         DeviceCardView(
             data: .init(
-            device: .init(
-                name: "iPhone 13 Pro",
-                currencyId: 1,
-                purchasePrice: 1599.99,
-                purchaseDate: Date(year: 2022, month: 9, day: 16),
-                usageRate: 7,
-                usageRatePeriodId: 2
-            ),
-            currency: .usd,
-            usageRatePeriod: .week
-        )
-        )
-        
-        DeviceCardView(
-            data: .init(
-            device: .init(
-                name: "iPhone 13 Pro",
-                currencyId: 1,
-                purchasePrice: 1599.99,
-                purchaseDate: Date(year: 2022, month: 9, day: 16),
-                usageRate: 30,
-                usageRatePeriodId: 3
-            ),
-            currency: .usd,
-            usageRatePeriod: .month
-        )
+                device: .init(
+                    name: "iPhone 13 Pro",
+                    currencyId: 1,
+                    purchasePrice: 1599.99,
+                    purchaseDate: Date(year: 2022, month: 9, day: 16),
+                    usageRate: 7,
+                    usageRatePeriodId: 2
+                ),
+                currency: .usd,
+                usageRatePeriod: .week
             )
+        )
+        
+        DeviceCardView(
+            data: .init(
+                device: .init(
+                    name: "iPhone 13 Pro",
+                    currencyId: 1,
+                    purchasePrice: 1599.99,
+                    purchaseDate: Date(year: 2022, month: 9, day: 16),
+                    usageRate: 30,
+                    usageRatePeriodId: 3
+                ),
+                currency: .usd,
+                usageRatePeriod: .month
+            )
+        )
     }
 }
