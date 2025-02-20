@@ -56,7 +56,7 @@ public struct HomeView: View {
                 }
                 .presentationDetents([.medium])
             }
-            .navigationTitle("Items")
+            .navigationTitle("Items \(self.store.count.map { $0.totalDailyCost.formatted(.currency(code: $0.currencyCode)) } ?? "")")
         }
     }
 }

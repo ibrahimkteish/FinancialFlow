@@ -10,6 +10,16 @@ import Models
 import SharingGRDB
 import AddDeviceFeature
 
+public struct CurrencyCost: FetchableRecord, Decodable, Equatable, Sendable {
+    let currencyCode: String
+    let totalDailyCost: Double
+    
+    init(currencyCode: String, totalDailyCost: Double) {
+        self.currencyCode = currencyCode
+        self.totalDailyCost = totalDailyCost
+    }
+}
+
 @Reducer
 public struct HomeReducer: Sendable {
 
@@ -30,8 +40,11 @@ public struct HomeReducer: Sendable {
         @Shared(.inMemory("order"))
         var ordering: Ordering = .created
         
+        @SharedReader(.fetch(Aggregate()))
+        public var count: CurrencyCost? = nil
+        
         public init() {
-            _devices = SharedReader.init(.fetch(Items(ordering: .created)))
+            _devices = SharedReader(.fetch(Items(ordering: self.ordering)))
         }
     }
     
@@ -90,6 +103,32 @@ public struct HomeReducer: Sendable {
             // Execute the query and map results
             return try Row.fetchAll(db, sql).map { row in
                 State(device: try Device(row: row), currency: row["currency"], usageRatePeriod: row["usage_rate_period"])
+            }
+        }
+    }
+    public struct Aggregate: FetchKeyRequest {
+
+        public typealias State = CurrencyCost?
+        
+        public func fetch(_ db: Database) throws -> State {
+            // Use raw SQL to join the tables
+            let sql =
+                        """
+             SELECT 
+                 c.code AS currency_code,
+                 SUM(d.usageRate / urp.daysMultiplier) AS total_daily_cost
+             FROM devices d
+             JOIN currencies c ON d.currencyId = c.id
+             JOIN usage_rate_periods urp ON d.usageRatePeriodId = urp.id
+             WHERE c.code = 'EUR'
+             GROUP BY c.code;
+             """
+            
+            // Execute the query and map results
+            return   try Row.fetchOne(db, sql: sql).map { row in
+                let currencyCode: String = row["currency_code"]
+                let totalDailyCost: Double = row["total_daily_cost"]
+                return .init(currencyCode: currencyCode, totalDailyCost: totalDailyCost)
             }
         }
     }
