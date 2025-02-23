@@ -44,7 +44,7 @@ public struct HomeReducer: Sendable {
         public var count: CurrencyCost? = nil
         
         public init() {
-            _devices = SharedReader(.fetch(Items(ordering: self.ordering)))
+          _devices = SharedReader(.fetch(Items(ordering: .created)))
         }
     }
     
