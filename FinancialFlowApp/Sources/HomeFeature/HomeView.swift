@@ -4,6 +4,7 @@
 import AddDeviceFeature
 import ComposableArchitecture
 import SwiftUI
+import AnalyticsFeature
 
 public struct HomeView: View {
     @Bindable var store: StoreOf<HomeReducer>
@@ -16,12 +17,12 @@ public struct HomeView: View {
     private var menu: some View {
         Menu {
             ForEach(HomeReducer.Ordering.allCases, id: \.self) { ordering in
-            Button {
-                store.send(.onSortChanged(ordering))
-            } label: {
-                Text(ordering.rawValue)
+                Button {
+                    store.send(.onSortChanged(ordering))
+                } label: {
+                    Text(ordering.rawValue)
+                }
             }
-          }
         } label: {
             Image(systemName: "line.horizontal.3.decrease.circle")
         }
@@ -37,8 +38,13 @@ public struct HomeView: View {
                 }
             }
             .toolbar {
-                ToolbarItemGroup(placement: .confirmationAction) {
-                   
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button {
+                        store.send(.analyticsButtonTapped)
+                    } label: {
+                        Image(systemName: "chart.bar.fill")
+                    }
+                    
                     menu
                     
                     Button {
@@ -55,6 +61,13 @@ public struct HomeView: View {
                     AddDeviceView(store: store)
                 }
                 .presentationDetents([.medium])
+            }
+            .sheet(
+                item: self.$store.scope(state: \.destination?.analytics, action: \.destination.analytics)
+            ) { store in
+                NavigationStack {
+                    AnalyticsView(store: store)
+                }
             }
             .navigationTitle("Items \(self.store.count.map { $0.totalDailyCost.formatted(.currency(code: $0.currencyCode)) } ?? "")")
         }

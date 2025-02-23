@@ -9,7 +9,6 @@ let package = Package(
         .iOS(.v17),
     ],
     products: [
-
         .library(
             name: "AddDeviceFeature",
             targets: ["AddDeviceFeature"]
@@ -25,6 +24,10 @@ let package = Package(
         .library(
             name: "Utils",
             targets: ["Utils"]
+        ),
+        .library(
+            name: "AnalyticsFeature",
+            targets: ["AnalyticsFeature"]
         ),
     ],
     dependencies: [
@@ -53,33 +56,41 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "GRDB", package: "GRDB.swift"),
                 .product(name: "SharingGRDB", package: "sharing-grdb"),
-
             ]
         ),
         .target(
             name: "HomeFeature",
             dependencies: [
                 "AddDeviceFeature",
+                "AnalyticsFeature",
                 "Models",
                 "Utils",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "GRDB", package: "GRDB.swift"),
             ]
         ),
+        .target(
+            name: "AnalyticsFeature",
+            dependencies: [
+                "Models",
+                "Utils",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "GRDB", package: "GRDB.swift"),
+                .product(name: "SharingGRDB", package: "sharing-grdb"),
+            ]
+        ),
+        .target(
+            name: "Models",
+            dependencies: [
+                "Utils",
+                .product(name: "SharingGRDB", package: "sharing-grdb"),
+            ]
+        ),
+        .target(name: "Utils"),
         
-            .target(
-                name: "Models",
-                dependencies: [
-                    "Utils",
-                    .product(name: "SharingGRDB", package: "sharing-grdb"),
-                ]
-            ),
-        
-            .target(name: "Utils"),
-        
-            .testTarget(
-                name: "HomeFeatureTests",
-                dependencies: ["HomeFeature"]
-            ),
+        .testTarget(
+            name: "HomeFeatureTests",
+            dependencies: ["HomeFeature"]
+        ),
     ]
 )
