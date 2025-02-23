@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CD2B57DB2D60C77900E18194 /* Models in Frameworks */ = {isa = PBXBuildFile; productRef = CD2B57DA2D60C77900E18194 /* Models */; };
+		CD2B57DD2D6265F400E18194 /* HomeFeature in Frameworks */ = {isa = PBXBuildFile; productRef = CD2B57DC2D6265F400E18194 /* HomeFeature */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		CD2B573F2D60B0E600E18194 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD2B57DD2D6265F400E18194 /* HomeFeature in Frameworks */,
+				CD2B57DB2D60C77900E18194 /* Models in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,7 @@
 				CD2B57302D60B0E400E18194 /* FinancialFlow */,
 				CD2B57412D60B0E600E18194 /* FinancialFlowTests */,
 				CD2B574B2D60B0E600E18194 /* FinancialFlowUITests */,
+				CD2B57D92D60C77900E18194 /* Frameworks */,
 				CD2B572F2D60B0E400E18194 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +98,13 @@
 				CD2B57482D60B0E600E18194 /* FinancialFlowUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CD2B57D92D60C77900E18194 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +127,8 @@
 			);
 			name = FinancialFlow;
 			packageProductDependencies = (
+				CD2B57DA2D60C77900E18194 /* Models */,
+				CD2B57DC2D6265F400E18194 /* HomeFeature */,
 			);
 			productName = FinancialFlow;
 			productReference = CD2B572E2D60B0E400E18194 /* FinancialFlow.app */;
@@ -560,6 +577,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CD2B57DA2D60C77900E18194 /* Models */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Models;
+		};
+		CD2B57DC2D6265F400E18194 /* HomeFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HomeFeature;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CD2B57262D60B0E400E18194 /* Project object */;
 }
