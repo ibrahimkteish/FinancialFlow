@@ -5,6 +5,7 @@ import AddDeviceFeature
 import ComposableArchitecture
 import SwiftUI
 import AnalyticsFeature
+import CurrencyRatesFeature
 
 public struct HomeView: View {
     @Bindable var store: StoreOf<HomeReducer>
@@ -39,10 +40,8 @@ public struct HomeView: View {
             }
     }
 
-
-
     public var body: some View {
-        NavigationStack/*(path: self.$store.scope(state: \.path, action: \.path))*/ {
+        NavigationStack {
             devices
             .toolbar {
               ToolbarItemGroup(placement: .topBarTrailing) {
@@ -68,13 +67,6 @@ public struct HomeView: View {
               }
             }
             .sheet(
-                isPresented: self.$store.showingCurrencyRates
-            ) {
-                NavigationStack {
-                    CurrencyRatesView(store: store)
-                }
-            }
-            .sheet(
                 item: self.$store.scope(state: \.destination?.addDevice, action: \.destination.addDevice)
             ) { store in
                 NavigationStack {
@@ -88,6 +80,11 @@ public struct HomeView: View {
                 NavigationStack {
                     AnalyticsView(store: store)
                 }
+            }
+            .sheet(
+                item: self.$store.scope(state: \.destination?.currencyRate, action: \.destination.currencyRate)
+            ) { store in
+                CurrencyRateView(store: store)
             }
             .navigationTitle("Items \(self.store.count.map { $0.totalDailyCost.formatted(.currency(code: $0.currencyCode)) } ?? "")")
         }

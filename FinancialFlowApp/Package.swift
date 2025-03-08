@@ -29,6 +29,10 @@ let package = Package(
             name: "AnalyticsFeature",
             targets: ["AnalyticsFeature"]
         ),
+        .library(
+            name: "CurrencyRatesFeature",
+            targets: ["CurrencyRatesFeature"]
+        ),
     ],
     dependencies: [
         .package(
@@ -63,6 +67,7 @@ let package = Package(
             dependencies: [
                 "AddDeviceFeature",
                 "AnalyticsFeature",
+                "CurrencyRatesFeature",
                 "Models",
                 "Utils",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -71,6 +76,16 @@ let package = Package(
         ),
         .target(
             name: "AnalyticsFeature",
+            dependencies: [
+                "Models",
+                "Utils",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "GRDB", package: "GRDB.swift"),
+                .product(name: "SharingGRDB", package: "sharing-grdb"),
+            ]
+        ),
+        .target(
+            name: "CurrencyRatesFeature",
             dependencies: [
                 "Models",
                 "Utils",

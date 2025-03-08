@@ -15,10 +15,18 @@ public struct AddDeviceView: View {
                 TextField("Device Name", text: $store.deviceName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 
-                Picker("Currency", selection: $store.selectedCurrencyId) {
-                    ForEach(store.currencies, id: \.id) { currency in
-                        Text(currency.code)
-                            .tag(currency.id!)
+                if store.currencies.isEmpty {
+                    HStack {
+                        Text("Loading currencies...")
+                        Spacer()
+                        ProgressView()
+                    }
+                } else {
+                    Picker("Currency", selection: $store.selectedCurrencyId) {
+                        ForEach(store.currencies, id: \.id) { currency in
+                            Text("\(currency.code) (\(currency.symbol)) - \(currency.name)")
+                                .tag(currency.id!)
+                        }
                     }
                 }
                 
