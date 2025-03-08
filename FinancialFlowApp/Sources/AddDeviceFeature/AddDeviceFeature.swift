@@ -10,6 +10,23 @@ import SharingGRDB
 
 @Reducer
 public struct AddDeviceReducer: Sendable {
+    // Define a FetchKeyRequest for currencies
+    public struct CurrencyFetcher: FetchKeyRequest {
+        public typealias State = [Currency]
+        
+        public init() {}
+        
+        public func fetch(_ db: Database) throws -> [Currency] {
+            print("Fetching currencies for device addition")
+            let result = try Currency.fetchAll(db, sql: """
+                SELECT * FROM currencies
+                ORDER BY code = 'USD' DESC, name
+            """)
+            print("Fetched \(result.count) currencies for device form")
+            return result
+        }
+    }
+    
     @ObservableState
     public struct State: Equatable, Sendable {
         var deviceName: String
@@ -18,7 +35,10 @@ public struct AddDeviceReducer: Sendable {
         var purchaseDate: Date
         var usageRate: String
         var selectedUsageRatePeriodId: Int64
-        var currencies: [Currency]
+        
+        @SharedReader(.fetchAll(sql: "SELECT * from \(Currency.databaseTableName)", animation: .default))
+        public var currencies: [Currency]
+        
         var usageRatePeriods: [UsageRatePeriod]
         var isValid: Bool {
             !deviceName.isEmpty && 
@@ -28,12 +48,11 @@ public struct AddDeviceReducer: Sendable {
         
         public init(
             deviceName: String = "",
-            selectedCurrencyId: Int64 = Currency.usd.id!,
+            selectedCurrencyId: Int64 = 1, // Default to first currency
             purchasePrice: String = "",
             purchaseDate: Date = .now,
             usageRate: String = "",
-            selectedUsageRatePeriodId: Int64 = UsageRatePeriod.day.id!,
-            currencies: [Currency] = [.usd, .eur, .gbp],
+            selectedUsageRatePeriodId: Int64 = 1, // Default to first period (day)
             usageRatePeriods: [UsageRatePeriod] = [.day, .week, .month, .year]
         ) {
             self.deviceName = deviceName
@@ -42,7 +61,6 @@ public struct AddDeviceReducer: Sendable {
             self.purchaseDate = purchaseDate
             self.usageRate = usageRate
             self.selectedUsageRatePeriodId = selectedUsageRatePeriodId
-            self.currencies = currencies
             self.usageRatePeriods = usageRatePeriods
         }
     }
@@ -94,11 +112,13 @@ public struct AddDeviceReducer: Sendable {
                     usageRatePeriodId: state.selectedUsageRatePeriodId
                 )
                 
-                return .run { _ in
+                return .run { send in
                     try await database.write { db in
                         var device_ = device
                         _ = try device_.insert(db)
                     }
+                    await send(.delegate(.didAddDevice(device)))
+                    await dismiss()
                 }
                 
             case .delegate:

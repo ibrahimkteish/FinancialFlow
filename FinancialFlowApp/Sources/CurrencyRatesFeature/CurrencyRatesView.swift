@@ -3,25 +3,46 @@ import Models
 import ComposableArchitecture
 import SharingGRDB
 
+public struct CurrencyRateView: View {
+  @Bindable var store: StoreOf<CurrencyRatesReducer>
+
+  public init(store: StoreOf<CurrencyRatesReducer>) {
+    self.store = store
+  }
+
+  public var body: some View {
+    NavigationStack {
+      CurrencyRatesView(store: store)
+        .sheet(
+          isPresented: $store.showingAddCurrency
+        ) {
+          AddCurrencyView(store: store)
+        }
+        .onAppear {
+          store.send(.fetchCurrencyRates)
+        }
+    }
+  }
+}
+
+#Preview {
+  CurrencyRateView(
+    store: Store(
+      initialState: CurrencyRatesReducer.State()
+    ) {
+      CurrencyRatesReducer()
+    }
+  )
+}
+
+
 public struct CurrencyRatesView: View {
-    let store: StoreOf<CurrencyRatesReducer>
+    @Bindable var store: StoreOf<CurrencyRatesReducer>
     @Environment(\.dismiss) private var dismiss
     @State private var rates: [(Currency, String)] = []
-    @State private var searchText = ""
     
     public init(store: StoreOf<CurrencyRatesReducer>) {
         self.store = store
-    }
-    
-    var filteredCurrencies: [Currency] {
-        if searchText.isEmpty {
-            return store.currencies
-        } else {
-            return store.currencies.filter { 
-                $0.name.localizedCaseInsensitiveContains(searchText) || 
-                $0.code.localizedCaseInsensitiveContains(searchText)
-            }
-        }
     }
     
     public var body: some View {
@@ -45,12 +66,12 @@ public struct CurrencyRatesView: View {
                             }
                             
                             Section(header: Text("Other Currencies")) {
-                                ForEach(filteredCurrencies.filter { $0.code != "USD" }, id: \.id) { currency in
+                                ForEach(store.currencies.filter { $0.code != "USD" }, id: \.id) { currency in
                                     currencyRow(currency)
                                 }
                             }
                         }
-                        .searchable(text: $searchText, prompt: "Search currencies")
+                        .searchable(text: $store.searchTerm, prompt: "Search currencies")
                     } else {
                         // Fallback for iOS 16 and earlier
                         List {
@@ -61,14 +82,14 @@ public struct CurrencyRatesView: View {
                             }
                             
                             Section(header: Text("Other Currencies")) {
-                                ForEach(filteredCurrencies.filter { $0.code != "USD" }, id: \.id) { currency in
+                                ForEach(store.currencies.filter { $0.code != "USD" }, id: \.id) { currency in
                                     currencyRow(currency)
                                 }
                             }
                         }
                         
                         // Simple search field for iOS 16 and earlier
-                        TextField("Search currencies", text: $searchText)
+                        TextField("Search currencies", text: $store.searchTerm)
                             .padding()
                             .background(Color(.systemGray6))
                             .cornerRadius(8)
