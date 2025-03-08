@@ -53,7 +53,16 @@ public struct SettingsReducer: Sendable {
     @SharedReader(.fetchAll(sql: "SELECT * from currencies ORDER BY code = 'USD' DESC, name", animation: .default))
     public var availableCurrencies: [Currency]
 
-    public var appTheme: AppTheme = .system
+    public var appTheme: AppTheme {
+      get { 
+        AppTheme(rawValue: settingsWithCurrency.settings.themeMode) ?? .system
+      }
+      set {
+        var settings = settingsWithCurrency.settings
+        settings.themeMode = newValue.rawValue
+        settingsWithCurrency.settings = settings
+      }
+    }
 
     public var notificationsEnabled: Bool = false
 
