@@ -21,10 +21,6 @@ public struct AppSettingsWithCurrency: Equatable, Sendable {
 
 @Reducer
 public struct SettingsReducer: Sendable {
-  // Define cancellation IDs for long-running effects
-  private enum CancelID: Hashable {
-    case presentationUpdates
-  }
 
   // Define a FetchKeyRequest for settings
   public struct SettingsFetcher: FetchKeyRequest {
@@ -56,19 +52,15 @@ public struct SettingsReducer: Sendable {
     @SharedReader(.fetchAll(sql: "SELECT * from currencies ORDER BY code = 'USD' DESC, name", animation: .default))
     public var availableCurrencies: [Currency]
 
-    public var presentation: SettingsPresentation
-    public var isShowingCurrencyPicker = false
-
-    public init(settingsWithCurrency: AppSettingsWithCurrency) {
-      self._settingsWithCurrency = SharedReader.init(wrappedValue: settingsWithCurrency, .fetch(SettingsFetcher(), animation: .default))
-
-      self.presentation = SettingsPresentation(
+    public var presentation = SettingsPresentation(
         appTheme: .dark,
         notificationsEnabled: false,
         defaultCurrencyId: 0,
         defaultCurrency: .usd
       )
-    }
+    public var isShowingCurrencyPicker = false
+
+    public init() {}
   }
 
   public struct SettingsPresentation: Equatable, Sendable {
@@ -111,7 +103,6 @@ public struct SettingsReducer: Sendable {
     case setDefaultCurrency(Int64?)
     case openCurrencyRates
     case onAppear
-    case onDisappear
     case delegate(Delegate)
     case updatePresentation(AppSettingsWithCurrency)
     
@@ -176,21 +167,12 @@ public struct SettingsReducer: Sendable {
             await send(.hideCurrencyPicker)
           }
 
-        case .onAppear:
-          state.presentation.appTheme = AppTheme(rawValue: state.settingsWithCurrency.settings.themeMode) ?? .system
-          state.presentation.notificationsEnabled = state.settingsWithCurrency.settings.notificationsEnabled
-          state.presentation.defaultCurrencyId = state.settingsWithCurrency.settings.defaultCurrencyId
-          state.presentation.defaultCurrency = state.settingsWithCurrency.defaultCurrency
-          
+        case .onAppear:          
           return .run { [state] send in
             for await newValue in state.$settingsWithCurrency.publisher.values {
               await send(.updatePresentation(newValue))
             }
           }
-          .cancellable(id: CancelID.presentationUpdates)
-
-        case .onDisappear:
-          return .cancel(id: CancelID.presentationUpdates)
 
         case .openCurrencyRates:
           return .send(.delegate(.currencyRatesTapped))

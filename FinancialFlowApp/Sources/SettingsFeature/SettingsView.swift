@@ -51,11 +51,8 @@ public struct SettingsView: View {
                 Text("Currency")
             }
         }
-        .onAppear {
-            store.send(.onAppear)
-        }
-        .onDisappear {
-            store.send(.onDisappear)
+        .task {
+          await store.send(.onAppear).finish()
         }
         .navigationTitle("Settings")
     
@@ -128,7 +125,7 @@ struct CurrencyPickerView: View {
     NavigationStack {
         SettingsView(
             store: Store(
-              initialState: SettingsReducer.State(settingsWithCurrency: .init())
+              initialState: SettingsReducer.State()
             ) {
                 SettingsReducer()
             }
