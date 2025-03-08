@@ -67,11 +67,6 @@ public struct CurrencyRatesView: View {
     .navigationTitle("Currency Rates")
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
-      ToolbarItem(placement: .cancellationAction) {
-        Button("Cancel") {
-          dismiss()
-        }
-      }
       ToolbarItem(placement: .confirmationAction) {
         Button("Save") {
           let updatedCurrencies = store.currencies.map { currency in
