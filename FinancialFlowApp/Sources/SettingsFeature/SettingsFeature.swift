@@ -64,15 +64,19 @@ public struct SettingsReducer: Sendable {
       }
     }
 
-    public var notificationsEnabled: Bool = false
+    public var notificationsEnabled: Bool {
+      get { settingsWithCurrency.settings.notificationsEnabled }
+      set {
+        var settings = settingsWithCurrency.settings
+        settings.notificationsEnabled = newValue
+        settingsWithCurrency.settings = settings
+      }
+    }
 
     public var defaultCurrencyId: Int64? {
       get { settingsWithCurrency.settings.defaultCurrencyId }
     }
 
-    public var defaultCurrency: Currency? {
-      get { settingsWithCurrency.defaultCurrency }
-    }
 
     public var isShowingCurrencyPicker = false
 

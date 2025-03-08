@@ -19,7 +19,7 @@ public struct SettingsView: View {
                     }
                 }
                 
-                Toggle("Enable Notifications", isOn: $store.notificationsEnabled)
+              Toggle("Enable Notifications", isOn: $store.notificationsEnabled)
             } header: {
                 Text("Appearance")
             } footer: {
