@@ -12,14 +12,14 @@ public struct SettingsView: View {
     public var body: some View {
         Form {
             Section {
-              Picker("App Theme", selection: $store.appTheme) {
+              Picker("App Theme", selection: $store.presentation.appTheme) {
                     ForEach(SettingsReducer.AppTheme.allCases, id: \.self) { theme in
                         Text(theme.displayName)
                             .tag(theme)
                     }
                 }
                 
-              Toggle("Enable Notifications", isOn: $store.notificationsEnabled)
+              Toggle("Enable Notifications", isOn: $store.presentation.notificationsEnabled)
             } header: {
                 Text("Appearance")
             } footer: {
@@ -27,7 +27,7 @@ public struct SettingsView: View {
             }
             
             Section {
-                if let currency = store.defaultCurrency {
+                if let currency = store.presentation.defaultCurrency {
                     HStack {
                         Text("Default Currency")
                         Spacer()
@@ -51,13 +51,16 @@ public struct SettingsView: View {
                 Text("Currency")
             }
         }
+        .onAppear {
+            store.send(.onAppear)
+        }
         .navigationTitle("Settings")
     
         .sheet(isPresented: $store.isShowingCurrencyPicker) {
             NavigationStack {
                 CurrencyPickerView(
                     currencies: store.availableCurrencies,
-                    selectedCurrencyId: store.defaultCurrencyId,
+                    selectedCurrencyId: store.presentation.defaultCurrencyId,
                     onSelect: { currencyId in
                         store.send(.setDefaultCurrency(currencyId))
                     },
@@ -122,7 +125,7 @@ struct CurrencyPickerView: View {
     NavigationStack {
         SettingsView(
             store: Store(
-                initialState: SettingsReducer.State()
+              initialState: SettingsReducer.State(settingsWithCurrency: .init())
             ) {
                 SettingsReducer()
             }

@@ -28,8 +28,6 @@ public struct SettingsReducer: Sendable {
     public init() {}
 
     public func fetch(_ db: Database) throws -> AppSettingsWithCurrency {
-      print("Fetching app settings from database")
-
       // Get settings with optional currency
       let settings = try AppSettings
         .including(optional: AppSettings.defaultCurrency)
@@ -53,40 +51,37 @@ public struct SettingsReducer: Sendable {
     @SharedReader(.fetchAll(sql: "SELECT * from currencies ORDER BY code = 'USD' DESC, name", animation: .default))
     public var availableCurrencies: [Currency]
 
-    public var appTheme: AppTheme {
-      get { 
-        AppTheme(rawValue: settingsWithCurrency.settings.themeMode) ?? .system
-      }
-      set {
-        var settings = settingsWithCurrency.settings
-        settings.themeMode = newValue.rawValue
-        settingsWithCurrency = AppSettingsWithCurrency(
-          settings: settings, 
-          defaultCurrency: settingsWithCurrency.defaultCurrency
-        )
-      }
-    }
-
-    public var notificationsEnabled: Bool {
-      get { settingsWithCurrency.settings.notificationsEnabled }
-      set {
-        var settings = settingsWithCurrency.settings
-        settings.notificationsEnabled = newValue
-        settingsWithCurrency = AppSettingsWithCurrency(
-          settings: settings, 
-          defaultCurrency: settingsWithCurrency.defaultCurrency
-        )
-      }
-    }
-
-    public var defaultCurrencyId: Int64? {
-      get { settingsWithCurrency.settings.defaultCurrencyId }
-    }
-
-
+    public var presentation: SettingsPresentation
     public var isShowingCurrencyPicker = false
 
-    public init() {}
+    public init(settingsWithCurrency: AppSettingsWithCurrency) {
+      self._settingsWithCurrency = SharedReader.init(wrappedValue: settingsWithCurrency, .fetch(SettingsFetcher(), animation: .default))
+      self.presentation = SettingsPresentation(
+        appTheme: .dark,
+        notificationsEnabled: false,
+        defaultCurrencyId: 0,
+        defaultCurrency: .usd
+      )
+    }
+  }
+
+  public struct SettingsPresentation: Equatable, Sendable {
+    public var appTheme: AppTheme
+    public var notificationsEnabled: Bool
+    public var defaultCurrencyId: Int64?
+    public var defaultCurrency: Currency?
+    
+    public init(
+      appTheme: AppTheme,
+      notificationsEnabled: Bool,
+      defaultCurrencyId: Int64?,
+      defaultCurrency: Currency?
+    ) {
+      self.appTheme = appTheme
+      self.notificationsEnabled = notificationsEnabled
+      self.defaultCurrencyId = defaultCurrencyId
+      self.defaultCurrency = defaultCurrency
+    }
   }
 
   public enum AppTheme: String, CaseIterable, Equatable, Sendable {
@@ -109,6 +104,7 @@ public struct SettingsReducer: Sendable {
     case hideCurrencyPicker
     case setDefaultCurrency(Int64?)
     case openCurrencyRates
+    case onAppear
     case delegate(Delegate)
 
     @CasePathable
@@ -126,13 +122,20 @@ public struct SettingsReducer: Sendable {
     Reduce { state, action in
       switch action {
         case .binding:
-          let settings = state.settingsWithCurrency.settings
+          let appTheme = state.presentation.appTheme
+          let notificationsEnabled = state.presentation.notificationsEnabled
+          let defaultCurrencyId = state.presentation.defaultCurrencyId
+          let settings = AppSettings(
+            id: state.settingsWithCurrency.settings.id,
+            themeMode: appTheme.rawValue,
+            defaultCurrencyId: defaultCurrencyId,
+            notificationsEnabled: notificationsEnabled
+          )
+          
           return .run { _ in
             try await database.write { db in
               // Update the settings in database
-              var settingsToUpdate = settings
-              settingsToUpdate.updatedAt = Date()
-              try settingsToUpdate.update(db)
+              try settings.update(db)
             }
           }
 
@@ -161,6 +164,13 @@ public struct SettingsReducer: Sendable {
             // Hide currency picker after database update
             await send(.hideCurrencyPicker)
           }
+
+        case .onAppear:
+          state.presentation.appTheme = AppTheme(rawValue: state.settingsWithCurrency.settings.themeMode) ?? .system
+          state.presentation.notificationsEnabled = state.settingsWithCurrency.settings.notificationsEnabled
+          state.presentation.defaultCurrencyId = state.settingsWithCurrency.settings.defaultCurrencyId
+          state.presentation.defaultCurrency = state.settingsWithCurrency.defaultCurrency
+          return .none
 
         case .openCurrencyRates:
           return .send(.delegate(.currencyRatesTapped))
