@@ -3,39 +3,6 @@ import Models
 import ComposableArchitecture
 import SharingGRDB
 
-public struct CurrencyRateView: View {
-  @Bindable var store: StoreOf<CurrencyRatesReducer>
-
-  public init(store: StoreOf<CurrencyRatesReducer>) {
-    self.store = store
-  }
-
-  public var body: some View {
-    NavigationStack {
-      CurrencyRatesView(store: store)
-        .sheet(
-          isPresented: $store.showingAddCurrency
-        ) {
-          AddCurrencyView(store: store)
-        }
-        .onAppear {
-          store.send(.fetchCurrencyRates)
-        }
-    }
-  }
-}
-
-#Preview {
-  CurrencyRateView(
-    store: Store(
-      initialState: CurrencyRatesReducer.State()
-    ) {
-      CurrencyRatesReducer()
-    }
-  )
-}
-
-
 public struct CurrencyRatesView: View {
     @Bindable var store: StoreOf<CurrencyRatesReducer>
     @Environment(\.dismiss) private var dismiss
@@ -98,6 +65,14 @@ public struct CurrencyRatesView: View {
                 }
             }
         }
+        .sheet(
+          isPresented: $store.showingAddCurrency
+        ) {
+          AddCurrencyView(store: store)
+        }
+        .onAppear {
+          store.send(.fetchCurrencyRates)
+        }
         .navigationTitle("Currency Rates")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -117,10 +92,7 @@ public struct CurrencyRatesView: View {
                         }
                         return currency
                     }
-                    Task {
-                        await store.send(.updateCurrencyRates(updatedCurrencies))
-                        dismiss()
-                    }
+                        store.send(.updateCurrencyRates(updatedCurrencies))
                 }
             }
             
@@ -132,9 +104,6 @@ public struct CurrencyRatesView: View {
                     Image(systemName: "plus")
                 }
             }
-        }
-        .task {
-            await store.send(.fetchCurrencyRates)
         }
     }
     

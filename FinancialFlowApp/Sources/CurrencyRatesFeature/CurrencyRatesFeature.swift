@@ -4,37 +4,37 @@ import SharingGRDB
 
 @Reducer
 public struct CurrencyRatesReducer: Sendable {
-
-@Reducer(state: .sendable, .equatable, action: .sendable, .equatable)
-public enum Destination: Equatable, Sendable {
-  case alert(AlertState<Alert>)
-
-  @CasePathable
+  
+  @Reducer(state: .sendable, .equatable, action: .sendable, .equatable)
+  public enum Destination: Equatable, Sendable {
+    case alert(AlertState<Alert>)
+    
+    @CasePathable
     public enum Alert: Equatable, Sendable {
       case alertButtonTapped
     }
-}
-
+  }
+  
   // Define a FetchKeyRequest for currencies with filtering
   public struct CurrencyFetcher: FetchKeyRequest {
     public typealias State = [Currency]
-
+    
     public let searchTerm: String
-
+    
     public init(searchTerm: String = "") {
       self.searchTerm = searchTerm
     }
-
+    
     public func fetch(_ db: Database) throws -> [Currency] {
       print("Fetching currencies from database with search term: \(searchTerm)")
-
+      
       // If searchTerm is empty, fetch all currencies
       if searchTerm.isEmpty {
         let result = try Currency.fetchAll(db)
         print("Fetched \(result.count) currencies")
         return result
       }
-
+      
       // Otherwise, filter currencies at the database level
       // This uses SQL LIKE for case-insensitive prefix/contains matching
       let lowercaseSearch = searchTerm.lowercased()
@@ -45,30 +45,30 @@ public enum Destination: Equatable, Sendable {
                 ORDER BY code = 'USD' DESC, name
             """
       let pattern = "%\(lowercaseSearch)%"
-
+      
       let result = try Currency.fetchAll(db, sql: sql, arguments: [pattern, pattern])
       print("Fetched \(result.count) filtered currencies")
       return result
     }
   }
-
+  
   @ObservableState
   public struct State: Equatable, Sendable {
     @Presents
     var destination: Destination.State?
-
+    
     @Shared(.inMemory("currency_search"))
     var searchTerm: String = ""
-
+    
     @SharedReader(.fetch(CurrencyFetcher()))
     public var currencies: [Currency]
-
+    
     public var showingAddCurrency = false
     public var isEditing = false
-
+    
     public init() {}
   }
-
+  
   public enum Action: Equatable, BindableAction {
     case binding(BindingAction<State>)
     case destination(PresentationAction<Destination.Action>)
@@ -80,31 +80,32 @@ public enum Destination: Equatable, Sendable {
     case deleteCurrency(Int64)
     case showAlert(String)
   }
-
+  
   @Dependency(\.defaultDatabase) var database
-
+  @Dependency(\.dismiss) var dismiss
+  
   public init() {}
-
+  
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
       switch action {
-
+          
         case .binding(\.searchTerm):
           let newFilterTerm = state.searchTerm
           return .run { [state] _ in
             try await state.$currencies.load(.fetch(CurrencyFetcher(searchTerm: newFilterTerm)))
           }
-
+          
         case .binding:
           return .none
         case .fetchCurrencyRates:
           return .run { [state] _ in
             try await state.$currencies.load(.fetch(CurrencyFetcher(searchTerm: state.searchTerm)))
           }
-
+          
         case let .updateCurrencyRates(rates):
-          return .run { _ in
+          return .concatenate(.run { _ in
             try await database.write { db in
               for rate in rates {
                 if var currency = try Currency.fetchOne(db, key: ["id": rate.id!]) {
@@ -114,16 +115,18 @@ public enum Destination: Equatable, Sendable {
               }
             }
             // No need to call fetchCurrencyRates as SharedReader will auto-update
-          }
-
+          },
+                              .run { _ in await dismiss() }
+          )
+          
         case .addCurrencyButtonTapped:
           state.showingAddCurrency = true
           return .none
-
+          
         case .addCurrencyCancelled:
           state.showingAddCurrency = false
           return .none
-
+          
         case let .addCurrencySaved(currency):
           state.showingAddCurrency = false
           return .run { _ in
@@ -132,7 +135,7 @@ public enum Destination: Equatable, Sendable {
             }
             // No need to call fetchCurrencyRates as SharedReader will auto-update
           }
-
+          
         case let .showAlert(message):
           state.destination = .alert(AlertState {
             TextState(message)
@@ -142,15 +145,15 @@ public enum Destination: Equatable, Sendable {
             }
           })
           return .none
-
+          
         case let .deleteCurrency(id):
           return .run { send in
             do {
               // First check if this is the default currency in a read transaction
               let isDefault = try await database.read { db in
                 return try Row.fetchOne(db, 
-                  sql: "SELECT 1 FROM app_settings WHERE defaultCurrencyId = ?", 
-                  arguments: [id]) != nil
+                                        sql: "SELECT 1 FROM app_settings WHERE defaultCurrencyId = ?", 
+                                        arguments: [id]) != nil
               }
               
               // If it's the default currency, don't proceed with deletion but show alert
@@ -169,7 +172,7 @@ public enum Destination: Equatable, Sendable {
               await send(.showAlert("Error deleting currency: \(error.localizedDescription)"))
             }
           }
-
+          
         case .destination:
           return .none
       }
