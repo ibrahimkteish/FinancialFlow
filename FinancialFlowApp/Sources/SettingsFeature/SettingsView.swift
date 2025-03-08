@@ -43,6 +43,10 @@ public struct SettingsView: View {
                         store.send(.showCurrencyPicker)
                     }
                 }
+                
+                Button("View Currency Rates") {
+                    store.send(.openCurrencyRates)
+                }
             } header: {
                 Text("Currency")
             }

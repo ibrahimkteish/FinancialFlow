@@ -89,6 +89,13 @@ public struct SettingsReducer: Sendable {
     case showCurrencyPicker
     case hideCurrencyPicker
     case setDefaultCurrency(Int64?)
+    case openCurrencyRates
+    case delegate(Delegate)
+
+    @CasePathable
+    public enum Delegate: Equatable, Sendable {
+      case currencyRatesTapped
+    }
   }
 
   @Dependency(\.defaultDatabase) var database
@@ -109,6 +116,9 @@ public struct SettingsReducer: Sendable {
               try settingsToUpdate.update(db)
             }
           }
+
+        case .delegate:
+          return .none
 
         case .showCurrencyPicker:
           state.isShowingCurrencyPicker = true
@@ -132,6 +142,9 @@ public struct SettingsReducer: Sendable {
             // Hide currency picker after database update
             await send(.hideCurrencyPicker)
           }
+
+        case .openCurrencyRates:
+          return .send(.delegate(.currencyRatesTapped))
       }
     }
   }

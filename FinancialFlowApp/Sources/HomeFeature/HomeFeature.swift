@@ -29,13 +29,13 @@ public struct HomeReducer: Sendable {
   @Reducer(state: .equatable, .sendable, action: .equatable, .sendable)
   public enum Path {
     case settings(SettingsReducer)
+    case currencyRates(CurrencyRatesReducer)
   }
 
   @Reducer(state: .equatable, .sendable, action: .equatable, .sendable)
   public enum Destination {
     case addDevice(AddDeviceReducer)
     case analytics(Analytics)
-    case currencyRate(CurrencyRatesReducer)
   }
 
   @ObservableState
@@ -145,7 +145,6 @@ public struct HomeReducer: Sendable {
     case addDeviceButtonTapped
     case binding(BindingAction<State>)
     case cancelAddDeviceButtonTapped
-    case currencyRatesButtonTapped
     case destination(PresentationAction<Destination.Action>)
     case onAppear
     case onSortChanged(Ordering)
@@ -173,10 +172,6 @@ public struct HomeReducer: Sendable {
           state.destination = .analytics(Analytics.State())
           return .none
 
-        case .currencyRatesButtonTapped:
-          state.destination = .currencyRate(CurrencyRatesReducer.State())
-          return .none
-
         case .cancelAddDeviceButtonTapped:
           state.destination = nil
           return .none
@@ -196,6 +191,12 @@ public struct HomeReducer: Sendable {
           return .run { [state] _ in
             try await state.$devices.load(.fetch(HomeReducer.Items(ordering: state.ordering)))
           }
+        case let .path(.element(id: _, action: .settings(.delegate(delAction)))):
+          switch delAction {
+            case .currencyRatesTapped:
+              state.path.append(.currencyRates(CurrencyRatesReducer.State()))
+          }
+          return .none
 
         case .path:
           return .none

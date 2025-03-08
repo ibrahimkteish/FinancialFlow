@@ -55,12 +55,6 @@ public struct HomeView: View {
               
               ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
-                  store.send(.currencyRatesButtonTapped)
-                } label: {
-                  Image(systemName: "dollarsign.arrow.circlepath")
-                }
-
-                Button {
                   store.send(.analyticsButtonTapped)
                 } label: {
                   Image(systemName: "chart.bar.fill")
@@ -90,16 +84,13 @@ public struct HomeView: View {
                     AnalyticsView(store: store)
                 }
             }
-            .sheet(
-                item: self.$store.scope(state: \.destination?.currencyRate, action: \.destination.currencyRate)
-            ) { store in
-                CurrencyRateView(store: store)
-            }
             .navigationTitle("Items \(self.store.count.map { $0.totalDailyCost.formatted(.currency(code: $0.currencyCode)) } ?? "")")
       } destination: { store in
         switch store.case {
           case let .settings(store):
             SettingsView(store: store)
+          case let .currencyRates(store):
+            CurrencyRatesView(store: store)
         }
       }
     }
