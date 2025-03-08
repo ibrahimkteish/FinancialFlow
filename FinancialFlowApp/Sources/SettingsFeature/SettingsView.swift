@@ -54,6 +54,9 @@ public struct SettingsView: View {
         .onAppear {
             store.send(.onAppear)
         }
+        .onDisappear {
+            store.send(.onDisappear)
+        }
         .navigationTitle("Settings")
     
         .sheet(isPresented: $store.isShowingCurrencyPicker) {

@@ -21,6 +21,11 @@ public struct AppSettingsWithCurrency: Equatable, Sendable {
 
 @Reducer
 public struct SettingsReducer: Sendable {
+  // Define cancellation IDs for long-running effects
+  private enum CancelID: Hashable {
+    case presentationUpdates
+  }
+
   // Define a FetchKeyRequest for settings
   public struct SettingsFetcher: FetchKeyRequest {
     public typealias State = AppSettingsWithCurrency
@@ -56,6 +61,7 @@ public struct SettingsReducer: Sendable {
 
     public init(settingsWithCurrency: AppSettingsWithCurrency) {
       self._settingsWithCurrency = SharedReader.init(wrappedValue: settingsWithCurrency, .fetch(SettingsFetcher(), animation: .default))
+
       self.presentation = SettingsPresentation(
         appTheme: .dark,
         notificationsEnabled: false,
@@ -105,8 +111,10 @@ public struct SettingsReducer: Sendable {
     case setDefaultCurrency(Int64?)
     case openCurrencyRates
     case onAppear
+    case onDisappear
     case delegate(Delegate)
-
+    case updatePresentation(AppSettingsWithCurrency)
+    
     @CasePathable
     public enum Delegate: Equatable, Sendable {
       case currencyRatesTapped
@@ -173,10 +181,26 @@ public struct SettingsReducer: Sendable {
           state.presentation.notificationsEnabled = state.settingsWithCurrency.settings.notificationsEnabled
           state.presentation.defaultCurrencyId = state.settingsWithCurrency.settings.defaultCurrencyId
           state.presentation.defaultCurrency = state.settingsWithCurrency.defaultCurrency
-          return .none
+          
+          return .run { [state] send in
+            for await newValue in state.$settingsWithCurrency.publisher.values {
+              await send(.updatePresentation(newValue))
+            }
+          }
+          .cancellable(id: CancelID.presentationUpdates)
+
+        case .onDisappear:
+          return .cancel(id: CancelID.presentationUpdates)
 
         case .openCurrencyRates:
           return .send(.delegate(.currencyRatesTapped))
+
+        case let .updatePresentation(newValue):
+          state.presentation.appTheme = AppTheme(rawValue: newValue.settings.themeMode) ?? .system
+          state.presentation.notificationsEnabled = newValue.settings.notificationsEnabled
+          state.presentation.defaultCurrencyId = newValue.settings.defaultCurrencyId
+          state.presentation.defaultCurrency = newValue.defaultCurrency
+          return .none
       }
     }
   }
