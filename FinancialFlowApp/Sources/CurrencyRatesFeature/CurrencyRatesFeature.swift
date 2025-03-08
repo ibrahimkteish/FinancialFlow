@@ -120,8 +120,28 @@ public struct CurrencyRatesReducer: Sendable {
 
         case let .deleteCurrency(id):
           return .run { send in
-            try await database.write { db in
-              _ = try Currency.deleteOne(db, key: ["id": id])
+            do {
+              try await database.write { db in
+                // Check if this is the default currency
+                let isDefault = try Row.fetchOne(db, 
+                  sql: "SELECT 1 FROM app_settings WHERE defaultCurrencyId = ?", 
+                  arguments: [id]) != nil
+                
+                if isDefault {
+                  // If it's the default currency, throw an error
+                  throw NSError(
+                    domain: "com.financialflow.error",
+                    code: 1001,
+                    userInfo: [NSLocalizedDescriptionKey: "Cannot delete the default currency. Change the default currency in Settings first."]
+                  )
+                }
+                
+                // If it's not the default currency, proceed with deletion
+                _ = try Currency.deleteOne(db, key: ["id": id])
+              }
+            } catch {
+              print("Error deleting currency: \(error.localizedDescription)")
+              // You could send an error action here if you want to display the error to the user
             }
           }
       }

@@ -123,6 +123,34 @@ public struct Currency: Equatable, Codable, FetchableRecord, PersistableRecord, 
     }
 }
 
+public struct AppSettings: Equatable, Codable, FetchableRecord, PersistableRecord, Sendable {
+    public static let databaseTableName = "app_settings"
+    
+    public var id: Int64?
+    public var themeMode: String // "light", "dark", "system"
+    public var defaultCurrencyId: Int64?
+    public var notificationsEnabled: Bool
+    public var updatedAt: Date
+    
+    public init(
+        id: Int64? = nil,
+        themeMode: String = "system",
+        defaultCurrencyId: Int64? = nil,
+        notificationsEnabled: Bool = true,
+        updatedAt: Date = Date()
+    ) {
+        self.id = id
+        self.themeMode = themeMode
+        self.defaultCurrencyId = defaultCurrencyId
+        self.notificationsEnabled = notificationsEnabled
+        self.updatedAt = updatedAt
+    }
+}
+
+extension AppSettings {
+    public static let defaultCurrency = belongsTo(Currency.self, using: ForeignKey(["defaultCurrencyId"]))
+}
+
 #if DEBUG
 extension Currency {
     public static let usd = Currency(id: 1, code: "USD", symbol: "$", name: "US Dollar", usdRate: 1.0)
@@ -286,6 +314,35 @@ extension DatabaseWriter where Self == DatabaseQueue {
                 INSERT INTO currencies (code, symbol, name, usdRate) 
                 VALUES ('AUD', 'A$', 'Australian Dollar', 0.66)
                 """)
+        }
+
+        migrator.registerMigration("Create \(AppSettings.databaseTableName) table") { db in
+            try db.create(table: AppSettings.databaseTableName) { tableau in
+                tableau.autoIncrementedPrimaryKey("id")
+                tableau.column("themeMode", .text).notNull().defaults(to: "system")
+                tableau.column("defaultCurrencyId", .integer)
+                    .references(Currency.databaseTableName, onDelete: .restrict)
+                tableau.column("notificationsEnabled", .boolean).notNull().defaults(to: true)
+                tableau.column("updatedAt", .datetime).notNull()
+            }
+            
+            // Insert default settings
+            try AppSettings(
+                themeMode: "system",
+                defaultCurrencyId: 1, // Default to USD
+                notificationsEnabled: true
+            ).insert(db)
+            
+            // Create a trigger to prevent deleting a currency if it's set as the default
+            try db.execute(sql: """
+                CREATE TRIGGER prevent_default_currency_deletion
+                BEFORE DELETE ON \(Currency.databaseTableName)
+                FOR EACH ROW
+                WHEN EXISTS (SELECT 1 FROM \(AppSettings.databaseTableName) WHERE defaultCurrencyId = OLD.id)
+                BEGIN
+                    SELECT RAISE(ABORT, 'Cannot delete a currency that is set as default. Change the default currency first.');
+                END;
+            """)
         }
 
         migrator.insertSampleData()
