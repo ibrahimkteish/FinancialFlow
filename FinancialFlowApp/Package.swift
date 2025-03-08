@@ -74,6 +74,7 @@ let package = Package(
                 "CurrencyRatesFeature",
                 "Models",
                 "Utils",
+                "SettingsFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "GRDB", package: "GRDB.swift"),
             ]

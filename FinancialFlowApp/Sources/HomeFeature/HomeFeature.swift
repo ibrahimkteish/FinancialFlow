@@ -11,6 +11,7 @@ import SharingGRDB
 import AddDeviceFeature
 import AnalyticsFeature
 import CurrencyRatesFeature
+import SettingsFeature
 
 public struct CurrencyCost: FetchableRecord, Decodable, Equatable, Sendable {
   let currencyCode: String
