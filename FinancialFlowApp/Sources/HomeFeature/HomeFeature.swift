@@ -119,21 +119,48 @@ public struct HomeReducer: Sendable {
     public typealias State = CurrencyCost?
 
     public func fetch(_ db: Database) throws -> State {
-      // Use raw SQL to join the tables
-      let sql =
-             """
-             SELECT 
-                 c.code AS currency_code,
-                 SUM(d.usageRate * c.usdRate / urp.daysMultiplier) AS total_daily_cost
-             FROM devices d
-             JOIN currencies c ON d.currencyId = c.id
-             JOIN usage_rate_periods urp ON d.usageRatePeriodId = urp.id
-             GROUP BY c.code;
-             """
+      // First get the default currency from settings
+      let settingsRow = try Row.fetchOne(db, sql: "SELECT defaultCurrencyId FROM app_settings LIMIT 1")
+      
+      // If no default currency is set, fall back to USD
+      let defaultCurrencyId: Int64
+      if let settingsCurrencyId = settingsRow?["defaultCurrencyId"] as? Int64 {
+        defaultCurrencyId = settingsCurrencyId
+      } else {
+        // Find USD as fallback
+        let usdRow = try Row.fetchOne(db, sql: "SELECT id FROM currencies WHERE code = 'USD' LIMIT 1")
+        defaultCurrencyId = usdRow?["id"] as? Int64 ?? 1 // Fallback to ID 1 if USD not found
+      }
+      
+      // Get the default currency code and conversion rate
+      let defaultCurrency = try Currency.fetchOne(db, key: defaultCurrencyId)
+      
+      // Use raw SQL to join the tables and convert all costs to the default currency
+      let sql = """
+          WITH default_currency AS (
+              SELECT code, usdRate 
+              FROM currencies 
+              WHERE id = ?
+          )
+          SELECT 
+              dc.code AS currency_code,
+              SUM(
+                  CASE
+                      -- Convert to default currency through USD as the common denominator
+                      WHEN c.id != ? THEN d.usageRate * (c.usdRate / dc.usdRate) / urp.daysMultiplier
+                      ELSE d.usageRate / urp.daysMultiplier
+                  END
+              ) AS total_daily_cost
+          FROM devices d
+          JOIN currencies c ON d.currencyId = c.id
+          JOIN usage_rate_periods urp ON d.usageRatePeriodId = urp.id,
+          default_currency dc
+          GROUP BY dc.code;
+      """
 
       // Execute the query and map results
-      return try Row.fetchOne(db, sql: sql).map { row in
-        let currencyCode: String = row["currency_code"]
+      return try Row.fetchOne(db, sql: sql, arguments: [defaultCurrencyId, defaultCurrencyId]).map { row in
+        let currencyCode: String = row["currency_code"] 
         let totalDailyCost: Double = row["total_daily_cost"]
         return .init(currencyCode: currencyCode, totalDailyCost: totalDailyCost)
       }
