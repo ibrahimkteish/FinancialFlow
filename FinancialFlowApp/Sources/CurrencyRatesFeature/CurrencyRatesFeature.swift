@@ -2,9 +2,9 @@ import SwiftUI
 import ComposableArchitecture
 
 public struct CurrencyRateView: View {
-    @Bindable var store: StoreOf<CurrencyRateReducer>
-    
-    public init(store: StoreOf<CurrencyRateReducer>) {
+    @Bindable var store: StoreOf<CurrencyRatesReducer>
+
+    public init(store: StoreOf<CurrencyRatesReducer>) {
         self.store = store
     }
     
@@ -26,9 +26,9 @@ public struct CurrencyRateView: View {
 #Preview {
     CurrencyRateView(
         store: Store(
-            initialState: CurrencyRateReducer.State()
+            initialState: CurrencyRatesReducer.State()
         ) {
-            CurrencyRateReducer()
+            CurrencyRatesReducer()
         }
     )
 } 

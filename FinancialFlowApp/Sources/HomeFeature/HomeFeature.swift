@@ -29,7 +29,7 @@ public struct HomeReducer: Sendable {
   public enum Destination {
     case addDevice(AddDeviceReducer)
     case analytics(Analytics)
-    case currencyRate(CurrencyRateReducer)
+    case currencyRate(CurrencyRatesReducer)
   }
 
   @ObservableState
@@ -164,7 +164,7 @@ public struct HomeReducer: Sendable {
           return .none
 
         case .currencyRatesButtonTapped:
-          state.destination = .currencyRate(CurrencyRateReducer.State())
+          state.destination = .currencyRate(CurrencyRatesReducer.State())
           return .none
 
         case .cancelAddDeviceButtonTapped:

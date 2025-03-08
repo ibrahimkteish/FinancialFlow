@@ -3,23 +3,31 @@ import Models
 import SharingGRDB
 
 @Reducer
-public struct CurrencyRateReducer: Sendable {
+public struct CurrencyRatesReducer: Sendable {
+
+    // Define a FetchKeyRequest for currencies
+    public struct CurrencyFetcher: FetchKeyRequest {
+        public typealias State = [Currency]
+        
+        public func fetch(_ db: Database) throws -> State {
+            let result = try Currency.fetchAll(db)
+            return result
+        }
+    }
     
     @ObservableState
     public struct State: Equatable, Sendable {
-        public var currencies: [Currency] = []
+        @SharedReader(.fetch(CurrencyFetcher()))
+        public var currencies: [Currency]
         public var showingAddCurrency = false
         public var isEditing = false
         
-        public init(currencies: [Currency] = []) {
-            self.currencies = currencies
-        }
+        public init() {}
     }
     
     public enum Action: Equatable, BindableAction {
         case binding(BindingAction<State>)
         case fetchCurrencyRates
-        case currencyRatesResponse([Currency])
         case updateCurrencyRates([Currency])
         case addCurrencyButtonTapped
         case addCurrencyCancelled
@@ -37,25 +45,11 @@ public struct CurrencyRateReducer: Sendable {
             switch action {
             case .binding:
                 return Effect<Action>.none
-                
+
             case .fetchCurrencyRates:
-                return .run { send in
-                    do {
-                        let currencies = try await database.read { db in
-                            print("Fetching currencies from database...")
-                            return try Currency.fetchAll(db)
-                        }
-                        print("Fetched \(currencies.count) currencies")
-                        await send(.currencyRatesResponse(currencies))
-                    } catch {
-                        print("Error fetching currencies: \(error)")
-                    }
+                return .run { [state] _ in
+                  try await state.$currencies.load(.fetch(CurrencyRatesReducer.CurrencyFetcher()))
                 }
-                
-            case let .currencyRatesResponse(currencies):
-                print("Setting currencies in state: \(currencies.count)")
-                state.currencies = currencies
-                return .none
                 
             case let .updateCurrencyRates(rates):
                 return .run { send in
@@ -84,15 +78,13 @@ public struct CurrencyRateReducer: Sendable {
                     try await database.write { db in
                         _ = try currency.inserted(db)
                     }
-                    await send(.fetchCurrencyRates)
                 }
                 
             case let .deleteCurrency(id):
                 return .run { send in
-                    try await database.write { db in
-//                        try Currency.deleteOne(db, id: id)
-                    }
-                    await send(.fetchCurrencyRates)
+//                    try await database.write { db in
+//                      try Currency.deleteOne(db, key: id)
+//                    }
                 }
             }
         }

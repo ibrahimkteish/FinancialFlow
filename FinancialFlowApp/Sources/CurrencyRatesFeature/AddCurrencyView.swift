@@ -3,7 +3,7 @@ import Models
 import ComposableArchitecture
 
 public struct AddCurrencyView: View {
-    let store: StoreOf<CurrencyRateReducer>
+    let store: StoreOf<CurrencyRatesReducer>
     @Environment(\.dismiss) private var dismiss
     
     @State private var code = ""
@@ -11,7 +11,7 @@ public struct AddCurrencyView: View {
     @State private var name = ""
     @State private var usdRate = ""
     
-    public init(store: StoreOf<CurrencyRateReducer>) {
+    public init(store: StoreOf<CurrencyRatesReducer>) {
         self.store = store
     }
     
@@ -76,9 +76,9 @@ public struct AddCurrencyView: View {
 #Preview {
     AddCurrencyView(
         store: Store(
-            initialState: CurrencyRateReducer.State()
+            initialState: CurrencyRatesReducer.State()
         ) {
-            CurrencyRateReducer()
+            CurrencyRatesReducer()
         }
     )
 } 

@@ -4,12 +4,12 @@ import ComposableArchitecture
 import SharingGRDB
 
 public struct CurrencyRatesView: View {
-    let store: StoreOf<CurrencyRateReducer>
+    let store: StoreOf<CurrencyRatesReducer>
     @Environment(\.dismiss) private var dismiss
     @State private var rates: [(Currency, String)] = []
     @State private var searchText = ""
     
-    public init(store: StoreOf<CurrencyRateReducer>) {
+    public init(store: StoreOf<CurrencyRatesReducer>) {
         self.store = store
     }
     
@@ -177,9 +177,9 @@ public struct CurrencyRatesView: View {
 #Preview {
     CurrencyRatesView(
         store: Store(
-            initialState: CurrencyRateReducer.State()
+            initialState: CurrencyRatesReducer.State()
         ) {
-            CurrencyRateReducer()
+            CurrencyRatesReducer()
         }
     )
 } 
