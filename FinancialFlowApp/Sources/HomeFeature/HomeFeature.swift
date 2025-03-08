@@ -26,6 +26,11 @@ public struct CurrencyCost: FetchableRecord, Decodable, Equatable, Sendable {
 public struct HomeReducer: Sendable {
 
   @Reducer(state: .equatable, .sendable, action: .equatable, .sendable)
+  public enum Path {
+    case settings(SettingsReducer)
+  }
+
+  @Reducer(state: .equatable, .sendable, action: .equatable, .sendable)
   public enum Destination {
     case addDevice(AddDeviceReducer)
     case analytics(Analytics)
@@ -44,7 +49,9 @@ public struct HomeReducer: Sendable {
     var ordering: Ordering = .created
     @SharedReader(.fetch(Aggregate()))
     public var count: CurrencyCost? = nil
-    
+
+    var path = StackState<Path.State>()
+
     public init() {}
   }
 
@@ -133,15 +140,17 @@ public struct HomeReducer: Sendable {
   }
 
   public enum Action: Equatable, BindableAction {
-    case binding(BindingAction<State>)
-    case addDeviceButtonTapped
     case analyticsButtonTapped
-    case currencyRatesButtonTapped
+    case addDeviceButtonTapped
+    case binding(BindingAction<State>)
     case cancelAddDeviceButtonTapped
+    case currencyRatesButtonTapped
     case destination(PresentationAction<Destination.Action>)
-    case removeDevice(Int64)
     case onAppear
     case onSortChanged(Ordering)
+    case path(StackAction<Path.State, Path.Action>)
+    case removeDevice(Int64)
+    case settingsButtonTapped
     case submitButtonTapped
   }
 
@@ -187,6 +196,13 @@ public struct HomeReducer: Sendable {
             try await state.$devices.load(.fetch(HomeReducer.Items(ordering: state.ordering)))
           }
 
+        case .path:
+          return .none
+          
+        case .settingsButtonTapped:
+          state.path.append(.settings(SettingsReducer.State()))
+          return .none
+
         case .submitButtonTapped:
           state.destination = nil
           return .none
@@ -196,5 +212,6 @@ public struct HomeReducer: Sendable {
       }
     }
     .ifLet(\.$destination, action: \.destination)
+    .forEach(\.path, action: \.path)
   }
 }
