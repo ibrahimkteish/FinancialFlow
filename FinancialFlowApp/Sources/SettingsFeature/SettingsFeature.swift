@@ -121,7 +121,7 @@ public struct SettingsReducer: Sendable {
     BindingReducer()
     Reduce { state, action in
       switch action {
-        case .binding:
+        case .binding(\.presentation):
           let appTheme = state.presentation.appTheme
           let notificationsEnabled = state.presentation.notificationsEnabled
           let defaultCurrencyId = state.presentation.defaultCurrencyId
@@ -138,6 +138,9 @@ public struct SettingsReducer: Sendable {
               try settings.update(db)
             }
           }
+
+        case .binding:
+          return .none
 
         case .delegate:
           return .none

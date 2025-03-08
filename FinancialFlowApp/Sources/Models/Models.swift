@@ -344,6 +344,30 @@ extension DatabaseWriter where Self == DatabaseQueue {
                 END;
             """)
         }
+        
+        // migrate make default currency id not nullable
+      migrator.registerMigration("Make defaultCurrencyId non-nullable") { db in
+        try db.create(table: "\(AppSettings.databaseTableName)_new") { table in
+          table.autoIncrementedPrimaryKey("id")
+          table.column("themeMode", .text).notNull().defaults(to: "system")
+          table.column("defaultCurrencyId", .integer).notNull()
+            .references(Currency.databaseTableName, onDelete: .restrict)
+          table.column("notificationsEnabled", .boolean).notNull().defaults(to: true)
+          table.column("updatedAt", .datetime).notNull()
+        }
+
+        // Copy data, setting a default value for `defaultCurrencyId` if necessary
+        try db.execute(sql: """
+        INSERT INTO \(AppSettings.databaseTableName)_new (id, themeMode, defaultCurrencyId, notificationsEnabled, updatedAt)
+        SELECT id, themeMode, COALESCE(defaultCurrencyId, 1), notificationsEnabled, updatedAt FROM \(AppSettings.databaseTableName)
+    """)
+
+        // Drop old table
+        try db.execute(sql: "DROP TABLE \(AppSettings.databaseTableName)")
+
+        // Rename new table to match original
+        try db.execute(sql: "ALTER TABLE \(AppSettings.databaseTableName)_new RENAME TO \(AppSettings.databaseTableName)")
+      }
 
         migrator.insertSampleData()
 

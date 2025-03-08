@@ -53,6 +53,9 @@ public struct HomeReducer: Sendable {
 
     var path = StackState<Path.State>()
 
+    @SharedReader(.fetch(SettingsReducer.SettingsFetcher()))
+    public var settingsWithCurrency: AppSettingsWithCurrency = .init()
+
     public init() {}
   }
 
@@ -202,7 +205,7 @@ public struct HomeReducer: Sendable {
           return .none
           
         case .settingsButtonTapped:
-          state.path.append(.settings(SettingsReducer.State()))
+          state.path.append(.settings(SettingsReducer.State(settingsWithCurrency: state.settingsWithCurrency)))
           return .none
 
         case .submitButtonTapped:
