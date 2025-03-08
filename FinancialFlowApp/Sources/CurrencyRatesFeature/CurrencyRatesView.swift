@@ -13,54 +13,86 @@ public struct CurrencyRatesView: View {
     }
     
     public var body: some View {
-        Group {
-            if store.currencies.isEmpty {
-                VStack {
-                    Text("Loading currencies...")
-                        .foregroundColor(.secondary)
-                    ProgressView()
-                        .padding()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                VStack {
-                    if #available(iOS 17.0, *) {
-                        List {
-                            Section(header: Text("Base Currency")) {
-                                if let usdCurrency = store.currencies.first(where: { $0.code == "USD" }) {
-                                    currencyRow(usdCurrency)
+        VStack {
+            if #available(iOS 17.0, *) {
+                List {
+                    if store.currencies.isEmpty {
+                        Section {
+                            HStack {
+                                Spacer()
+                                VStack {
+                                    Text("Loading currencies...")
+                                        .foregroundColor(.secondary)
+                                    ProgressView()
+                                        .padding()
                                 }
-                            }
-                            
-                            Section(header: Text("Other Currencies")) {
-                                ForEach(store.currencies.filter { $0.code != "USD" }, id: \.id) { currency in
-                                    currencyRow(currency)
-                                }
+                                Spacer()
                             }
                         }
-                        .searchable(text: $store.searchTerm, prompt: "Search currencies")
                     } else {
-                        // Fallback for iOS 16 and earlier
-                        List {
+                        Section(header: Text("Base Currency")) {
                             if let usdCurrency = store.currencies.first(where: { $0.code == "USD" }) {
-                                Section(header: Text("Base Currency")) {
-                                    currencyRow(usdCurrency)
-                                }
-                            }
-                            
-                            Section(header: Text("Other Currencies")) {
-                                ForEach(store.currencies.filter { $0.code != "USD" }, id: \.id) { currency in
-                                    currencyRow(currency)
-                                }
+                                currencyRow(usdCurrency)
                             }
                         }
                         
-                        // Simple search field for iOS 16 and earlier
-                        TextField("Search currencies", text: $store.searchTerm)
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(8)
-                            .padding(.horizontal)
+                        Section(header: Text("Other Currencies")) {
+                            if filteredCurrencies.filter({ $0.code != "USD" }).isEmpty && !store.searchTerm.isEmpty {
+                                Text("No currencies match your search")
+                                    .foregroundColor(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                                    .padding()
+                            } else {
+                                ForEach(filteredCurrencies.filter { $0.code != "USD" }, id: \.id) { currency in
+                                    currencyRow(currency)
+                                }
+                            }
+                        }
+                    }
+                }
+                .searchable(text: $store.searchTerm, prompt: "Search currencies")
+            } else {
+                // Fallback for iOS 16 and earlier
+                // Simple search field for iOS 16 and earlier
+                TextField("Search currencies", text: $store.searchTerm)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+                    .padding(.horizontal)
+                
+                List {
+                    if store.currencies.isEmpty {
+                        Section {
+                            HStack {
+                                Spacer()
+                                VStack {
+                                    Text("Loading currencies...")
+                                        .foregroundColor(.secondary)
+                                    ProgressView()
+                                        .padding()
+                                }
+                                Spacer()
+                            }
+                        }
+                    } else {
+                        if let usdCurrency = store.currencies.first(where: { $0.code == "USD" }) {
+                            Section(header: Text("Base Currency")) {
+                                currencyRow(usdCurrency)
+                            }
+                        }
+                        
+                        Section(header: Text("Other Currencies")) {
+                            if filteredCurrencies.filter({ $0.code != "USD" }).isEmpty && !store.searchTerm.isEmpty {
+                                Text("No currencies match your search")
+                                    .foregroundColor(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                                    .padding()
+                            } else {
+                                ForEach(filteredCurrencies.filter { $0.code != "USD" }, id: \.id) { currency in
+                                    currencyRow(currency)
+                                }
+                            }
+                        }
                     }
                 }
             }
