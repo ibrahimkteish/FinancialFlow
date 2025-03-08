@@ -62,6 +62,9 @@ public struct CurrencyRatesReducer: Sendable {
 
     @SharedReader(.fetch(CurrencyFetcher()))
     public var currencies: [Currency]
+    
+    @SharedReader(.fetchOne(sql: "SELECT COUNT(*) FROM currencies"))
+    public var totalCurrenciesCount: Int = 0
 
     public var showingAddCurrency = false
     public var isEditing = false

@@ -16,18 +16,30 @@ public struct CurrencyRatesView: View {
     VStack {
       List {
         if store.currencies.isEmpty {
-          Section {
-            HStack {
-              Spacer()
-              VStack {
-                Text("Loading currencies...")
-                  .foregroundColor(.secondary)
-                ProgressView()
-                  .padding()
+          // Only show loading if there are actually currencies in the database but they're not loaded yet
+          if store.totalCurrenciesCount > 0 && store.searchTerm.isEmpty {
+            Section {
+              HStack {
+                Spacer()
+                VStack {
+                  Text("Loading currencies...")
+                    .foregroundColor(.secondary)
+                  ProgressView()
+                    .padding()
+                }
+                Spacer()
               }
-              Spacer()
+            }
+          } else if !store.searchTerm.isEmpty {
+            // Show "no results" message if searching and nothing found
+            Section {
+              Text("No currencies match your search")
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding()
             }
           }
+          // If totalCurrenciesCount is 0, don't show anything
         } else {
           Section(header: Text("Base Currency")) {
             if let usdCurrency = store.currencies.first(where: { $0.code == "USD" }) {
@@ -36,15 +48,8 @@ public struct CurrencyRatesView: View {
           }
 
           Section(header: Text("Other Currencies")) {
-            if store.currencies.filter({ $0.code != "USD" }).isEmpty && !store.searchTerm.isEmpty {
-              Text("No currencies match your search")
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding()
-            } else {
-              ForEach(store.currencies.filter { $0.code != "USD" }, id: \.id) { currency in
-                currencyRow(currency)
-              }
+            ForEach(store.currencies.filter { $0.code != "USD" }, id: \.id) { currency in
+              currencyRow(currency)
             }
           }
         }
