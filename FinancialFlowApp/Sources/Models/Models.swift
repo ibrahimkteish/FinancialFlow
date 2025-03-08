@@ -108,12 +108,14 @@ public struct Currency: Equatable, Codable, FetchableRecord, PersistableRecord, 
     public var code: String  // "USD", "EUR"
     public var symbol: String  // "$", "€"
     public var name: String  // "US Dollar", "Euro"
+    public var usdRate: Double  // Exchange rate to USD (1 unit of this currency = X USD)
     
-    public init(id: Int64? = nil, code: String, symbol: String, name: String) {
+    public init(id: Int64? = nil, code: String, symbol: String, name: String, usdRate: Double = 1.0) {
         self.id = id
         self.code = code
         self.symbol = symbol
         self.name = name
+        self.usdRate = usdRate
     }
     
     public mutating func didInsert(_ inserted: InsertionSuccess) {
@@ -123,10 +125,13 @@ public struct Currency: Equatable, Codable, FetchableRecord, PersistableRecord, 
 
 #if DEBUG
 extension Currency {
-    public static let usd = Currency(id: 1, code: "USD", symbol: "$", name: "US Dollar")
-    public static let eur = Currency(id: 2, code: "EUR", symbol: "€", name: "Euro")
-    public static let gbp = Currency(id: 3, code: "GBP", symbol: "£", name: "British Pound")
-    public static let yen = Currency(id: 4, code: "JPY", symbol: "¥", name: "Japanese Yen")
+    public static let usd = Currency(id: 1, code: "USD", symbol: "$", name: "US Dollar", usdRate: 1.0)
+    public static let eur = Currency(id: 2, code: "EUR", symbol: "€", name: "Euro", usdRate: 1.08)
+    public static let gbp = Currency(id: 3, code: "GBP", symbol: "£", name: "British Pound", usdRate: 1.26)
+    public static let jpy = Currency(id: 4, code: "JPY", symbol: "¥", name: "Japanese Yen", usdRate: 0.0067)
+    public static let chf = Currency(id: 5, code: "CHF", symbol: "Fr", name: "Swiss Franc", usdRate: 1.13)
+    public static let cad = Currency(id: 6, code: "CAD", symbol: "C$", name: "Canadian Dollar", usdRate: 0.73)
+    public static let aud = Currency(id: 7, code: "AUD", symbol: "A$", name: "Australian Dollar", usdRate: 0.66)
 }
 #endif
 
@@ -186,10 +191,24 @@ extension DatabaseWriter where Self == DatabaseQueue {
                 tableau.column("name", .text).notNull()           // "US Dollar", "Euro"
             }
             
-            let insertedUsdId = try Currency(code: "USD", symbol: "$", name: "US Dollar").inserted(db).id
-            usdId.setValue(insertedUsdId)
-            let insertedEurId = try Currency(code: "EUR", symbol: "€", name: "Euro").inserted(db).id
-            eurId.setValue(insertedEurId)
+            // Use direct SQL insertion instead of the Currency model to avoid the usdRate field
+            try db.execute(sql: """
+                INSERT INTO currencies (code, symbol, name) 
+                VALUES ('USD', '$', 'US Dollar')
+                """)
+            let usdRow = try Row.fetchOne(db, sql: "SELECT id FROM currencies WHERE code = 'USD'")
+            if let id = usdRow?["id"] as Int64? {
+                usdId.setValue(id)
+            }
+            
+            try db.execute(sql: """
+                INSERT INTO currencies (code, symbol, name) 
+                VALUES ('EUR', '€', 'Euro')
+                """)
+            let eurRow = try Row.fetchOne(db, sql: "SELECT id FROM currencies WHERE code = 'EUR'")
+            if let id = eurRow?["id"] as Int64? {
+                eurId.setValue(id)
+            }
         }
         
         migrator.registerMigration("Create \(Device.databaseTableName) table") { db in
@@ -215,13 +234,62 @@ extension DatabaseWriter where Self == DatabaseQueue {
                 purchaseDate: Date(year: 2022, month: 9, day: 16),
                 usageRate: 1,
                 usageRatePeriodId: 1
-            ).inserted(db)
+            ).inserted(db)   
+        }
+
+        migrator.registerMigration("Add usdRate to currencies") { db in
+            // First add the column
+            try db.alter(table: Currency.databaseTableName) { t in
+                t.add(column: "usdRate", .double).notNull().defaults(to: 1.0)
+            }
             
-            
+            // Then update existing currencies with initial rates
+            try db.execute(sql: """
+                UPDATE currencies 
+                SET usdRate = CASE 
+                    WHEN code = 'USD' THEN 1.0
+                    WHEN code = 'EUR' THEN 1.08
+                    WHEN code = 'GBP' THEN 1.26
+                    WHEN code = 'JPY' THEN 0.0067
+                    ELSE 1.0
+                END
+                """)
         }
         
+        migrator.registerMigration("Add more currencies") { db in
+            // Add Japanese Yen
+            try db.execute(sql: """
+                INSERT INTO currencies (code, symbol, name, usdRate) 
+                VALUES ('JPY', '¥', 'Japanese Yen', 0.0067)
+                """)
+                
+            // Add Swiss Franc
+            try db.execute(sql: """
+                INSERT INTO currencies (code, symbol, name, usdRate) 
+                VALUES ('CHF', 'Fr', 'Swiss Franc', 1.13)
+                """)
+                
+            // Add British Pound
+            try db.execute(sql: """
+                INSERT INTO currencies (code, symbol, name, usdRate) 
+                VALUES ('GBP', '£', 'British Pound', 1.26)
+                """)
+                
+            // Add Canadian Dollar
+            try db.execute(sql: """
+                INSERT INTO currencies (code, symbol, name, usdRate) 
+                VALUES ('CAD', 'C$', 'Canadian Dollar', 0.73)
+                """)
+                
+            // Add Australian Dollar
+            try db.execute(sql: """
+                INSERT INTO currencies (code, symbol, name, usdRate) 
+                VALUES ('AUD', 'A$', 'Australian Dollar', 0.66)
+                """)
+        }
+
         migrator.insertSampleData()
-        
+
         do {
 #if DEBUG
             migrator.eraseDatabaseOnSchemaChange = true

@@ -27,31 +27,51 @@ public struct HomeView: View {
             Image(systemName: "line.horizontal.3.decrease.circle")
         }
     }
-    
-    public var body: some View {
-        NavigationStack/*(path: self.$store.scope(state: \.path, action: \.path))*/ {
-            ScrollView {
+
+    @ViewBuilder
+    private var devices: some View {
+        ScrollView {
                 VStack {
                     ForEach(self.store.state.devices, id: \.id) { device in
                         DeviceCardView(data: device)
                     }
                 }
             }
+    }
+
+
+
+    public var body: some View {
+        NavigationStack/*(path: self.$store.scope(state: \.path, action: \.path))*/ {
+            devices
             .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button {
-                        store.send(.analyticsButtonTapped)
-                    } label: {
-                        Image(systemName: "chart.bar.fill")
-                    }
-                    
-                    menu
-                    
-                    Button {
-                        self.store.send(.addDeviceButtonTapped)
-                    } label: {
-                        Image(systemName: "plus")
-                    }
+              ToolbarItemGroup(placement: .topBarTrailing) {
+                Button {
+                  store.send(.currencyRatesButtonTapped)
+                } label: {
+                  Image(systemName: "dollarsign.arrow.circlepath")
+                }
+
+                Button {
+                  store.send(.analyticsButtonTapped)
+                } label: {
+                  Image(systemName: "chart.bar.fill")
+                }
+
+                menu
+
+                Button {
+                  self.store.send(.addDeviceButtonTapped)
+                } label: {
+                  Image(systemName: "plus")
+                }
+              }
+            }
+            .sheet(
+                isPresented: self.$store.showingCurrencyRates
+            ) {
+                NavigationStack {
+                    CurrencyRatesView(store: store)
                 }
             }
             .sheet(

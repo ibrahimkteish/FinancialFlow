@@ -5,50 +5,50 @@ import SharingGRDB
 
 @Reducer
 public struct Analytics: Sendable {
-    @ObservableState
+  @ObservableState
   public struct State: Equatable, Sendable {
-        @SharedReader(.fetch(PMetrics()))
-        public var portfolioMetrics: PortfolioMetrics?
-        @SharedReader(.fetch(UMetrics(timeRange: .month)))
-        public var usage: UsageMetrics?
-        @SharedReader(.fetch(DUMetrics()))
-        public var devices: [DeviceUsageMetrics] = []
-        public var selectedTimeRange: AnalyticsTimeRange = .month
+    @SharedReader(.fetch(PMetrics()))
+    public var portfolioMetrics: PortfolioMetrics?
+    @SharedReader(.fetch(UMetrics(timeRange: .month)))
+    public var usage: UsageMetrics?
+    @SharedReader(.fetch(DUMetrics()))
+    public var devices: [DeviceUsageMetrics] = []
+    public var selectedTimeRange: AnalyticsTimeRange = .month
 
-        public init() {}
+    public init() {}
 
-        var formattedTotalPurchaseValue: String {
-            guard let metrics = portfolioMetrics else { return "N/A" }
-            return formatCurrency(metrics.totalPurchaseValue)
-        }
-
-        var formattedRemainingValue: String {
-            guard let metrics = portfolioMetrics else { return "N/A" }
-            return formatCurrency(metrics.remainingValue)
-        }
-
-        var formattedConsumedValue: String {
-            guard let metrics = portfolioMetrics else { return "N/A" }
-            return formatCurrency(metrics.totalConsumedValue)
-        }
-
-        var formattedDailyUsage: String {
-            guard let metrics = usage else { return "N/A" }
-            return formatCurrency(metrics.averageDailyUsage)
-        }
-
-        private func formatCurrency(_ value: Double) -> String {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .currency
-            formatter.maximumFractionDigits = 2
-            return formatter.string(from: NSNumber(value: value)) ?? "N/A"
-        }
+    var formattedTotalPurchaseValue: String {
+      guard let metrics = portfolioMetrics else { return "N/A" }
+      return formatCurrency(metrics.totalPurchaseValue)
     }
 
-    public enum Action: Equatable, BindableAction {
-        case binding(BindingAction<State>)
-        case refresh
+    var formattedRemainingValue: String {
+      guard let metrics = portfolioMetrics else { return "N/A" }
+      return formatCurrency(metrics.remainingValue)
     }
+
+    var formattedConsumedValue: String {
+      guard let metrics = portfolioMetrics else { return "N/A" }
+      return formatCurrency(metrics.totalConsumedValue)
+    }
+
+    var formattedDailyUsage: String {
+      guard let metrics = usage else { return "N/A" }
+      return formatCurrency(metrics.averageDailyUsage)
+    }
+
+    private func formatCurrency(_ value: Double) -> String {
+      let formatter = NumberFormatter()
+      formatter.numberStyle = .currency
+      formatter.maximumFractionDigits = 2
+      return formatter.string(from: NSNumber(value: value)) ?? "N/A"
+    }
+  }
+
+  public enum Action: Equatable, BindableAction {
+    case binding(BindingAction<State>)
+    case refresh
+  }
 
   public struct DUMetrics: FetchKeyRequest {
     public init() {}
@@ -175,46 +175,27 @@ public struct Analytics: Sendable {
     }
   }
 
-    @Dependency(\.analyticsService) var analyticsService
+  @Dependency(\.analyticsService) var analyticsService
 
-    public init() {}
+  public init() {}
 
-    public var body: some ReducerOf<Self> {
-        BindingReducer()
-        Reduce { state, action in
-            switch action {
-            case .binding(\.selectedTimeRange):
-                return .run { [state] _ in
-                  try await state.$usage.load(.fetch(UMetrics(timeRange: state.selectedTimeRange)))
-                }
+  public var body: some ReducerOf<Self> {
+    BindingReducer()
+    Reduce { state, action in
+      switch action {
+        case .binding(\.selectedTimeRange):
+          return .run { [state] _ in
+            try await state.$usage.load(.fetch(UMetrics(timeRange: state.selectedTimeRange)))
+          }
 
-            case .binding:
-                return .none
+        case .binding:
+          return .none
 
-            case .refresh:
-                return .none
-            }
-        }
+        case .refresh:
+          return .none
+      }
     }
-
-//    private func fetchMetrics(state: inout State) -> Effect<Action> {
-//        state.isLoading = true
-//
-//        return .run { [timeRange = state.selectedTimeRange] send in
-//            async let portfolioTask = analyticsService.fetchPortfolioMetrics()
-//            async let usageTask = analyticsService.fetchDepreciationMetrics(timeRange: timeRange)
-//            async let devicesTask = analyticsService.fetchDevicePerformanceMetrics()
-//
-//            let (portfolio, usage, devices) = try await (portfolioTask, usageTask, devicesTask)
-//            let metrics = AnalyticsMetrics(
-//                portfolio: portfolio,
-//                usage: usage,
-//                devices: devices
-//            )
-//
-//            await send(.metricsResponse(.success(metrics)))
-//        }
-//    }
+  }
 }
 
 // MARK: - Dependencies

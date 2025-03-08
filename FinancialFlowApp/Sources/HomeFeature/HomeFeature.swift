@@ -38,12 +38,13 @@ public struct HomeReducer: Sendable {
 
     @SharedReader(.fetch(Items(ordering: .created)))
     public var devices: [Items.State]
-
     @Shared(.inMemory("order"))
     var ordering: Ordering = .created
-
     @SharedReader(.fetch(Aggregate()))
     public var count: CurrencyCost? = nil
+    public var currencies: [Currency] = []
+    
+    public var showingCurrencyRates = false
 
     public init() {}
   }
@@ -52,9 +53,9 @@ public struct HomeReducer: Sendable {
     case created = "CreatedAt"
     case currency = "Currency"
     case name = "Name"
-    case updatedAt = "UpdatedAt"
     case price = "PurchasePrice"
-
+    case updatedAt = "UpdatedAt"
+    
 
     var orderingTerm: any SQLOrderingTerm & Sendable {
       switch self {
@@ -116,16 +117,15 @@ public struct HomeReducer: Sendable {
              """
              SELECT 
                  c.code AS currency_code,
-                 SUM(d.usageRate / urp.daysMultiplier) AS total_daily_cost
+                 SUM(d.usageRate * c.usdRate / urp.daysMultiplier) AS total_daily_cost
              FROM devices d
              JOIN currencies c ON d.currencyId = c.id
              JOIN usage_rate_periods urp ON d.usageRatePeriodId = urp.id
-             WHERE c.code = 'EUR'
              GROUP BY c.code;
              """
 
       // Execute the query and map results
-      return   try Row.fetchOne(db, sql: sql).map { row in
+      return try Row.fetchOne(db, sql: sql).map { row in
         let currencyCode: String = row["currency_code"]
         let totalDailyCost: Double = row["total_daily_cost"]
         return .init(currencyCode: currencyCode, totalDailyCost: totalDailyCost)
@@ -133,15 +133,20 @@ public struct HomeReducer: Sendable {
     }
   }
 
-  public enum Action: Equatable {
+  public enum Action: Equatable, BindableAction {
+    case binding(BindingAction<State>)
     case addDeviceButtonTapped
     case analyticsButtonTapped
+    case currencyRatesButtonTapped
     case cancelAddDeviceButtonTapped
     case destination(PresentationAction<Destination.Action>)
     case removeDevice(Int64)
     case onAppear
     case onSortChanged(Ordering)
     case submitButtonTapped
+    case fetchCurrencyRates
+    case currencyRatesResponse([Currency])
+    case updateCurrencyRates([Currency])
   }
 
   @Dependency(\.defaultDatabase) var database
@@ -149,8 +154,11 @@ public struct HomeReducer: Sendable {
   public init() {}
 
   public var body: some ReducerOf<Self> {
+    BindingReducer()
     Reduce { state, action in
       switch action {
+        case .binding:
+          return .none
         case .addDeviceButtonTapped:
           state.destination = .addDevice(AddDeviceReducer.State())
           return .none
@@ -158,6 +166,12 @@ public struct HomeReducer: Sendable {
         case .analyticsButtonTapped:
           state.destination = .analytics(Analytics.State())
           return .none
+
+        case .currencyRatesButtonTapped:
+          state.showingCurrencyRates = true
+          return .run { send in
+            await send(.fetchCurrencyRates)
+          }
 
         case .cancelAddDeviceButtonTapped:
           state.destination = nil
@@ -171,7 +185,9 @@ public struct HomeReducer: Sendable {
           }
 
         case .onAppear:
-          return .none
+          return .run { send in
+            await send(.fetchCurrencyRates)
+          }
 
         case let .onSortChanged(newSort):
           state.$ordering.withLock { $0 = newSort }
@@ -182,6 +198,38 @@ public struct HomeReducer: Sendable {
         case .submitButtonTapped:
           state.destination = nil
           return .none
+
+        case .fetchCurrencyRates:
+          return .run { send in
+            do {
+              let currencies = try await database.read { db in
+                print("Fetching currencies from database...")
+                return try Currency.fetchAll(db)
+              }
+              print("Fetched \(currencies.count) currencies")
+              await send(.currencyRatesResponse(currencies))
+            } catch {
+              print("Error fetching currencies: \(error)")
+            }
+          }
+
+        case let .currencyRatesResponse(currencies):
+          print("Setting currencies in state: \(currencies.count)")
+          state.currencies = currencies
+          return .none
+
+        case let .updateCurrencyRates(rates):
+          return .run { send in
+            try await database.write { db in
+              for rate in rates {
+                if var currency = try Currency.fetchOne(db, key: ["id": rate.id!]) {
+                  currency.usdRate = rate.usdRate
+                  try currency.update(db)
+                }
+              }
+            }
+            await send(.fetchCurrencyRates)
+          }
 
         case .destination:
           return .none
