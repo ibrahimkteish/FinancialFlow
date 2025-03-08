@@ -61,6 +61,13 @@ public struct SettingsReducer: Sendable {
     public var isShowingCurrencyPicker = false
 
     public init() {}
+    
+    mutating func updatePresentation(from settings: AppSettingsWithCurrency) {
+      presentation.appTheme = AppTheme(rawValue: settings.settings.themeMode) ?? .system
+      presentation.notificationsEnabled = settings.settings.notificationsEnabled
+      presentation.defaultCurrencyId = settings.settings.defaultCurrencyId
+      presentation.defaultCurrency = settings.defaultCurrency
+    }
   }
 
   public struct SettingsPresentation: Equatable, Sendable {
@@ -178,10 +185,7 @@ public struct SettingsReducer: Sendable {
           return .send(.delegate(.currencyRatesTapped))
 
         case let .updatePresentation(newValue):
-          state.presentation.appTheme = AppTheme(rawValue: newValue.settings.themeMode) ?? .system
-          state.presentation.notificationsEnabled = newValue.settings.notificationsEnabled
-          state.presentation.defaultCurrencyId = newValue.settings.defaultCurrencyId
-          state.presentation.defaultCurrency = newValue.defaultCurrency
+          state.updatePresentation(from: newValue)
           return .none
       }
     }
