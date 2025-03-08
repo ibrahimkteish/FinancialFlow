@@ -60,7 +60,10 @@ public struct SettingsReducer: Sendable {
       set {
         var settings = settingsWithCurrency.settings
         settings.themeMode = newValue.rawValue
-        settingsWithCurrency.settings = settings
+        settingsWithCurrency = AppSettingsWithCurrency(
+          settings: settings, 
+          defaultCurrency: settingsWithCurrency.defaultCurrency
+        )
       }
     }
 
@@ -69,7 +72,10 @@ public struct SettingsReducer: Sendable {
       set {
         var settings = settingsWithCurrency.settings
         settings.notificationsEnabled = newValue
-        settingsWithCurrency.settings = settings
+        settingsWithCurrency = AppSettingsWithCurrency(
+          settings: settings, 
+          defaultCurrency: settingsWithCurrency.defaultCurrency
+        )
       }
     }
 
