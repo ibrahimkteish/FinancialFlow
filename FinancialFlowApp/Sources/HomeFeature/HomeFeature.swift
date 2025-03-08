@@ -10,6 +10,7 @@ import Models
 import SharingGRDB
 import AddDeviceFeature
 import AnalyticsFeature
+import CurrencyRatesFeature
 
 public struct CurrencyCost: FetchableRecord, Decodable, Equatable, Sendable {
   let currencyCode: String
@@ -28,6 +29,7 @@ public struct HomeReducer: Sendable {
   public enum Destination {
     case addDevice(AddDeviceReducer)
     case analytics(Analytics)
+    case currencyRate(CurrencyRateReducer)
   }
 
   @ObservableState
@@ -42,10 +44,7 @@ public struct HomeReducer: Sendable {
     var ordering: Ordering = .created
     @SharedReader(.fetch(Aggregate()))
     public var count: CurrencyCost? = nil
-    public var currencies: [Currency] = []
     
-    public var showingCurrencyRates = false
-
     public init() {}
   }
 
@@ -144,9 +143,6 @@ public struct HomeReducer: Sendable {
     case onAppear
     case onSortChanged(Ordering)
     case submitButtonTapped
-    case fetchCurrencyRates
-    case currencyRatesResponse([Currency])
-    case updateCurrencyRates([Currency])
   }
 
   @Dependency(\.defaultDatabase) var database
@@ -168,10 +164,8 @@ public struct HomeReducer: Sendable {
           return .none
 
         case .currencyRatesButtonTapped:
-          state.showingCurrencyRates = true
-          return .run { send in
-            await send(.fetchCurrencyRates)
-          }
+          state.destination = .currencyRate(CurrencyRateReducer.State())
+          return .none
 
         case .cancelAddDeviceButtonTapped:
           state.destination = nil
@@ -185,9 +179,7 @@ public struct HomeReducer: Sendable {
           }
 
         case .onAppear:
-          return .run { send in
-            await send(.fetchCurrencyRates)
-          }
+          return .none
 
         case let .onSortChanged(newSort):
           state.$ordering.withLock { $0 = newSort }
@@ -198,38 +190,6 @@ public struct HomeReducer: Sendable {
         case .submitButtonTapped:
           state.destination = nil
           return .none
-
-        case .fetchCurrencyRates:
-          return .run { send in
-            do {
-              let currencies = try await database.read { db in
-                print("Fetching currencies from database...")
-                return try Currency.fetchAll(db)
-              }
-              print("Fetched \(currencies.count) currencies")
-              await send(.currencyRatesResponse(currencies))
-            } catch {
-              print("Error fetching currencies: \(error)")
-            }
-          }
-
-        case let .currencyRatesResponse(currencies):
-          print("Setting currencies in state: \(currencies.count)")
-          state.currencies = currencies
-          return .none
-
-        case let .updateCurrencyRates(rates):
-          return .run { send in
-            try await database.write { db in
-              for rate in rates {
-                if var currency = try Currency.fetchOne(db, key: ["id": rate.id!]) {
-                  currency.usdRate = rate.usdRate
-                  try currency.update(db)
-                }
-              }
-            }
-            await send(.fetchCurrencyRates)
-          }
 
         case .destination:
           return .none

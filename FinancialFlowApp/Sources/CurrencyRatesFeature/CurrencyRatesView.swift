@@ -4,12 +4,12 @@ import ComposableArchitecture
 import SharingGRDB
 
 public struct CurrencyRatesView: View {
-    let store: StoreOf<HomeReducer>
+    let store: StoreOf<CurrencyRateReducer>
     @Environment(\.dismiss) private var dismiss
     @State private var rates: [(Currency, String)] = []
     @State private var searchText = ""
     
-    public init(store: StoreOf<HomeReducer>) {
+    public init(store: StoreOf<CurrencyRateReducer>) {
         self.store = store
     }
     
@@ -102,6 +102,15 @@ public struct CurrencyRatesView: View {
                     }
                 }
             }
+            
+            // Add a button to add new currencies
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    store.send(.addCurrencyButtonTapped)
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
         }
         .task {
             await store.send(.fetchCurrencyRates)
@@ -151,15 +160,26 @@ public struct CurrencyRatesView: View {
             }
         }
         .padding(.vertical, 4)
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            if currency.code != "USD" { // Don't allow deleting the base currency
+                Button(role: .destructive) {
+                    if let id = currency.id {
+                        store.send(.deleteCurrency(id))
+                    }
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+            }
+        }
     }
 }
 
 #Preview {
     CurrencyRatesView(
         store: Store(
-            initialState: HomeReducer.State()
+            initialState: CurrencyRateReducer.State()
         ) {
-            HomeReducer()
+            CurrencyRateReducer()
         }
     )
 } 
