@@ -5,6 +5,16 @@ import SharingGRDB
 @Reducer
 public struct CurrencyRatesReducer: Sendable {
 
+@Reducer(state: .sendable, .equatable, action: .sendable, .equatable)
+public enum Destination: Equatable, Sendable {
+  case alert(AlertState<Alert>)
+
+  @CasePathable
+    public enum Alert: Equatable, Sendable {
+      case alertButtonTapped
+    }
+}
+
   // Define a FetchKeyRequest for currencies with filtering
   public struct CurrencyFetcher: FetchKeyRequest {
     public typealias State = [Currency]
@@ -44,6 +54,9 @@ public struct CurrencyRatesReducer: Sendable {
 
   @ObservableState
   public struct State: Equatable, Sendable {
+    @Presents
+    var destination: Destination.State?
+
     @Shared(.inMemory("currency_search"))
     var searchTerm: String = ""
 
@@ -58,12 +71,14 @@ public struct CurrencyRatesReducer: Sendable {
 
   public enum Action: Equatable, BindableAction {
     case binding(BindingAction<State>)
+    case destination(PresentationAction<Destination.Action>)
     case fetchCurrencyRates
     case updateCurrencyRates([Currency])
     case addCurrencyButtonTapped
     case addCurrencyCancelled
     case addCurrencySaved(Currency)
     case deleteCurrency(Int64)
+    case showAlert(String)
   }
 
   @Dependency(\.defaultDatabase) var database
@@ -118,32 +133,58 @@ public struct CurrencyRatesReducer: Sendable {
             // No need to call fetchCurrencyRates as SharedReader will auto-update
           }
 
+        case let .showAlert(message):
+          state.destination = .alert(AlertState {
+            TextState(message)
+          } actions: {
+            ButtonState(role: .cancel) {
+              TextState("OK")
+            }
+          })
+          return .none
+
         case let .deleteCurrency(id):
           return .run { send in
             do {
-              try await database.write { db in
-                // Check if this is the default currency
-                let isDefault = try Row.fetchOne(db, 
+              // First check if this is the default currency in a read transaction
+              let isDefault = try await database.read { db in
+                return try Row.fetchOne(db, 
                   sql: "SELECT 1 FROM app_settings WHERE defaultCurrencyId = ?", 
                   arguments: [id]) != nil
-                
-                if isDefault {
-                  // If it's the default currency, throw an error
-                  throw NSError(
-                    domain: "com.financialflow.error",
-                    code: 1001,
-                    userInfo: [NSLocalizedDescriptionKey: "Cannot delete the default currency. Change the default currency in Settings first."]
-                  )
-                }
-                
-                // If it's not the default currency, proceed with deletion
+              }
+              
+              // If it's the default currency, don't proceed with deletion but show alert
+              if isDefault {
+                print("Cannot delete default currency (ID: \(id))")
+                await send(.showAlert("Cannot delete the default currency. Change the default currency in Settings first."))
+                return
+              }
+              
+              // If we're here, it's not the default currency, so proceed with deletion
+              try await database.write { db in
                 _ = try Currency.deleteOne(db, key: ["id": id])
               }
             } catch {
-              print("Error deleting currency: \(error.localizedDescription)")
-              // You could send an error action here if you want to display the error to the user
+              print("Error with currency deletion: \(error.localizedDescription)")
+              await send(.showAlert("Error deleting currency: \(error.localizedDescription)"))
             }
           }
+
+        case .destination:
+          return .none
+      }
+    }
+    .ifLet(\.$destination, action: \.destination)
+  }
+}
+
+extension AlertState where Action == CurrencyRatesReducer.Destination.Alert {
+  static func show(_ message: String) -> Self {
+    AlertState {
+      TextState(message)
+    } actions: {
+      ButtonState(action: .alertButtonTapped) {
+        TextState("OK")
       }
     }
   }

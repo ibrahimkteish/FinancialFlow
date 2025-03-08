@@ -12,7 +12,7 @@ public struct SettingsView: View {
     public var body: some View {
         Form {
             Section {
-                Picker("App Theme", selection: $store.appTheme) {
+              Picker("App Theme", selection: $store.appTheme) {
                     ForEach(SettingsReducer.AppTheme.allCases, id: \.self) { theme in
                         Text(theme.displayName)
                             .tag(theme)
@@ -27,39 +27,89 @@ public struct SettingsView: View {
             }
             
             Section {
-                if let defaultCurrencyId = store.defaultCurrencyId {
+                if let currency = store.defaultCurrency {
                     HStack {
                         Text("Default Currency")
                         Spacer()
-                        Text("USD") // TODO: Replace with actual currency code
+                        Text("\(currency.code) (\(currency.symbol))")
+                            .foregroundColor(.secondary)
                     }
                     
                     Button("Change Default Currency") {
-                        // TODO: Add action to change default currency
+                        store.send(.showCurrencyPicker)
                     }
                 } else {
                     Button("Set Default Currency") {
-                        // TODO: Add action to set default currency
+                        store.send(.showCurrencyPicker)
                     }
                 }
             } header: {
                 Text("Currency")
             }
-            
-            Section {
-                Button("Reset to Default Settings") {
-                    store.send(.resetToDefaults)
-                }
-                .foregroundColor(.red)
-            } header: {
-                Text("Reset")
-            } footer: {
-                Text("This will reset all settings to their default values.")
-            }
         }
         .navigationTitle("Settings")
-        .onAppear {
-            store.send(.loadSettings)
+    
+        .sheet(isPresented: $store.isShowingCurrencyPicker) {
+            NavigationStack {
+                CurrencyPickerView(
+                    currencies: store.availableCurrencies,
+                    selectedCurrencyId: store.defaultCurrencyId,
+                    onSelect: { currencyId in
+                        store.send(.setDefaultCurrency(currencyId))
+                    },
+                    onCancel: {
+                        store.send(.hideCurrencyPicker)
+                    }
+                )
+            }
+        }
+    }
+}
+
+// Currency picker view for selecting default currency
+struct CurrencyPickerView: View {
+    let currencies: [Currency]
+    let selectedCurrencyId: Int64?
+    let onSelect: (Int64?) -> Void
+    let onCancel: () -> Void
+    
+    var body: some View {
+        List {
+            Button {
+                onSelect(nil)
+            } label: {
+                HStack {
+                    Text("None")
+                    Spacer()
+                    if selectedCurrencyId == nil {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(.blue)
+                    }
+                }
+            }
+            
+            ForEach(currencies, id: \.id) { currency in
+                Button {
+                    onSelect(currency.id)
+                } label: {
+                    HStack {
+                        Text("\(currency.code) (\(currency.symbol)) - \(currency.name)")
+                        Spacer()
+                        if selectedCurrencyId == currency.id {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Select Currency")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") {
+                    onCancel()
+                }
+            }
         }
     }
 }

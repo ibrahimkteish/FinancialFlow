@@ -8,74 +8,131 @@ import Foundation
 import GRDB
 import SharingGRDB
 
+// A struct to hold settings with optional default currency
+public struct AppSettingsWithCurrency: Equatable, Sendable {
+    public var settings: AppSettings
+    public var defaultCurrency: Currency?
+    
+    public init(settings: AppSettings = .init(), defaultCurrency: Currency? = nil) {
+        self.settings = settings
+        self.defaultCurrency = defaultCurrency
+    }
+}
+
 @Reducer
 public struct SettingsReducer: Sendable {
-    @ObservableState
-    public struct State: Equatable, Sendable {
-        // App settings state
-        public var appTheme: AppTheme
-        public var notificationsEnabled: Bool
-        public var defaultCurrencyId: Int64?
-        
-        public init(
-            appTheme: AppTheme = .system,
-            notificationsEnabled: Bool = true,
-            defaultCurrencyId: Int64? = nil
-        ) {
-            self.appTheme = appTheme
-            self.notificationsEnabled = notificationsEnabled
-            self.defaultCurrencyId = defaultCurrencyId
-        }
-    }
-    
-    public enum AppTheme: String, CaseIterable, Equatable, Sendable {
-        case light
-        case dark
-        case system
-        
-        public var displayName: String {
-            switch self {
-            case .light: return "Light"
-            case .dark: return "Dark"
-            case .system: return "System"
-            }
-        }
-    }
-
-    public enum Action: BindableAction, Equatable, Sendable {
-        case binding(BindingAction<State>)
-        case saveSettings
-        case loadSettings
-        case resetToDefaults
-    }
-
-    @Dependency(\.defaultDatabase) var database
+  // Define a FetchKeyRequest for settings
+  public struct SettingsFetcher: FetchKeyRequest {
+    public typealias State = AppSettingsWithCurrency
 
     public init() {}
 
-    public var body: some ReducerOf<Self> {
-        BindingReducer()
-        Reduce { state, action in
-            switch action {
-            case .binding:
-                return .none
-                
-            case .saveSettings:
-                // TODO: Implement saving settings to database or UserDefaults
-                return .none
-                
-            case .loadSettings:
-                // TODO: Implement loading settings from database or UserDefaults
-                return .none
-                
-            case .resetToDefaults:
-                state.appTheme = .system
-                state.notificationsEnabled = true
-                state.defaultCurrencyId = nil
-                return .run { send in
-                    await send(.saveSettings)
-                }
-            }
-        }
+    public func fetch(_ db: Database) throws -> AppSettingsWithCurrency {
+      print("Fetching app settings from database")
+
+      // Get settings with optional currency
+      let settings = try AppSettings
+        .including(optional: AppSettings.defaultCurrency)
+        .fetchOne(db) ?? AppSettings()
+
+      // Get the associated currency if there's a defaultCurrencyId
+      var currency: Currency? = nil
+      if let currencyId = settings.defaultCurrencyId {
+        currency = try Currency.fetchOne(db, key: currencyId)
+      }
+
+      return AppSettingsWithCurrency(settings: settings, defaultCurrency: currency)
     }
-} 
+  }
+
+  @ObservableState
+  public struct State: Equatable, Sendable {
+    @SharedReader(.fetch(SettingsFetcher()))
+    public var settingsWithCurrency: AppSettingsWithCurrency = .init()
+
+    @SharedReader(.fetchAll(sql: "SELECT * from currencies ORDER BY code = 'USD' DESC, name", animation: .default))
+    public var availableCurrencies: [Currency]
+
+    public var appTheme: AppTheme = .system
+
+    public var notificationsEnabled: Bool = false
+
+    public var defaultCurrencyId: Int64? {
+      get { settingsWithCurrency.settings.defaultCurrencyId }
+    }
+
+    public var defaultCurrency: Currency? {
+      get { settingsWithCurrency.defaultCurrency }
+    }
+
+    public var isShowingCurrencyPicker = false
+
+    public init() {}
+  }
+
+  public enum AppTheme: String, CaseIterable, Equatable, Sendable {
+    case light
+    case dark
+    case system
+
+    public var displayName: String {
+      switch self {
+        case .light: return "Light"
+        case .dark: return "Dark"
+        case .system: return "System"
+      }
+    }
+  }
+
+  public enum Action: BindableAction, Equatable, Sendable {
+    case binding(BindingAction<State>)
+    case showCurrencyPicker
+    case hideCurrencyPicker
+    case setDefaultCurrency(Int64?)
+  }
+
+  @Dependency(\.defaultDatabase) var database
+
+  public init() {}
+
+  public var body: some ReducerOf<Self> {
+    BindingReducer()
+    Reduce { state, action in
+      switch action {
+        case .binding:
+          let settings = state.settingsWithCurrency.settings
+          return .run { _ in
+            try await database.write { db in
+              // Update the settings in database
+              var settingsToUpdate = settings
+              settingsToUpdate.updatedAt = Date()
+              try settingsToUpdate.update(db)
+            }
+          }
+
+        case .showCurrencyPicker:
+          state.isShowingCurrencyPicker = true
+          return .none
+
+        case .hideCurrencyPicker:
+          state.isShowingCurrencyPicker = false
+          return .none
+
+        case let .setDefaultCurrency(currencyId):
+          // Update default currency
+          var updatedSettings = state.settingsWithCurrency.settings
+          updatedSettings.defaultCurrencyId = currencyId
+          updatedSettings.updatedAt = Date()
+
+          return .run { [updatedSettings] send in
+            try await database.write { db in
+              // Update the settings in database
+              try updatedSettings.update(db)
+            }
+            // Hide currency picker after database update
+            await send(.hideCurrencyPicker)
+          }
+      }
+    }
+  }
+}
