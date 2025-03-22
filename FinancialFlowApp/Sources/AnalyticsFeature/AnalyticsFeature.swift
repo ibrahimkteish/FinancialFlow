@@ -7,13 +7,13 @@ import SharingGRDB
 public struct Analytics: Sendable {
   @ObservableState
   public struct State: Equatable, Sendable {
-    @SharedReader(.fetch(PMetrics()))
+    @SharedReader(.fetch(PortfolioMetricsRequest()))
     public var portfolioMetrics: PortfolioMetrics?
-    @SharedReader(.fetch(UMetrics()))
+    @SharedReader(.fetch(UsageMetricsRequest()))
     public var usage: UsageMetrics?
-    @SharedReader(.fetch(DUMetrics()))
+    @SharedReader(.fetch(DeviceUsageMetricsRequest()))
     public var devices: [DeviceUsageMetrics] = []
-    @SharedReader(.fetch(DefaultCurrency()))
+    @SharedReader(.fetch(DefaultCurrencyRequest()))
     public var defaultCurrency: String = "$"
 
     public init() {}
@@ -52,7 +52,7 @@ public struct Analytics: Sendable {
     case refresh
   }
 
-  public struct DUMetrics: FetchKeyRequest {
+  public struct DeviceUsageMetricsRequest: FetchKeyRequest {
     public init() {}
 
     public func fetch(_ db: Database) throws -> [DeviceUsageMetrics] {
@@ -89,7 +89,7 @@ public struct Analytics: Sendable {
     }
   }
 
-  public struct UMetrics: FetchKeyRequest {
+  public struct UsageMetricsRequest: FetchKeyRequest {
     public init() {}
 
     public func fetch(_ db: Database) throws -> UsageMetrics? {
@@ -147,7 +147,7 @@ public struct Analytics: Sendable {
     }
   }
 
-  public struct PMetrics: FetchKeyRequest {
+  public struct PortfolioMetricsRequest: FetchKeyRequest {
 
     public func fetch(_ db: Database) throws -> PortfolioMetrics? {
       // First get the default currency
@@ -237,7 +237,7 @@ public struct Analytics: Sendable {
     }
   }
 
-  public struct DefaultCurrency: FetchKeyRequest {
+  public struct DefaultCurrencyRequest: FetchKeyRequest {
     public typealias State = String
     
     public init() {}
