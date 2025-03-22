@@ -208,8 +208,6 @@ public struct Analytics: Sendable {
     }
   }
 
-  @Dependency(\.analyticsService) var analyticsService
-
   public init() {}
 
   public var body: some ReducerOf<Self> {
@@ -224,16 +222,4 @@ public struct Analytics: Sendable {
       }
     }
   }
-}
-
-// MARK: - Dependencies
-extension DependencyValues {
-    var analyticsService: AnalyticsService {
-        get { self[AnalyticsServiceKey.self] }
-        set { self[AnalyticsServiceKey.self] = newValue }
-    }
-}
-
-private enum AnalyticsServiceKey: DependencyKey {
-    static let liveValue = AnalyticsService()
 } 

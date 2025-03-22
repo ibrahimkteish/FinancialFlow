@@ -77,30 +77,4 @@ public struct DeviceUsageMetrics: Equatable, Identifiable, Sendable {
     var isWithinExpectedUsage: Bool {
         consumptionPercentage <= expectedConsumptionPercentage
     }
-}
-
-// MARK: - Analytics Time Range
-public enum AnalyticsTimeRange: String, CaseIterable, Sendable, Equatable {
-    case week = "7 Days"
-    case month = "30 Days"
-    case quarter = "90 Days"
-    case year = "1 Year"
-    
-    var daysCount: Int {
-        switch self {
-        case .week: return 7
-        case .month: return 30
-        case .quarter: return 90
-        case .year: return 365
-        }
-    }
-    
-    var monthsCount: Int {
-        switch self {
-        case .week: return 1
-        case .month: return 1
-        case .quarter: return 3
-        case .year: return 12
-        }
-    }
 } 

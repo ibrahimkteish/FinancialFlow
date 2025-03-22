@@ -46,56 +46,6 @@ public actor AnalyticsService: Sendable {
         }
     }
     
-    // MARK: - Usage Metrics
-    public func fetchDepreciationMetrics(timeRange: AnalyticsTimeRange) async throws -> UsageMetrics {
-        try await database.read { db in
-            let sql = """
-                WITH RECURSIVE dates(date) AS (
-                    SELECT date('now', '-\(timeRange.daysCount) days')
-                    UNION ALL
-                    SELECT date(date, '+1 month')
-                    FROM dates
-                    WHERE date < date('now')
-                )
-                SELECT 
-                    dates.date as month,
-                    COALESCE(SUM(
-                        CASE 
-                            WHEN d.usageRatePeriodId = 1 THEN d.usageRate
-                            WHEN d.usageRatePeriodId = 2 THEN d.usageRate / 7
-                            WHEN d.usageRatePeriodId = 3 THEN d.usageRate / 30
-                            ELSE d.usageRate / 365
-                        END
-                    ), 0) as daily_usage,
-                    c.symbol as currency
-                FROM dates
-                LEFT JOIN devices d ON strftime('%Y-%m', d.purchaseDate) <= strftime('%Y-%m', dates.date)
-                LEFT JOIN currencies c ON d.currencyId = c.id
-                GROUP BY strftime('%Y-%m', dates.date), c.symbol
-                ORDER BY dates.date
-            """
-            
-            let rows = try Row.fetchAll(db, sql: sql)
-            
-            let monthlyData = rows.map { row in
-                UsageMetrics.MonthlyUsage(
-                    month: row["month"] as? Date ?? Date(),
-                    consumedValue: (row["daily_usage"] as? Double ?? 0) * 30, // Convert daily to monthly
-                    currency: row["currency"] as? String ?? "$"
-                )
-            }
-
-            let averageDailyUsage = monthlyData.map { $0.consumedValue }.reduce(0, +) / Double(monthlyData.count) / 30
-            let projectedAnnualUsage = averageDailyUsage * 365
-            
-            return UsageMetrics(
-                monthlyData: monthlyData,
-                averageDailyUsage: averageDailyUsage,
-                projectedAnnualUsage: projectedAnnualUsage
-            )
-        }
-    }
-    
     // MARK: - Device Usage Metrics
     public func fetchDevicePerformanceMetrics() async throws -> [DeviceUsageMetrics] {
         try await database.read { db in
