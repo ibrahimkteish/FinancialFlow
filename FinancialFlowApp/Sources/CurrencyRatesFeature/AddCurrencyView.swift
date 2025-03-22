@@ -71,11 +71,8 @@ public struct AddCurrencyView: View {
             name: name,
             usdRate: rate
         )
-        
-        Task {
-            await store.send(.addCurrencySaved(newCurrency))
-            dismiss()
-        }
+
+        store.send(.addCurrencySaved(newCurrency))
     }
 }
 

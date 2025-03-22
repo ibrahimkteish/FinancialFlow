@@ -17,12 +17,10 @@ public struct AddDeviceReducer: Sendable {
         public init() {}
         
         public func fetch(_ db: Database) throws -> [Currency] {
-            print("Fetching currencies for device addition")
             let result = try Currency.fetchAll(db, sql: """
                 SELECT * FROM currencies
                 ORDER BY code = 'USD' DESC, name
             """)
-            print("Fetched \(result.count) currencies for device form")
             return result
         }
     }

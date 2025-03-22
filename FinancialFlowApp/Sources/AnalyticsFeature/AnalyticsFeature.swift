@@ -7,13 +7,14 @@ import SharingGRDB
 public struct Analytics: Sendable {
   @ObservableState
   public struct State: Equatable, Sendable {
-    @SharedReader(.fetch(PMetrics()))
+    @SharedReader(.fetch(PortfolioMetricsRequest()))
     public var portfolioMetrics: PortfolioMetrics?
-    @SharedReader(.fetch(UMetrics(timeRange: .month)))
+    @SharedReader(.fetch(UsageMetricsRequest()))
     public var usage: UsageMetrics?
-    @SharedReader(.fetch(DUMetrics()))
+    @SharedReader(.fetch(DeviceUsageMetricsRequest()))
     public var devices: [DeviceUsageMetrics] = []
-    public var selectedTimeRange: AnalyticsTimeRange = .month
+    @SharedReader(.fetch(DefaultCurrencyRequest()))
+    public var defaultCurrency: String = "$"
 
     public init() {}
 
@@ -41,6 +42,7 @@ public struct Analytics: Sendable {
       let formatter = NumberFormatter()
       formatter.numberStyle = .currency
       formatter.maximumFractionDigits = 2
+      formatter.currencySymbol = defaultCurrency
       return formatter.string(from: NSNumber(value: value)) ?? "N/A"
     }
   }
@@ -50,7 +52,7 @@ public struct Analytics: Sendable {
     case refresh
   }
 
-  public struct DUMetrics: FetchKeyRequest {
+  public struct DeviceUsageMetricsRequest: FetchKeyRequest {
     public init() {}
 
     public func fetch(_ db: Database) throws -> [DeviceUsageMetrics] {
@@ -66,7 +68,7 @@ public struct Analytics: Sendable {
                         ELSE d.usageRate / 365
                     END as daily_usage_rate,
                     julianday('now') - julianday(d.purchaseDate) as elapsed_days,
-                    c.symbol as currency
+                    c.code as currency_code
                 FROM devices d
                 JOIN currencies c ON d.currencyId = c.id
             """
@@ -81,83 +83,143 @@ public struct Analytics: Sendable {
           purchaseValue: row["purchaseValue"] as? Double ?? 0,
           dailyUsageRate: dailyUsageRate,
           elapsedDays: elapsedDays,
-          currency: row["currency"] as? String ?? "$"
+          currencyCode: row["currency_code"] as? String ?? "USD"
         )
       }
     }
   }
 
-  public struct UMetrics: FetchKeyRequest {
-    let timeRange: AnalyticsTimeRange
+  public struct UsageMetricsRequest: FetchKeyRequest {
+    public init() {}
 
     public func fetch(_ db: Database) throws -> UsageMetrics? {
+      // First get the default currency
+      let defaultCurrencyRow = try Row.fetchOne(db, sql: "SELECT defaultCurrencyId FROM app_settings LIMIT 1")
+      let defaultCurrencyId = defaultCurrencyRow?["defaultCurrencyId"] as? Int64 ?? 1 // Fallback to 1 (USD)
+      
+      // Calculate daily usage using the same approach as HomeFeature
       let sql = """
-                WITH RECURSIVE dates(date) AS (
-                    SELECT date('now', '-\(timeRange.daysCount) days')
-                    UNION ALL
-                    SELECT date(date, '+1 month')
-                    FROM dates
-                    WHERE date < date('now')
+                WITH total_in_usd AS (
+                    -- First convert everything to USD (multiply by the inverse of usdRate for non-USD currencies)
+                    SELECT SUM(
+                        CASE 
+                            WHEN c.code = 'USD' THEN d.usageRate 
+                            ELSE d.usageRate * (1.0 / c.usdRate)
+                        END / urp.daysMultiplier
+                    ) AS usd_total,
+                    strftime('%Y-%m', 'now') as current_month
+                    FROM devices d
+                    JOIN currencies c ON d.currencyId = c.id
+                    JOIN usage_rate_periods urp ON d.usageRatePeriodId = urp.id
                 )
                 SELECT 
-                    dates.date as month,
-                    COALESCE(SUM(
-                        CASE 
-                            WHEN d.usageRatePeriodId = 1 THEN d.usageRate
-                            WHEN d.usageRatePeriodId = 2 THEN d.usageRate / 7
-                            WHEN d.usageRatePeriodId = 3 THEN d.usageRate / 30
-                            ELSE d.usageRate / 365
-                        END
-                    ), 0) as daily_usage,
-                    c.symbol as currency
-                FROM dates
-                LEFT JOIN devices d ON strftime('%Y-%m', d.purchaseDate) <= strftime('%Y-%m', dates.date)
-                LEFT JOIN currencies c ON d.currencyId = c.id
-                GROUP BY strftime('%Y-%m', dates.date), c.symbol
-                ORDER BY dates.date
-            """
+                    tu.current_month as month,
+                    c.code AS currency_code,
+                    CASE 
+                        -- For USD, return as is
+                        WHEN c.code = 'USD' THEN tu.usd_total
+                        -- For other currencies, convert from USD to target currency
+                        ELSE tu.usd_total * c.usdRate
+                    END AS daily_usage
+                FROM total_in_usd tu
+                JOIN currencies c ON c.id = ?
+                """
 
-      let rows = try Row.fetchAll(db, sql: sql)
-
-      let monthlyData = rows.map { row in
+      let row = try Row.fetchOne(db, sql: sql, arguments: [defaultCurrencyId])
+      let dailyUsage = row?["daily_usage"] as? Double ?? 0
+      let currencyCode = row?["currency_code"] as? String ?? "USD"
+      let currencySymbol = try Row.fetchOne(db, sql: "SELECT symbol FROM currencies WHERE code = ?", arguments: [currencyCode])?["symbol"] as? String ?? "$"
+      
+      // Create a simple monthly usage with the current month
+      let monthlyData = [
         UsageMetrics.MonthlyUsage(
-          month: row["month"] as? Date ?? Date(),
-          consumedValue: (row["daily_usage"] as? Double ?? 0) * 30, // Convert daily to monthly
-          currency: row["currency"] as? String ?? "$"
+          month: Date(),
+          consumedValue: dailyUsage * 30, // Monthly equivalent
+          currency: currencySymbol
         )
-      }
-
-      let averageDailyUsage = monthlyData.map (\.consumedValue).reduce(0, +) / Double(monthlyData.count) / 30
-      let projectedAnnualUsage = averageDailyUsage * 365
+      ]
 
       return UsageMetrics(
         monthlyData: monthlyData,
-        averageDailyUsage: averageDailyUsage,
-        projectedAnnualUsage: projectedAnnualUsage
+        averageDailyUsage: dailyUsage,
+        projectedAnnualUsage: dailyUsage * 365
       )
     }
   }
 
-  public struct PMetrics: FetchKeyRequest {
+  public struct PortfolioMetricsRequest: FetchKeyRequest {
 
     public func fetch(_ db: Database) throws -> PortfolioMetrics? {
+      // First get the default currency
+      let defaultCurrencyRow = try Row.fetchOne(db, sql: "SELECT defaultCurrencyId FROM app_settings LIMIT 1")
+      let defaultCurrencyId = defaultCurrencyRow?["defaultCurrencyId"] as? Int64 ?? 1 // Fallback to 1 (USD)
+      
       let sql = """
-                SELECT 
-                    COUNT(*) as totalDevices,
-                    SUM(purchasePrice) as totalPurchaseValue,
-                    AVG(julianday('now') - julianday(purchaseDate)) as averageAge,
-                    SUM(
-                        CASE 
-                            WHEN d.usageRatePeriodId = 1 THEN d.usageRate * (julianday('now') - julianday(d.purchaseDate))
-                            WHEN d.usageRatePeriodId = 2 THEN d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/7)
-                            WHEN d.usageRatePeriodId = 3 THEN d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/30)
-                            ELSE d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/365)
-                        END
-                    ) as totalConsumedValue
-                FROM devices d
-            """
+                WITH values_in_default AS (
+                    -- Convert all values to default currency
+                    SELECT 
+                        COUNT(*) as totalDevices,
+                        SUM(
+                            CASE 
+                                -- For same currency, use as is
+                                WHEN d.currencyId = ? THEN d.purchasePrice
+                                -- For USD to other, multiply by exchange rate
+                                WHEN target.code = 'USD' THEN d.purchasePrice * (1.0 / source.usdRate)
+                                -- For other to USD, multiply by USD rate
+                                WHEN source.code = 'USD' THEN d.purchasePrice * target.usdRate
+                                -- For other currencies, convert through USD
+                                ELSE d.purchasePrice * (1.0 / source.usdRate) * target.usdRate
+                            END
+                        ) as totalPurchaseValue,
+                        AVG(julianday('now') - julianday(d.purchaseDate)) as averageAge,
+                        SUM(
+                            CASE 
+                                -- For same currency, use as is
+                                WHEN d.currencyId = ? THEN
+                                    CASE 
+                                        WHEN d.usageRatePeriodId = 1 THEN d.usageRate * (julianday('now') - julianday(d.purchaseDate))
+                                        WHEN d.usageRatePeriodId = 2 THEN d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/7)
+                                        WHEN d.usageRatePeriodId = 3 THEN d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/30)
+                                        ELSE d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/365)
+                                    END
+                                -- For different currencies, convert the usage rate first
+                                ELSE
+                                    CASE 
+                                        WHEN d.usageRatePeriodId = 1 THEN 
+                                            (CASE 
+                                                WHEN target.code = 'USD' THEN d.usageRate * (1.0 / source.usdRate)
+                                                WHEN source.code = 'USD' THEN d.usageRate * target.usdRate
+                                                ELSE d.usageRate * (1.0 / source.usdRate) * target.usdRate
+                                            END) * (julianday('now') - julianday(d.purchaseDate))
+                                        WHEN d.usageRatePeriodId = 2 THEN 
+                                            (CASE 
+                                                WHEN target.code = 'USD' THEN d.usageRate * (1.0 / source.usdRate)
+                                                WHEN source.code = 'USD' THEN d.usageRate * target.usdRate
+                                                ELSE d.usageRate * (1.0 / source.usdRate) * target.usdRate
+                                            END) * ((julianday('now') - julianday(d.purchaseDate))/7)
+                                        WHEN d.usageRatePeriodId = 3 THEN 
+                                            (CASE 
+                                                WHEN target.code = 'USD' THEN d.usageRate * (1.0 / source.usdRate)
+                                                WHEN source.code = 'USD' THEN d.usageRate * target.usdRate
+                                                ELSE d.usageRate * (1.0 / source.usdRate) * target.usdRate
+                                            END) * ((julianday('now') - julianday(d.purchaseDate))/30)
+                                        ELSE 
+                                            (CASE 
+                                                WHEN target.code = 'USD' THEN d.usageRate * (1.0 / source.usdRate)
+                                                WHEN source.code = 'USD' THEN d.usageRate * target.usdRate
+                                                ELSE d.usageRate * (1.0 / source.usdRate) * target.usdRate
+                                            END) * ((julianday('now') - julianday(d.purchaseDate))/365)
+                                    END
+                            END
+                        ) as totalConsumedValue
+                    FROM devices d
+                    JOIN currencies source ON d.currencyId = source.id
+                    JOIN currencies target ON target.id = ?
+                )
+                SELECT * FROM values_in_default
+                """
 
-      let row = try Row.fetchOne(db, sql: sql)
+      let row = try Row.fetchOne(db, sql: sql, arguments: [defaultCurrencyId, defaultCurrencyId, defaultCurrencyId])
 
       let totalDevices = row?["totalDevices"] as? Int ?? 0
       let totalPurchaseValue = row?["totalPurchaseValue"] as? Double ?? 0
@@ -175,7 +237,29 @@ public struct Analytics: Sendable {
     }
   }
 
-  @Dependency(\.analyticsService) var analyticsService
+  public struct DefaultCurrencyRequest: FetchKeyRequest {
+    public typealias State = String
+    
+    public init() {}
+    
+    public func fetch(_ db: Database) throws -> String {
+      let sql = """
+                SELECT 
+                    c.symbol as currency_symbol
+                FROM app_settings s
+                JOIN currencies c ON s.defaultCurrencyId = c.id
+                LIMIT 1
+                """
+      
+      if let row = try Row.fetchOne(db, sql: sql),
+         let symbol = row["currency_symbol"] as? String {
+        return symbol
+      }
+      
+      // Fallback to USD if no default currency is set
+      return "$"
+    }
+  }
 
   public init() {}
 
@@ -183,11 +267,6 @@ public struct Analytics: Sendable {
     BindingReducer()
     Reduce { state, action in
       switch action {
-        case .binding(\.selectedTimeRange):
-          return .run { [state] _ in
-            try await state.$usage.load(.fetch(UMetrics(timeRange: state.selectedTimeRange)))
-          }
-
         case .binding:
           return .none
 
@@ -196,16 +275,4 @@ public struct Analytics: Sendable {
       }
     }
   }
-}
-
-// MARK: - Dependencies
-extension DependencyValues {
-    var analyticsService: AnalyticsService {
-        get { self[AnalyticsServiceKey.self] }
-        set { self[AnalyticsServiceKey.self] = newValue }
-    }
-}
-
-private enum AnalyticsServiceKey: DependencyKey {
-    static let liveValue = AnalyticsService()
 } 
