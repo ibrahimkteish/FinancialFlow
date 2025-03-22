@@ -154,9 +154,11 @@ public struct CurrencyRatesReducer: Sendable {
             do {
               // First check if this is the default currency in a read transaction
               let isDefault = try await database.read { db in
-                return try Row.fetchOne(db,
-                                        sql: "SELECT 1 FROM app_settings WHERE defaultCurrencyId = ?",
-                                        arguments: [id]) != nil
+                return try Row.fetchOne(
+                  db,
+                  sql: "SELECT 1 FROM app_settings WHERE defaultCurrencyId = ?",
+                  arguments: [id]
+                ) != nil
               }
 
               // If it's the default currency, don't proceed with deletion but show alert

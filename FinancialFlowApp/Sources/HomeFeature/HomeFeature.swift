@@ -121,7 +121,7 @@ public struct HomeReducer: Sendable {
     public func fetch(_ db: Database) throws -> State {
       // First get the default currency from settings
       let settingsRow = try Row.fetchOne(db, sql: "SELECT defaultCurrencyId FROM app_settings LIMIT 1")
-      
+
       // If no default currency is set, fall back to USD
       let defaultCurrencyId: Int64
       if let settingsCurrencyId = settingsRow?["defaultCurrencyId"] as? Int64 {
@@ -131,35 +131,57 @@ public struct HomeReducer: Sendable {
         let usdRow = try Row.fetchOne(db, sql: "SELECT id FROM currencies WHERE code = 'USD' LIMIT 1")
         defaultCurrencyId = usdRow?["id"] as? Int64 ?? 1 // Fallback to ID 1 if USD not found
       }
-      
-      // Get the default currency code and conversion rate
+
+      // First get information about how the default currency is stored
       let defaultCurrency = try Currency.fetchOne(db, key: defaultCurrencyId)
       
-      // Use raw SQL to join the tables and convert all costs to the default currency
+      // Debug output to verify rates
+      if let defaultCurrency = defaultCurrency {
+        print("Default currency: \(defaultCurrency.code), USD Rate: \(defaultCurrency.usdRate)")
+        
+        // Print a few other currencies for comparison
+        let otherCurrencies = try Currency.fetchAll(db, sql: "SELECT * FROM currencies LIMIT 5")
+        for currency in otherCurrencies {
+          print("Currency: \(currency.code), USD Rate: \(currency.usdRate)")
+        }
+      }
+      
+      // In our database, usdRate represents how many units of a currency equals 1 USD
+      // So for USD, usdRate = 1.0
+      // For EUR, if usdRate = 0.92 (meaning 0.92 EUR = 1 USD)
+      // For JPY, if usdRate = 108 (meaning 108 JPY = 1 USD)
+      // To convert from any currency to USD:
+      // - We multiply by (1.0 / usdRate): e.g., 1 EUR * (1/0.92) = 1.08 USD or 1 JPY * (1/108) = 0.0093 USD
       let sql = """
-          WITH default_currency AS (
-              SELECT code, usdRate 
-              FROM currencies 
-              WHERE id = ?
+          WITH total_in_usd AS (
+              -- First convert everything to USD (multiply by the inverse of usdRate for non-USD currencies)
+              SELECT SUM(
+                  CASE 
+                      WHEN c.code = 'USD' THEN d.usageRate 
+                      ELSE d.usageRate * (1.0 / c.usdRate)
+                  END / urp.daysMultiplier
+              ) AS usd_total
+              FROM devices d
+              JOIN currencies c ON d.currencyId = c.id
+              JOIN usage_rate_periods urp ON d.usageRatePeriodId = urp.id
           )
           SELECT 
-              dc.code AS currency_code,
-              SUM(
-                  CASE
-                      -- Convert to default currency through USD as the common denominator
-                      WHEN c.id != ? THEN d.usageRate * (c.usdRate / dc.usdRate) / urp.daysMultiplier
-                      ELSE d.usageRate / urp.daysMultiplier
-                  END
-              ) AS total_daily_cost
-          FROM devices d
-          JOIN currencies c ON d.currencyId = c.id
-          JOIN usage_rate_periods urp ON d.usageRatePeriodId = urp.id,
-          default_currency dc
-          GROUP BY dc.code;
+              c.code AS currency_code,
+              CASE 
+                  -- For USD, return as is
+                  WHEN c.code = 'USD' THEN tu.usd_total
+                  -- For other currencies, convert from USD to target currency
+                  -- If target currency's usdRate is X (meaning X units = 1 USD)
+                  -- Then to convert USD to that currency, we multiply by usdRate:
+                  -- For example: 3.18 USD * 0.92 = 2.93 EUR or 3.18 USD * 108 = 343.44 JPY
+                  ELSE tu.usd_total * c.usdRate
+              END AS total_daily_cost
+          FROM total_in_usd tu
+          JOIN currencies c ON c.id = ?
       """
 
       // Execute the query and map results
-      return try Row.fetchOne(db, sql: sql, arguments: [defaultCurrencyId, defaultCurrencyId]).map { row in
+      return try Row.fetchOne(db, sql: sql, arguments: [defaultCurrencyId]).map { row in
         let currencyCode: String = row["currency_code"] 
         let totalDailyCost: Double = row["total_daily_cost"]
         return .init(currencyCode: currencyCode, totalDailyCost: totalDailyCost)

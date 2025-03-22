@@ -18,7 +18,7 @@ public struct AddCurrencyView: View {
     public var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("Currency Information")) {
+                Section(header: Text("Currency Information"), footer: Text("Enter the direct exchange rate: how many units of this currency equal exactly 1 USD. Exchange rates vary over time, so enter the current market value.").font(.caption)) {
                     TextField("Code (e.g. GBP)", text: $code)
                         .autocapitalization(.allCharacters)
                         .disableAutocorrection(true)
@@ -27,8 +27,14 @@ public struct AddCurrencyView: View {
                     
                     TextField("Name (e.g. British Pound)", text: $name)
                     
-                    TextField("Exchange Rate to USD", text: $usdRate)
-                        .keyboardType(.decimalPad)
+                    VStack(alignment: .leading, spacing: 4) {
+                        TextField("Exchange Rate to USD", text: $usdRate)
+                            .keyboardType(.decimalPad)
+                        
+                        Text("Enter how many units of this currency equals 1 USD")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 }
                 
                 Section {

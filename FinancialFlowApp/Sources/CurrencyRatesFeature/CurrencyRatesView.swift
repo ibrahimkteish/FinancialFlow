@@ -118,7 +118,14 @@ public struct CurrencyRatesView: View {
             } else {
                 let rateIndex = rates.firstIndex(where: { $0.0.id == currency.id })
                 TextField("Rate", text: Binding(
-                    get: { rateIndex.map { rates[$0].1 } ?? String(format: "%.4f", currency.usdRate) },
+                    get: { 
+                        if let index = rateIndex {
+                            return rates[index].1
+                        } else {
+                            // Use modern formatting with proper precision
+                            return currency.usdRate.formatted(.number.precision(.fractionLength(0...4)))
+                        }
+                    },
                     set: { newValue in
                         if let index = rateIndex {
                             rates[index].1 = newValue
