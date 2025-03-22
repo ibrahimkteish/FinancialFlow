@@ -150,23 +150,76 @@ public struct Analytics: Sendable {
   public struct PMetrics: FetchKeyRequest {
 
     public func fetch(_ db: Database) throws -> PortfolioMetrics? {
+      // First get the default currency
+      let defaultCurrencyRow = try Row.fetchOne(db, sql: "SELECT defaultCurrencyId FROM app_settings LIMIT 1")
+      let defaultCurrencyId = defaultCurrencyRow?["defaultCurrencyId"] as? Int64 ?? 1 // Fallback to 1 (USD)
+      
       let sql = """
-                SELECT 
-                    COUNT(*) as totalDevices,
-                    SUM(purchasePrice) as totalPurchaseValue,
-                    AVG(julianday('now') - julianday(purchaseDate)) as averageAge,
-                    SUM(
-                        CASE 
-                            WHEN d.usageRatePeriodId = 1 THEN d.usageRate * (julianday('now') - julianday(d.purchaseDate))
-                            WHEN d.usageRatePeriodId = 2 THEN d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/7)
-                            WHEN d.usageRatePeriodId = 3 THEN d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/30)
-                            ELSE d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/365)
-                        END
-                    ) as totalConsumedValue
-                FROM devices d
-            """
+                WITH values_in_default AS (
+                    -- Convert all values to default currency
+                    SELECT 
+                        COUNT(*) as totalDevices,
+                        SUM(
+                            CASE 
+                                -- For same currency, use as is
+                                WHEN d.currencyId = ? THEN d.purchasePrice
+                                -- For USD to other, multiply by exchange rate
+                                WHEN target.code = 'USD' THEN d.purchasePrice * (1.0 / source.usdRate)
+                                -- For other to USD, multiply by USD rate
+                                WHEN source.code = 'USD' THEN d.purchasePrice * target.usdRate
+                                -- For other currencies, convert through USD
+                                ELSE d.purchasePrice * (1.0 / source.usdRate) * target.usdRate
+                            END
+                        ) as totalPurchaseValue,
+                        AVG(julianday('now') - julianday(d.purchaseDate)) as averageAge,
+                        SUM(
+                            CASE 
+                                -- For same currency, use as is
+                                WHEN d.currencyId = ? THEN
+                                    CASE 
+                                        WHEN d.usageRatePeriodId = 1 THEN d.usageRate * (julianday('now') - julianday(d.purchaseDate))
+                                        WHEN d.usageRatePeriodId = 2 THEN d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/7)
+                                        WHEN d.usageRatePeriodId = 3 THEN d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/30)
+                                        ELSE d.usageRate * ((julianday('now') - julianday(d.purchaseDate))/365)
+                                    END
+                                -- For different currencies, convert the usage rate first
+                                ELSE
+                                    CASE 
+                                        WHEN d.usageRatePeriodId = 1 THEN 
+                                            (CASE 
+                                                WHEN target.code = 'USD' THEN d.usageRate * (1.0 / source.usdRate)
+                                                WHEN source.code = 'USD' THEN d.usageRate * target.usdRate
+                                                ELSE d.usageRate * (1.0 / source.usdRate) * target.usdRate
+                                            END) * (julianday('now') - julianday(d.purchaseDate))
+                                        WHEN d.usageRatePeriodId = 2 THEN 
+                                            (CASE 
+                                                WHEN target.code = 'USD' THEN d.usageRate * (1.0 / source.usdRate)
+                                                WHEN source.code = 'USD' THEN d.usageRate * target.usdRate
+                                                ELSE d.usageRate * (1.0 / source.usdRate) * target.usdRate
+                                            END) * ((julianday('now') - julianday(d.purchaseDate))/7)
+                                        WHEN d.usageRatePeriodId = 3 THEN 
+                                            (CASE 
+                                                WHEN target.code = 'USD' THEN d.usageRate * (1.0 / source.usdRate)
+                                                WHEN source.code = 'USD' THEN d.usageRate * target.usdRate
+                                                ELSE d.usageRate * (1.0 / source.usdRate) * target.usdRate
+                                            END) * ((julianday('now') - julianday(d.purchaseDate))/30)
+                                        ELSE 
+                                            (CASE 
+                                                WHEN target.code = 'USD' THEN d.usageRate * (1.0 / source.usdRate)
+                                                WHEN source.code = 'USD' THEN d.usageRate * target.usdRate
+                                                ELSE d.usageRate * (1.0 / source.usdRate) * target.usdRate
+                                            END) * ((julianday('now') - julianday(d.purchaseDate))/365)
+                                    END
+                            END
+                        ) as totalConsumedValue
+                    FROM devices d
+                    JOIN currencies source ON d.currencyId = source.id
+                    JOIN currencies target ON target.id = ?
+                )
+                SELECT * FROM values_in_default
+                """
 
-      let row = try Row.fetchOne(db, sql: sql)
+      let row = try Row.fetchOne(db, sql: sql, arguments: [defaultCurrencyId, defaultCurrencyId, defaultCurrencyId])
 
       let totalDevices = row?["totalDevices"] as? Int ?? 0
       let totalPurchaseValue = row?["totalPurchaseValue"] as? Double ?? 0
