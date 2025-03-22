@@ -32,13 +32,25 @@ public struct HomeView: View {
 
     @ViewBuilder
     private var devices: some View {
-        ScrollView {
-                VStack {
-                    ForEach(self.store.state.devices, id: \.id) { device in
-                        DeviceCardView(data: device)
+        List {
+            ForEach(self.store.state.devices, id: \.id) { device in
+                DeviceCardView(data: device)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            if let id = device.id {
+                                store.send(.removeDevice(id))
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
                     }
-                }
             }
+            .listRowBackground(Color.clear)
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
     }
 
     public var body: some View {
