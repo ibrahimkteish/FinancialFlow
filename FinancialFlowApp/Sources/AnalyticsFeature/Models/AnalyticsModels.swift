@@ -48,8 +48,8 @@ public struct DeviceUsageMetrics: Equatable, Identifiable, Sendable {
     let purchaseValue: Double
     let dailyUsageRate: Double
     let elapsedDays: Int
-    let currency: String
-    
+    let currencyCode: String
+
     var totalPlannedDays: Double {
         purchaseValue / dailyUsageRate
     }
@@ -92,6 +92,15 @@ public enum AnalyticsTimeRange: String, CaseIterable, Sendable, Equatable {
         case .month: return 30
         case .quarter: return 90
         case .year: return 365
+        }
+    }
+    
+    var monthsCount: Int {
+        switch self {
+        case .week: return 1
+        case .month: return 1
+        case .quarter: return 3
+        case .year: return 12
         }
     }
 } 

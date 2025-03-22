@@ -111,7 +111,7 @@ public actor AnalyticsService: Sendable {
                         ELSE d.usageRate / 365
                     END as daily_usage_rate,
                     julianday('now') - julianday(d.purchaseDate) as elapsed_days,
-                    c.symbol as currency
+                    c.code as currency_code
                 FROM devices d
                 JOIN currencies c ON d.currencyId = c.id
             """
@@ -126,7 +126,7 @@ public actor AnalyticsService: Sendable {
                     purchaseValue: row["purchaseValue"] as? Double ?? 0,
                     dailyUsageRate: dailyUsageRate,
                     elapsedDays: elapsedDays,
-                    currency: row["currency"] as? String ?? "$"
+                    currencyCode: row["currency_code"] as? String ?? "USD"
                 )
             }
         }

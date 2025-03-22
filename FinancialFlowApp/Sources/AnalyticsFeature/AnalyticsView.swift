@@ -11,15 +11,7 @@ public struct AnalyticsView: View {
   public var body: some View {
     ScrollView {
       VStack(spacing: 20) {
-        timeRangePicker
         portfolioOverview
-        if let usageMetrics = store.usage {
-          UsageChartView(
-            data: usageMetrics.monthlyData,
-            currency: "$"
-          )
-          .padding(.horizontal)
-        }
         deviceUsageList
       }
       .padding(.vertical)
@@ -36,20 +28,10 @@ public struct AnalyticsView: View {
     }
   }
 
-  private var timeRangePicker: some View {
-    Picker("Time Range", selection: self.$store.selectedTimeRange) {
-      ForEach(AnalyticsTimeRange.allCases, id: \.self) { range in
-        Text(range.rawValue).tag(range)
-      }
-    }
-    .pickerStyle(.segmented)
-    .padding(.horizontal)
-  }
-
   private var portfolioOverview: some View {
     LazyVGrid(columns: [
-      GridItem(.flexible()),
-      GridItem(.flexible())
+      GridItem(.flexible(minimum: 150), spacing: 16, alignment: .center),
+      GridItem(.flexible(minimum: 150), spacing: 16, alignment: .center)
     ], spacing: 16) {
       AnalyticsCard(
         title: "Total Purchase Value",
@@ -58,9 +40,7 @@ public struct AnalyticsView: View {
 
       AnalyticsCard(
         title: "Remaining Value",
-        value: store.formattedRemainingValue,
-        trend: store.portfolioMetrics?.remainingValuePercentage,
-        trendIsPositive: store.portfolioMetrics?.remainingValuePercentage ?? 0 > 50
+        value: store.formattedRemainingValue
       )
 
       AnalyticsCard(
@@ -70,8 +50,7 @@ public struct AnalyticsView: View {
 
       AnalyticsCard(
         title: "Daily Usage",
-        value: store.formattedDailyUsage,
-        subtitle: "Average across all devices"
+        value: store.formattedDailyUsage
       )
     }
     .padding(.horizontal)
@@ -98,12 +77,14 @@ public struct AnalyticsView: View {
 
           HStack {
             VStack(alignment: .leading) {
-              Text("Daily Rate: \(metric.currency)\(String(format: "%.2f", metric.dailyUsageRate))")
+              Text("Daily Rate: \(metric.dailyUsageRate.formatted(.currency(code: metric.currencyCode)))")
+                .environment(\.locale, Locale.current)
               Text("Days Left: \(Int(metric.daysRemaining))")
             }
             Spacer()
             VStack(alignment: .trailing) {
-              Text("Value Left: \(metric.currency)\(String(format: "%.2f", metric.remainingValue))")
+              Text("Value Left: \(metric.remainingValue.formatted(.currency(code: metric.currencyCode)))")
+                .environment(\.locale, Locale.current)
               Text("Expected: \(Int(metric.expectedConsumptionPercentage))%")
             }
           }
