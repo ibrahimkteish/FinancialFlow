@@ -26,12 +26,9 @@ public struct CurrencyRatesReducer: Sendable {
     }
 
     public func fetch(_ db: Database) throws -> [Currency] {
-      print("Fetching currencies from database with search term: \(searchTerm)")
-
       // If searchTerm is empty, fetch all currencies
       if searchTerm.isEmpty {
         let result = try Currency.fetchAll(db)
-        print("Fetched \(result.count) currencies")
         return result
       }
 
@@ -47,7 +44,6 @@ public struct CurrencyRatesReducer: Sendable {
       let pattern = "%\(lowercaseSearch)%"
 
       let result = try Currency.fetchAll(db, sql: sql, arguments: [pattern, pattern])
-      print("Fetched \(result.count) filtered currencies")
       return result
     }
   }
@@ -136,17 +132,18 @@ public struct CurrencyRatesReducer: Sendable {
             try await database.write { db in
               _ = try currency.inserted(db)
             }
-            // No need to call fetchCurrencyRates as SharedReader will auto-update
           }
 
         case let .showAlert(message):
-          state.destination = .alert(AlertState {
-            TextState(message)
-          } actions: {
-            ButtonState(role: .cancel) {
-              TextState("OK")
+          state.destination = .alert(
+            AlertState {
+              TextState(message)
+            } actions: {
+              ButtonState(role: .cancel) {
+                TextState("OK")
+              }
             }
-          })
+          )
           return .none
 
         case let .deleteCurrency(id):
@@ -163,7 +160,6 @@ public struct CurrencyRatesReducer: Sendable {
 
               // If it's the default currency, don't proceed with deletion but show alert
               if isDefault {
-                print("Cannot delete default currency (ID: \(id))")
                 await send(.showAlert("Cannot delete the default currency. Change the default currency in Settings first."))
                 return
               }
@@ -173,7 +169,6 @@ public struct CurrencyRatesReducer: Sendable {
                 _ = try Currency.deleteOne(db, key: ["id": id])
               }
             } catch {
-              print("Error with currency deletion: \(error.localizedDescription)")
               await send(.showAlert("Error deleting currency: \(error.localizedDescription)"))
             }
           }

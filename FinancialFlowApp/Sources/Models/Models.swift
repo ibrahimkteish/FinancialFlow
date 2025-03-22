@@ -154,12 +154,12 @@ extension AppSettings {
 #if DEBUG
 extension Currency {
     public static let usd = Currency(id: 1, code: "USD", symbol: "$", name: "US Dollar", usdRate: 1.0)
-    public static let eur = Currency(id: 2, code: "EUR", symbol: "€", name: "Euro", usdRate: 1.08)
-    public static let gbp = Currency(id: 3, code: "GBP", symbol: "£", name: "British Pound", usdRate: 1.26)
-    public static let jpy = Currency(id: 4, code: "JPY", symbol: "¥", name: "Japanese Yen", usdRate: 0.0067)
-    public static let chf = Currency(id: 5, code: "CHF", symbol: "Fr", name: "Swiss Franc", usdRate: 1.13)
-    public static let cad = Currency(id: 6, code: "CAD", symbol: "C$", name: "Canadian Dollar", usdRate: 0.73)
-    public static let aud = Currency(id: 7, code: "AUD", symbol: "A$", name: "Australian Dollar", usdRate: 0.66)
+    public static let eur = Currency(id: 2, code: "EUR", symbol: "€", name: "Euro", usdRate: 0.9237)
+    public static let gbp = Currency(id: 3, code: "GBP", symbol: "£", name: "British Pound", usdRate: 0.7736)
+    public static let jpy = Currency(id: 4, code: "JPY", symbol: "¥", name: "Japanese Yen", usdRate: 0.0067) // 1 JPY = 0.0067 USD
+    public static let chf = Currency(id: 5, code: "CHF", symbol: "Fr", name: "Swiss Franc", usdRate: 0.8824)
+    public static let cad = Currency(id: 6, code: "CAD", symbol: "C$", name: "Canadian Dollar", usdRate: 1.4348)
+    public static let aud = Currency(id: 7, code: "AUD", symbol: "A$", name: "Australian Dollar", usdRate: 1.5933)
 }
 #endif
 
@@ -174,7 +174,6 @@ extension DatabaseWriter where Self == DatabaseQueue {
 #if DEBUG
                 print($0.expandedDescription)
 #else
-                print($0)
 #endif
             }
         }

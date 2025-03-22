@@ -135,17 +135,6 @@ public struct HomeReducer: Sendable {
       // First get information about how the default currency is stored
       let defaultCurrency = try Currency.fetchOne(db, key: defaultCurrencyId)
       
-      // Debug output to verify rates
-      if let defaultCurrency = defaultCurrency {
-        print("Default currency: \(defaultCurrency.code), USD Rate: \(defaultCurrency.usdRate)")
-        
-        // Print a few other currencies for comparison
-        let otherCurrencies = try Currency.fetchAll(db, sql: "SELECT * FROM currencies LIMIT 5")
-        for currency in otherCurrencies {
-          print("Currency: \(currency.code), USD Rate: \(currency.usdRate)")
-        }
-      }
-      
       // In our database, usdRate represents how many units of a currency equals 1 USD
       // So for USD, usdRate = 1.0
       // For EUR, if usdRate = 0.92 (meaning 0.92 EUR = 1 USD)
