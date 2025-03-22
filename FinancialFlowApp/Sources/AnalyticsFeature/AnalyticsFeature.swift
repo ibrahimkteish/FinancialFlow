@@ -127,7 +127,7 @@ public struct Analytics: Sendable {
         )
       }
 
-      let averageDailyUsage = monthlyData.map { $0.consumedValue }.reduce(0, +) / Double(monthlyData.count) / 30
+      let averageDailyUsage = monthlyData.map (\.consumedValue).reduce(0, +) / Double(monthlyData.count) / 30
       let projectedAnnualUsage = averageDailyUsage * 365
 
       return UsageMetrics(

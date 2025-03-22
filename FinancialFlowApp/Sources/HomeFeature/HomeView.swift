@@ -6,6 +6,7 @@ import ComposableArchitecture
 import SwiftUI
 import AnalyticsFeature
 import CurrencyRatesFeature
+import SettingsFeature
 
 public struct HomeView: View {
     @Bindable var store: StoreOf<HomeReducer>
@@ -41,16 +42,18 @@ public struct HomeView: View {
     }
 
     public var body: some View {
-        NavigationStack {
+      NavigationStack(path: self.$store.scope(state: \.path, action: \.path)) {
             devices
             .toolbar {
-              ToolbarItemGroup(placement: .topBarTrailing) {
+              ToolbarItemGroup(placement: .topBarLeading) {
                 Button {
-                  store.send(.currencyRatesButtonTapped)
+                  store.send(.settingsButtonTapped)
                 } label: {
-                  Image(systemName: "dollarsign.arrow.circlepath")
+                  Image(systemName: "gear")
                 }
-
+              }
+              
+              ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
                   store.send(.analyticsButtonTapped)
                 } label: {
@@ -81,12 +84,14 @@ public struct HomeView: View {
                     AnalyticsView(store: store)
                 }
             }
-            .sheet(
-                item: self.$store.scope(state: \.destination?.currencyRate, action: \.destination.currencyRate)
-            ) { store in
-                CurrencyRateView(store: store)
-            }
             .navigationTitle("Items \(self.store.count.map { $0.totalDailyCost.formatted(.currency(code: $0.currencyCode)) } ?? "")")
+      } destination: { store in
+        switch store.case {
+          case let .settings(store):
+            SettingsView(store: store)
+          case let .currencyRates(store):
+            CurrencyRatesView(store: store)
         }
+      }
     }
 }
