@@ -241,7 +241,6 @@ public struct DeviceCardView: View {
         .background(cardBackground)
         .scaleEffect(isPressed ? 0.98 : 1.0)
         .animation(.spring(response: 0.3), value: isPressed)
-        .padding(.horizontal)
         .onTapGesture {
             withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
                 isPressed = true
