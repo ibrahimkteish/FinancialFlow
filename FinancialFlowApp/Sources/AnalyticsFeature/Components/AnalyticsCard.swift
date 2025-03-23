@@ -14,9 +14,7 @@ struct AnalyticsCard: View {
     
     var body: some View {
         VStack(alignment: .center, spacing: 8) {
-            Text(title)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+            titleText
             
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(value)
@@ -28,5 +26,12 @@ struct AnalyticsCard: View {
         .padding()
         .background(Color.secondary.opacity(0.15))
         .cornerRadius(12)
+    }
+    
+    var titleText: some View {
+        Text(title)
+            .font(.subheadline) 
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
     }
 } 

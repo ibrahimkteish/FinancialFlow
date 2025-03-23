@@ -2,11 +2,30 @@
 // created by: @ibrahim koteish
 // created at: 2025-02-18
 
+import Generated
 import ComposableArchitecture
 import Models
 import Foundation
 import GRDB
 import SharingGRDB
+
+
+extension UsageRatePeriod {
+  var localizedName: String {
+    switch self.name {
+    case "day":
+      return Strings.day
+    case "week":
+      return Strings.week
+    case "month":
+      return Strings.month
+    case "year":
+      return Strings.year
+    default:
+        return "day"
+    }
+  }
+}
 
 @Reducer
 public struct AddDeviceReducer: Sendable {

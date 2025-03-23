@@ -1,0 +1,19 @@
+--indent 2
+--maxwidth 120
+--self insert
+--commas inline
+--stripunusedargs closure-only
+--disable blankLinesAtStartOfScope, blankLinesAtEndOfScope, initCoderUnavailable, wrapMultilineStatementBraces
+--wrapparameters before-first
+--wraparguments before-first
+--wrapcollections before-first
+--swiftversion 5.7
+--ifdef no-indent
+--closingparen balanced
+--wrapreturntype preserve
+--closurevoid remove
+--exclude ./CodeGen/**
+--importgrouping alpha
+--indentcase true
+--enable sortSwitchCases
+--closurevoid preserve

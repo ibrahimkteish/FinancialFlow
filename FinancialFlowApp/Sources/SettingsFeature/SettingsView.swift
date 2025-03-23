@@ -1,3 +1,4 @@
+import Generated
 import SwiftUI
 import ComposableArchitecture
 import Models
@@ -12,50 +13,77 @@ public struct SettingsView: View {
     public var body: some View {
         Form {
             Section {
-              Picker("App Theme", selection: $store.presentation.appTheme) {
+              Picker(Strings.appTheme, selection: $store.presentation.appTheme) {
                     ForEach(SettingsReducer.AppTheme.allCases, id: \.self) { theme in
                         Text(theme.displayName)
                             .tag(theme)
                     }
                 }
-                
-              Toggle("Enable Notifications", isOn: $store.presentation.notificationsEnabled)
             } header: {
-                Text("Appearance")
+              Text(Strings.appearance)
             } footer: {
-                Text("Theme changes will affect the app's appearance.")
+              Text(Strings.themeFooter)
             }
             
             Section {
                 if let currency = store.presentation.defaultCurrency {
                     HStack {
-                        Text("Default Currency")
+                      Text(Strings.defaultCurrency)
                         Spacer()
                         Text("\(currency.code) (\(currency.symbol))")
                             .foregroundColor(.secondary)
                     }
                     
-                    Button("Change Default Currency") {
+                    Button(Strings.changeDefaultCurrency) {
                         store.send(.showCurrencyPicker)
                     }
                 } else {
-                    Button("Set Default Currency") {
+                    Button(Strings.setDefaultCurrency) {
                         store.send(.showCurrencyPicker)
                     }
                 }
                 
-                Button("View Currency Rates") {
+                Button(Strings.viewCurrencyRates) {
                     store.send(.openCurrencyRates)
                 }
             } header: {
-                Text("Currency")
+                Text(Strings.currency)
+            }
+            
+            Section {
+                Button {
+                    store.send(.openLanguageSettings)
+                } label: {
+                    HStack {
+                        Text(Strings.language)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            } header: {
+                Text(Strings.languageRegion)
+            } footer: {
+                Text(Strings.opensSettings)
+            }
+            
+            Section {
+                HStack {
+                    Text(Strings.version)
+                    Spacer()
+                    Text("\(store.appVersion) (\(store.buildNumber))")
+                        .foregroundColor(.secondary)
+                }
+            } header: {
+                Text(Strings.about)
             }
         }
         .task {
           await store.send(.onAppear).finish()
         }
         .navigationTitle("Settings")
-    
+
         .sheet(isPresented: $store.isShowingCurrencyPicker) {
             NavigationStack {
                 CurrencyPickerView(
@@ -86,7 +114,7 @@ struct CurrencyPickerView: View {
                 onSelect(nil)
             } label: {
                 HStack {
-                    Text("None")
+                    Text(Strings.none)
                     Spacer()
                     if selectedCurrencyId == nil {
                         Image(systemName: "checkmark")
@@ -110,10 +138,10 @@ struct CurrencyPickerView: View {
                 }
             }
         }
-        .navigationTitle("Select Currency")
+        .navigationTitle(Strings.selectCurrency)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") {
+              Button(Strings.cancel) {
                     onCancel()
                 }
             }

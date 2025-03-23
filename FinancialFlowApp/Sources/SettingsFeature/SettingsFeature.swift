@@ -2,11 +2,14 @@
 // created by: @ibrahim koteish
 // created at: 2025-03-8
 
+import BuildClient
 import ComposableArchitecture
 import Models
 import Foundation
 import GRDB
 import SharingGRDB
+import UIApplicationClient
+import UIKit
 
 // A struct to hold settings with optional default currency
 public struct AppSettingsWithCurrency: Equatable, Sendable {
@@ -59,6 +62,9 @@ public struct SettingsReducer: Sendable {
         defaultCurrency: .usd
       )
     public var isShowingCurrencyPicker = false
+    
+    public var appVersion: String = ""
+    public var buildNumber: String = ""
 
     public init() {}
     
@@ -101,6 +107,17 @@ public struct SettingsReducer: Sendable {
         case .system: return "System"
       }
     }
+
+    public var userInterfaceStyle: UIUserInterfaceStyle {
+      switch self {
+        case .dark:
+          return .dark
+        case .light:
+          return .light
+        case .system:
+          return .unspecified
+      }
+    }
   }
 
   public enum Action: BindableAction, Equatable, Sendable {
@@ -109,9 +126,11 @@ public struct SettingsReducer: Sendable {
     case hideCurrencyPicker
     case setDefaultCurrency(Int64?)
     case openCurrencyRates
+    case openLanguageSettings
     case onAppear
     case delegate(Delegate)
     case updatePresentation(AppSettingsWithCurrency)
+    case updateVersionInfo(appVersion: String, buildNumber: String)
     
     @CasePathable
     public enum Delegate: Equatable, Sendable {
@@ -119,7 +138,9 @@ public struct SettingsReducer: Sendable {
     }
   }
 
+  @Dependency(\.build) var build
   @Dependency(\.defaultDatabase) var database
+  @Dependency(\.applicationClient) var applicationClient
 
   public init() {}
 
@@ -143,6 +164,7 @@ public struct SettingsReducer: Sendable {
               // Update the settings in database
               try settings.update(db)
             }
+            await applicationClient.setUserInterfaceStyle(appTheme.userInterfaceStyle)
           }
 
         case .binding:
@@ -174,18 +196,34 @@ public struct SettingsReducer: Sendable {
             await send(.hideCurrencyPicker)
           }
 
+        case .openCurrencyRates:
+          return .send(.delegate(.currencyRatesTapped))
+
+        case .openLanguageSettings:
+          return .run { _ in
+            // Open Settings app language section
+            await applicationClient.openSettings()
+          }
+
         case .onAppear:          
-          return .run { [state] send in
+          return .run { [state] send in 
+            // Get app version and build number and send them to the reducer
+            let appVersion = build.buildVersion()
+            let buildNumber = build.buildNumber()
+            await send(.updateVersionInfo(appVersion: appVersion, buildNumber: buildNumber))
+            
             for await newValue in state.$settingsWithCurrency.publisher.values {
               await send(.updatePresentation(newValue))
             }
           }
 
-        case .openCurrencyRates:
-          return .send(.delegate(.currencyRatesTapped))
-
         case let .updatePresentation(newValue):
           state.updatePresentation(from: newValue)
+          return .none
+
+        case let .updateVersionInfo(appVersion, buildNumber):
+          state.appVersion = appVersion
+          state.buildNumber = buildNumber
           return .none
       }
     }

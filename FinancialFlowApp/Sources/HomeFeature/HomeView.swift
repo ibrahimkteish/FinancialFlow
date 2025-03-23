@@ -7,6 +7,7 @@ import SwiftUI
 import AnalyticsFeature
 import CurrencyRatesFeature
 import SettingsFeature
+import Generated
 
 public struct HomeView: View {
     @Bindable var store: StoreOf<HomeReducer>
@@ -22,7 +23,7 @@ public struct HomeView: View {
                 Button {
                     store.send(.onSortChanged(ordering))
                 } label: {
-                    Text(ordering.rawValue)
+                    Text(ordering.localizedName)
                 }
             }
         } label: {
@@ -43,7 +44,7 @@ public struct HomeView: View {
                                 store.send(.removeDevice(id))
                             }
                         } label: {
-                            Label("Delete", systemImage: "trash")
+                            Label(Strings.delete, systemImage: "trash")
                         }
                     }
             }
@@ -81,6 +82,9 @@ public struct HomeView: View {
                 }
               }
             }
+            .onAppear {
+              store.send(.onAppear)
+            }
             .sheet(
                 item: self.$store.scope(state: \.destination?.addDevice, action: \.destination.addDevice)
             ) { store in
@@ -96,7 +100,9 @@ public struct HomeView: View {
                     AnalyticsView(store: store)
                 }
             }
-            .navigationTitle("Items \(self.store.count.map { $0.totalDailyCost.formatted(.currency(code: $0.currencyCode)) } ?? "")")
+            .navigationTitle(self.store.count.map { 
+                Strings.itemsWithCost($0.totalDailyCost.formatted(.currency(code: $0.currencyCode)))
+            } ?? "")
       } destination: { store in
         switch store.case {
           case let .settings(store):

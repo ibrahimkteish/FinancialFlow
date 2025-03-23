@@ -12,6 +12,7 @@ import AddDeviceFeature
 import AnalyticsFeature
 import CurrencyRatesFeature
 import SettingsFeature
+import Generated
 
 public struct CurrencyCost: FetchableRecord, Decodable, Equatable, Sendable {
   let currencyCode: String
@@ -50,6 +51,9 @@ public struct HomeReducer: Sendable {
     var ordering: Ordering = .created
     @SharedReader(.fetch(Aggregate()))
     public var count: CurrencyCost? = nil
+    
+    @SharedReader(.fetch(SettingsReducer.SettingsFetcher()))
+    public var settingsWithCurrency: AppSettingsWithCurrency = .init()
 
     var path = StackState<Path.State>()
 
@@ -71,6 +75,16 @@ public struct HomeReducer: Sendable {
         case .name: return Column("name")
         case .currency: return Column("currencyId")
         case .price: return Column("purchasePrice")
+      }
+    }
+
+    var localizedName: String {
+      switch self {
+        case .created: return Strings.createdAt
+        case .updatedAt: return Strings.updatedAt
+        case .name: return Strings.name
+        case .currency: return Strings.currency
+        case .price: return Strings.purchasePrice
       }
     }
   }
@@ -132,9 +146,6 @@ public struct HomeReducer: Sendable {
         defaultCurrencyId = usdRow?["id"] as? Int64 ?? 1 // Fallback to ID 1 if USD not found
       }
 
-      // First get information about how the default currency is stored
-      let defaultCurrency = try Currency.fetchOne(db, key: defaultCurrencyId)
-      
       // In our database, usdRate represents how many units of a currency equals 1 USD
       // So for USD, usdRate = 1.0
       // For EUR, if usdRate = 0.92 (meaning 0.92 EUR = 1 USD)
@@ -193,6 +204,7 @@ public struct HomeReducer: Sendable {
   }
 
   @Dependency(\.defaultDatabase) var database
+  @Dependency(\.applicationClient) var applicationClient
 
   public init() {}
 
@@ -222,7 +234,11 @@ public struct HomeReducer: Sendable {
           }
 
         case .onAppear:
-          return .none
+          return .run { [state] send in
+            // Apply theme from settings
+            let savedTheme = SettingsReducer.AppTheme(rawValue: state.settingsWithCurrency.settings.themeMode) ?? .system
+            await applicationClient.setUserInterfaceStyle(savedTheme.userInterfaceStyle)
+          }
 
         case let .onSortChanged(newSort):
           state.$ordering.withLock { $0 = newSort }
