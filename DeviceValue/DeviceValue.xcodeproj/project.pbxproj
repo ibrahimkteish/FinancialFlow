@@ -26,9 +26,22 @@
 		CD2B573E2D60B0E600E18194 /* DeviceValueTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeviceValueTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		95840A022D9084E400C3CECB /* Exceptions for "DeviceValue" folder in "DeviceValue" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CD2B572D2D60B0E400E18194 /* DeviceValue */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CD2B57302D60B0E400E18194 /* DeviceValue */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				95840A022D9084E400C3CECB /* Exceptions for "DeviceValue" folder in "DeviceValue" target */,
+			);
 			path = DeviceValue;
 			sourceTree = "<group>";
 		};
@@ -351,6 +364,7 @@
 				DEVELOPMENT_TEAM = 996NENJTSD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DeviceValue/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -381,6 +395,7 @@
 				DEVELOPMENT_TEAM = 996NENJTSD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DeviceValue/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
