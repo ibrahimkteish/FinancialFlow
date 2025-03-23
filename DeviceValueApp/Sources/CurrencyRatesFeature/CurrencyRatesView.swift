@@ -1,23 +1,23 @@
-import SwiftUI
-import Models
 import ComposableArchitecture
+import Models
 import SharingGRDB
+import SwiftUI
 
 public struct CurrencyRatesView: View {
-    @Bindable var store: StoreOf<CurrencyRatesReducer>
-    @Environment(\.dismiss) private var dismiss
-    @State private var rates: [(Currency, String)] = []
-    
-    public init(store: StoreOf<CurrencyRatesReducer>) {
-        self.store = store
-    }
-    
+  @Bindable var store: StoreOf<CurrencyRatesReducer>
+  @Environment(\.dismiss) private var dismiss
+  @State private var rates: [(Currency, String)] = []
+
+  public init(store: StoreOf<CurrencyRatesReducer>) {
+    self.store = store
+  }
+
   public var body: some View {
     VStack {
       List {
         if store.currencies.isEmpty {
           // Only show loading if there are actually currencies in the database but they're not loaded yet
-          if store.totalCurrenciesCount > 0 && store.searchTerm.isEmpty {
+          if store.totalCurrenciesCount > 0, store.searchTerm.isEmpty {
             Section {
               HStack {
                 Spacer()
@@ -92,77 +92,77 @@ public struct CurrencyRatesView: View {
       }
     }
   }
-    
-    @ViewBuilder
-    private func currencyRow(_ currency: Currency) -> some View {
+
+  @ViewBuilder
+  private func currencyRow(_ currency: Currency) -> some View {
+    HStack {
+      VStack(alignment: .leading, spacing: 4) {
         HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text(currency.symbol)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    Text(currency.name)
-                        .font(.headline)
-                }
-                Text(currency.code)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-            
-            if currency.code == "USD" {
-                Text("Base")
-                    .foregroundColor(.secondary)
-                    .fontWeight(.medium)
+          Text(currency.symbol)
+            .font(.headline)
+            .foregroundColor(.primary)
+          Text(currency.name)
+            .font(.headline)
+        }
+        Text(currency.code)
+          .font(.subheadline)
+          .foregroundColor(.secondary)
+      }
+
+      Spacer()
+
+      if currency.code == "USD" {
+        Text("Base")
+          .foregroundColor(.secondary)
+          .fontWeight(.medium)
+      } else {
+        let rateIndex = rates.firstIndex(where: { $0.0.id == currency.id })
+        TextField("Rate", text: Binding(
+          get: {
+            if let index = rateIndex {
+              return rates[index].1
             } else {
-                let rateIndex = rates.firstIndex(where: { $0.0.id == currency.id })
-                TextField("Rate", text: Binding(
-                    get: { 
-                        if let index = rateIndex {
-                            return rates[index].1
-                        } else {
-                            // Use modern formatting with proper precision
-                            return currency.usdRate.formatted(.number.precision(.fractionLength(0...4)))
-                        }
-                    },
-                    set: { newValue in
-                        if let index = rateIndex {
-                            rates[index].1 = newValue
-                        } else {
-                            rates.append((currency, newValue))
-                        }
-                    }
-                ))
-                .keyboardType(.decimalPad)
-                .multilineTextAlignment(.trailing)
-                .frame(width: 100)
-                .padding(8)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
+              // Use modern formatting with proper precision
+              return currency.usdRate.formatted(.number.precision(.fractionLength(0 ... 4)))
             }
-        }
-        .padding(.vertical, 4)
-        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-            if currency.code != "USD" { // Don't allow deleting the base currency
-                Button(role: .destructive) {
-                    if let id = currency.id {
-                        store.send(.deleteCurrency(id))
-                    }
-                } label: {
-                    Label("Delete", systemImage: "trash")
-                }
+          },
+          set: { newValue in
+            if let index = rateIndex {
+              rates[index].1 = newValue
+            } else {
+              rates.append((currency, newValue))
             }
-        }
+          }
+        ))
+        .keyboardType(.decimalPad)
+        .multilineTextAlignment(.trailing)
+        .frame(width: 100)
+        .padding(8)
+        .background(Color(.systemGray6))
+        .cornerRadius(8)
+      }
     }
+    .padding(.vertical, 4)
+    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+      if currency.code != "USD" { // Don't allow deleting the base currency
+        Button(role: .destructive) {
+          if let id = currency.id {
+            store.send(.deleteCurrency(id))
+          }
+        } label: {
+          Label("Delete", systemImage: "trash")
+        }
+      }
+    }
+  }
 }
 
 #Preview {
-    CurrencyRatesView(
-        store: Store(
-            initialState: CurrencyRatesReducer.State()
-        ) {
-            CurrencyRatesReducer()
-        }
-    )
-} 
+  CurrencyRatesView(
+    store: Store(
+      initialState: CurrencyRatesReducer.State()
+    ) {
+      CurrencyRatesReducer()
+    }
+  )
+}

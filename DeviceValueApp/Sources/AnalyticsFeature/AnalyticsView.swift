@@ -1,6 +1,6 @@
-import SwiftUI
 import ComposableArchitecture
 import Generated
+import SwiftUI
 
 public struct AnalyticsView: View {
   @Bindable var store: StoreOf<Analytics>
@@ -93,7 +93,11 @@ public struct AnalyticsView: View {
           .foregroundColor(.secondary)
 
           // Usage slider (hidden thumb)
-          HiddenThumbSlider(value: Double(metric.consumptionPercentage), range: 0...100, accentColor: metric.isWithinExpectedUsage ? UIColor.red : UIColor.green)
+          HiddenThumbSlider(
+            value: Double(metric.consumptionPercentage),
+            range: 0 ... 100,
+            accentColor: metric.isWithinExpectedUsage ? UIColor.red : UIColor.green
+          )
         }
         .padding()
         .background(Color(.secondarySystemBackground))

@@ -4,22 +4,22 @@
 
 import BuildClient
 import ComposableArchitecture
-import Models
 import Foundation
 import GRDB
+import Models
 import SharingGRDB
 import UIApplicationClient
 import UIKit
 
 // A struct to hold settings with optional default currency
 public struct AppSettingsWithCurrency: Equatable, Sendable {
-    public var settings: AppSettings
-    public var defaultCurrency: Currency?
-    
-    public init(settings: AppSettings = .init(), defaultCurrency: Currency? = nil) {
-        self.settings = settings
-        self.defaultCurrency = defaultCurrency
-    }
+  public var settings: AppSettings
+  public var defaultCurrency: Currency?
+
+  public init(settings: AppSettings = .init(), defaultCurrency: Currency? = nil) {
+    self.settings = settings
+    self.defaultCurrency = defaultCurrency
+  }
 }
 
 @Reducer
@@ -38,7 +38,7 @@ public struct SettingsReducer: Sendable {
         .fetchOne(db) ?? AppSettings()
 
       // Get the associated currency if there's a defaultCurrencyId
-      var currency: Currency? = nil
+      var currency: Currency?
       if let currencyId = settings.defaultCurrencyId {
         currency = try Currency.fetchOne(db, key: currencyId)
       }
@@ -56,23 +56,23 @@ public struct SettingsReducer: Sendable {
     public var availableCurrencies: [Currency]
 
     public var presentation = SettingsPresentation(
-        appTheme: .dark,
-        notificationsEnabled: false,
-        defaultCurrencyId: 0,
-        defaultCurrency: .usd
-      )
+      appTheme: .dark,
+      notificationsEnabled: false,
+      defaultCurrencyId: 0,
+      defaultCurrency: .usd
+    )
     public var isShowingCurrencyPicker = false
-    
+
     public var appVersion: String = ""
     public var buildNumber: String = ""
 
     public init() {}
-    
+
     mutating func updatePresentation(from settings: AppSettingsWithCurrency) {
-      presentation.appTheme = AppTheme(rawValue: settings.settings.themeMode) ?? .system
-      presentation.notificationsEnabled = settings.settings.notificationsEnabled
-      presentation.defaultCurrencyId = settings.settings.defaultCurrencyId
-      presentation.defaultCurrency = settings.defaultCurrency
+      self.presentation.appTheme = AppTheme(rawValue: settings.settings.themeMode) ?? .system
+      self.presentation.notificationsEnabled = settings.settings.notificationsEnabled
+      self.presentation.defaultCurrencyId = settings.settings.defaultCurrencyId
+      self.presentation.defaultCurrency = settings.defaultCurrency
     }
   }
 
@@ -81,7 +81,7 @@ public struct SettingsReducer: Sendable {
     public var notificationsEnabled: Bool
     public var defaultCurrencyId: Int64?
     public var defaultCurrency: Currency?
-    
+
     public init(
       appTheme: AppTheme,
       notificationsEnabled: Bool,
@@ -131,7 +131,7 @@ public struct SettingsReducer: Sendable {
     case delegate(Delegate)
     case updatePresentation(AppSettingsWithCurrency)
     case updateVersionInfo(appVersion: String, buildNumber: String)
-    
+
     @CasePathable
     public enum Delegate: Equatable, Sendable {
       case currencyRatesTapped
@@ -158,7 +158,7 @@ public struct SettingsReducer: Sendable {
             defaultCurrencyId: defaultCurrencyId,
             notificationsEnabled: notificationsEnabled
           )
-          
+
           return .run { _ in
             try await database.write { db in
               // Update the settings in database
@@ -205,13 +205,13 @@ public struct SettingsReducer: Sendable {
             await applicationClient.openSettings()
           }
 
-        case .onAppear:          
-          return .run { [state] send in 
+        case .onAppear:
+          return .run { [state] send in
             // Get app version and build number and send them to the reducer
             let appVersion = build.buildVersion()
             let buildNumber = build.buildNumber()
             await send(.updateVersionInfo(appVersion: appVersion, buildNumber: buildNumber))
-            
+
             for await newValue in state.$settingsWithCurrency.publisher.values {
               await send(.updatePresentation(newValue))
             }

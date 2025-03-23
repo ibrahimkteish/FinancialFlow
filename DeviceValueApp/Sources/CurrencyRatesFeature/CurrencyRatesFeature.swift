@@ -27,20 +27,20 @@ public struct CurrencyRatesReducer: Sendable {
 
     public func fetch(_ db: Database) throws -> [Currency] {
       // If searchTerm is empty, fetch all currencies
-      if searchTerm.isEmpty {
+      if self.searchTerm.isEmpty {
         let result = try Currency.fetchAll(db)
         return result
       }
 
       // Otherwise, filter currencies at the database level
       // This uses SQL LIKE for case-insensitive prefix/contains matching
-      let lowercaseSearch = searchTerm.lowercased()
+      let lowercaseSearch = self.searchTerm.lowercased()
       let sql = """
-                SELECT * FROM currencies 
-                WHERE LOWER(name) LIKE ? 
-                OR LOWER(code) LIKE ? 
-                ORDER BY code = 'USD' DESC, name
-            """
+          SELECT * FROM currencies 
+          WHERE LOWER(name) LIKE ? 
+          OR LOWER(code) LIKE ? 
+          ORDER BY code = 'USD' DESC, name
+      """
       let pattern = "%\(lowercaseSearch)%"
 
       let result = try Currency.fetchAll(db, sql: sql, arguments: [pattern, pattern])
@@ -58,7 +58,7 @@ public struct CurrencyRatesReducer: Sendable {
 
     @SharedReader(.fetch(CurrencyFetcher()))
     public var currencies: [Currency]
-    
+
     @SharedReader(.fetchOne(sql: "SELECT COUNT(*) FROM currencies"))
     public var totalCurrenciesCount: Int = 0
 
@@ -151,7 +151,7 @@ public struct CurrencyRatesReducer: Sendable {
             do {
               // First check if this is the default currency in a read transaction
               let isDefault = try await database.read { db in
-                return try Row.fetchOne(
+                try Row.fetchOne(
                   db,
                   sql: "SELECT 1 FROM app_settings WHERE defaultCurrencyId = ?",
                   arguments: [id]
@@ -160,7 +160,9 @@ public struct CurrencyRatesReducer: Sendable {
 
               // If it's the default currency, don't proceed with deletion but show alert
               if isDefault {
-                await send(.showAlert("Cannot delete the default currency. Change the default currency in Settings first."))
+                await send(
+                  .showAlert("Cannot delete the default currency. Change the default currency in Settings first.")
+                )
                 return
               }
 

@@ -12,8 +12,8 @@
 --closingparen balanced
 --wrapreturntype preserve
 --closurevoid remove
---exclude ./CodeGen/**
+--exclude /Sources/Generated/CodeGen/**
 --importgrouping alpha
 --indentcase true
---enable sortSwitchCases
+--enable sortedSwitchCases
 --closurevoid preserve

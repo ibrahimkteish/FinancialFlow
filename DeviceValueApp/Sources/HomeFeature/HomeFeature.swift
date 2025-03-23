@@ -5,14 +5,14 @@
 //  Created by Ibrahim Koteish on 15/2/25.
 //
 
-import ComposableArchitecture
-import Models
-import SharingGRDB
 import AddDeviceFeature
 import AnalyticsFeature
+import ComposableArchitecture
 import CurrencyRatesFeature
-import SettingsFeature
 import Generated
+import Models
+import SettingsFeature
+import SharingGRDB
 
 public struct CurrencyCost: FetchableRecord, Decodable, Equatable, Sendable {
   let currencyCode: String
@@ -51,7 +51,7 @@ public struct HomeReducer: Sendable {
     var ordering: Ordering = .created
     @SharedReader(.fetch(Aggregate()))
     public var count: CurrencyCost? = nil
-    
+
     @SharedReader(.fetch(SettingsReducer.SettingsFetcher()))
     public var settingsWithCurrency: AppSettingsWithCurrency = .init()
 
@@ -66,7 +66,6 @@ public struct HomeReducer: Sendable {
     case name = "Name"
     case price = "PurchasePrice"
     case updatedAt = "UpdatedAt"
-    
 
     var orderingTerm: any SQLOrderingTerm & Sendable {
       switch self {
@@ -91,11 +90,12 @@ public struct HomeReducer: Sendable {
 
   public struct Items: FetchKeyRequest {
     public let ordering: Ordering
-    public struct State: Equatable, Sendable  {
+    public struct State: Equatable, Sendable {
 
       public var id: Int64? {
         self.device.id
       }
+
       public let device: Device
       public let currency: Currency
       public let usageRatePeriod: UsageRatePeriod
@@ -120,7 +120,7 @@ public struct HomeReducer: Sendable {
       let sql = Device.all()
         .including(required: Device.currency)
         .including(required: Device.usageRatePeriod)
-        .order(ordering.orderingTerm)
+        .order(self.ordering.orderingTerm)
 
       // Execute the query and map results
       return try Row.fetchAll(db, sql).map { row in
@@ -128,6 +128,7 @@ public struct HomeReducer: Sendable {
       }
     }
   }
+
   public struct Aggregate: FetchKeyRequest {
 
     public typealias State = CurrencyCost?
@@ -182,7 +183,7 @@ public struct HomeReducer: Sendable {
 
       // Execute the query and map results
       return try Row.fetchOne(db, sql: sql, arguments: [defaultCurrencyId]).map { row in
-        let currencyCode: String = row["currency_code"] 
+        let currencyCode: String = row["currency_code"]
         let totalDailyCost: Double = row["total_daily_cost"]
         return .init(currencyCode: currencyCode, totalDailyCost: totalDailyCost)
       }
@@ -234,9 +235,10 @@ public struct HomeReducer: Sendable {
           }
 
         case .onAppear:
-          return .run { [state] send in
+          return .run { [state] _ in
             // Apply theme from settings
-            let savedTheme = SettingsReducer.AppTheme(rawValue: state.settingsWithCurrency.settings.themeMode) ?? .system
+            let savedTheme = SettingsReducer
+              .AppTheme(rawValue: state.settingsWithCurrency.settings.themeMode) ?? .system
             await applicationClient.setUserInterfaceStyle(savedTheme.userInterfaceStyle)
           }
 
@@ -254,7 +256,7 @@ public struct HomeReducer: Sendable {
 
         case .path:
           return .none
-          
+
         case .settingsButtonTapped:
           state.path.append(.settings(SettingsReducer.State()))
           return .none
