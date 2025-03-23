@@ -125,6 +125,7 @@ let package = Package(
         .target(
             name: "CurrencyRatesFeature",
             dependencies: [
+                "Generated",
                 "Models",
                 "Utils",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),

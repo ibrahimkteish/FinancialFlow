@@ -5,7 +5,6 @@
 //  Created by Ibrahim Koteish on 16/2/25.
 //
 
-import AddDeviceFeature
 import Generated
 import GRDB
 import Models
@@ -100,8 +99,11 @@ public struct DeviceCardView: View {
   @ViewBuilder
   private var usagePeriodView: some View {
     Text(
-      Strings
-        .usedFor(data.device.elapsedDays, String(format: "%.1f", elapsedPeriodCount), data.usageRatePeriod.localizedName)
+      Strings.usedFor(
+        data.device.elapsedDays,
+        String(format: "%.1f", elapsedPeriodCount),
+        data.usageRatePeriod.localizedName
+      )
     )
     .font(.subheadline)
     .foregroundStyle(.secondary)
@@ -310,4 +312,21 @@ public struct DeviceCardView: View {
     )
   }
   .preferredColorScheme(.dark)
+}
+
+public extension UsageRatePeriod {
+  var localizedName: String {
+    switch self.name {
+      case "day":
+        return Strings.day
+      case "week":
+        return Strings.week
+      case "month":
+        return Strings.month
+      case "year":
+        return Strings.year
+      default:
+        return "day"
+    }
+  }
 }

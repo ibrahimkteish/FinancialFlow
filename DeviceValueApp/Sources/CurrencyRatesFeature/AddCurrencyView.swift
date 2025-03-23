@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Generated
 import Models
 import SwiftUI
 
@@ -19,43 +20,41 @@ public struct AddCurrencyView: View {
     NavigationStack {
       Form {
         Section(
-          header: Text("Currency Information"),
-          footer: Text(
-            "Enter the direct exchange rate: how many units of this currency equal exactly 1 USD. Exchange rates vary over time, so enter the current market value."
-          )
-          .font(.caption)
+          header: Text(Strings.currencyInformation),
+          footer: Text(Strings.enterOneUSDExplanation)
+            .font(.caption)
         ) {
-          TextField("Code (e.g. GBP)", text: $code)
+          TextField(Strings.codeExample, text: $code)
             .autocapitalization(.allCharacters)
             .disableAutocorrection(true)
 
-          TextField("Symbol (e.g. £)", text: $symbol)
+          TextField(Strings.currencySymbol, text: $symbol)
 
-          TextField("Name (e.g. British Pound)", text: $name)
+          TextField(Strings.nameOfCurrency, text: $name)
 
           VStack(alignment: .leading, spacing: 4) {
-            TextField("Exchange Rate to USD", text: $usdRate)
+            TextField(Strings.exchangeRateToUSD, text: $usdRate)
               .keyboardType(.decimalPad)
 
-            Text("Enter how many units of this currency equals 1 USD")
+            Text(Strings.equalsOneUSD)
               .font(.caption)
               .foregroundColor(.secondary)
           }
         }
 
         Section {
-          Button("Save") {
+          Button(Strings.save) {
             saveCurrency()
           }
           .disabled(!isFormValid)
           .frame(maxWidth: .infinity)
         }
       }
-      .navigationTitle("Add Currency")
+      .navigationTitle(Strings.addCurrency)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("Cancel") {
+          Button(Strings.cancel) {
             store.send(.addCurrencyCancelled)
             dismiss()
           }

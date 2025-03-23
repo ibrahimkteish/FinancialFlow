@@ -12,6 +12,8 @@ import Foundation
 public enum Strings {
   /// About
   public static let about = Strings.tr("Localizable", "About", fallback: "About")
+  /// Add Currency
+  public static let addCurrency = Strings.tr("Localizable", "AddCurrency", fallback: "Add Currency")
   /// Add New Device
   public static let addNewDevice = Strings.tr("Localizable", "AddNewDevice", fallback: "Add New Device")
   /// Appearance
@@ -22,12 +24,18 @@ public enum Strings {
   public static let cancel = Strings.tr("Localizable", "Cancel", fallback: "Cancel")
   /// Change Default Currency
   public static let changeDefaultCurrency = Strings.tr("Localizable", "ChangeDefaultCurrency", fallback: "Change Default Currency")
+  /// Code (e.g. GBP)
+  public static let codeExample = Strings.tr("Localizable", "CodeExample", fallback: "Code (e.g. GBP)")
   /// Consumed Value
   public static let consumedValue = Strings.tr("Localizable", "ConsumedValue", fallback: "Consumed Value")
   /// Created At
   public static let createdAt = Strings.tr("Localizable", "CreatedAt", fallback: "Created At")
   /// Currency
   public static let currency = Strings.tr("Localizable", "Currency", fallback: "Currency")
+  /// Currency Information
+  public static let currencyInformation = Strings.tr("Localizable", "CurrencyInformation", fallback: "Currency Information")
+  /// Symbol (e.g. £)
+  public static let currencySymbol = Strings.tr("Localizable", "CurrencySymbol", fallback: "Symbol (e.g. £)")
   /// Daily Rate: %@
   public static func dailyRate(_ p1: Any) -> String {
     return Strings.tr("Localizable", "DailyRate", String(describing: p1), fallback: "Daily Rate: %@")
@@ -52,6 +60,12 @@ public enum Strings {
   public static let deviceName = Strings.tr("Localizable", "DeviceName", fallback: "Device Name")
   /// Device Usage
   public static let deviceUsage = Strings.tr("Localizable", "DeviceUsage", fallback: "Device Usage")
+  /// Enter the direct exchange rate: how many units of this currency equal exactly 1 USD. Exchange rates vary over time, so enter the current market value.
+  public static let enterOneUSDExplanation = Strings.tr("Localizable", "EnterOneUSDExplanation", fallback: "Enter the direct exchange rate: how many units of this currency equal exactly 1 USD. Exchange rates vary over time, so enter the current market value.")
+  /// Enter how many units of this currency equals 1 USD
+  public static let equalsOneUSD = Strings.tr("Localizable", "EqualsOneUSD", fallback: "Enter how many units of this currency equals 1 USD")
+  /// Exchange Rate to USD
+  public static let exchangeRateToUSD = Strings.tr("Localizable", "ExchangeRateToUSD", fallback: "Exchange Rate to USD")
   /// Expected: %lld%%
   public static func expected(_ p1: Int) -> String {
     return Strings.tr("Localizable", "Expected", p1, fallback: "Expected: %lld%%")
@@ -72,6 +86,8 @@ public enum Strings {
   public static let month = Strings.tr("Localizable", "month", fallback: "month")
   /// Name
   public static let name = Strings.tr("Localizable", "Name", fallback: "Name")
+  /// Name (e.g. British Pound)
+  public static let nameOfCurrency = Strings.tr("Localizable", "NameOfCurrency", fallback: "Name (e.g. British Pound)")
   /// None
   public static let `none` = Strings.tr("Localizable", "None", fallback: "None")
   /// Opens system settings to change app language.
@@ -108,6 +124,8 @@ public enum Strings {
   }
   /// Remaining Value
   public static let remainingValue = Strings.tr("Localizable", "RemainingValue", fallback: "Remaining Value")
+  /// Save
+  public static let save = Strings.tr("Localizable", "Save", fallback: "Save")
   /// Select Currency
   public static let selectCurrency = Strings.tr("Localizable", "SelectCurrency", fallback: "Select Currency")
   /// Set Default Currency
