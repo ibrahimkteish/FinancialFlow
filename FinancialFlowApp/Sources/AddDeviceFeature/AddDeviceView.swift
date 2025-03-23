@@ -1,3 +1,4 @@
+import Generated
 import SwiftUI
 import ComposableArchitecture
 import Models
@@ -49,7 +50,7 @@ public struct AddDeviceView: View {
 
             Section  {
                 HStack {
-                    Text("Rate")
+                  Text(Strings.justRate)
                     Spacer()
                     TextField("0.00", text: $store.usageRate)
                         .keyboardType(.decimalPad)

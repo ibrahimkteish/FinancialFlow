@@ -1,5 +1,6 @@
 import SwiftUI
 import ComposableArchitecture
+import Generated
 
 public struct AnalyticsView: View {
   @Bindable var store: StoreOf<Analytics>
@@ -16,7 +17,7 @@ public struct AnalyticsView: View {
       }
       .padding(.vertical)
     }
-    .navigationTitle("Usage Analytics")
+    .navigationTitle(Strings.usageAnalytics)
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         Button {
@@ -34,22 +35,22 @@ public struct AnalyticsView: View {
       GridItem(.flexible(minimum: 150), spacing: 16, alignment: .center)
     ], spacing: 16) {
       AnalyticsCard(
-        title: "Total Purchase Value",
+        title: Strings.totalPurchaseValue,
         value: store.formattedTotalPurchaseValue
       )
 
       AnalyticsCard(
-        title: "Remaining Value",
+        title: Strings.remainingValue,
         value: store.formattedRemainingValue
       )
 
       AnalyticsCard(
-        title: "Consumed Value",
+        title: Strings.consumedValue,
         value: store.formattedConsumedValue
       )
 
       AnalyticsCard(
-        title: "Daily Usage",
+        title: Strings.dailyUsage,
         value: store.formattedDailyUsage
       )
     }
@@ -58,7 +59,7 @@ public struct AnalyticsView: View {
 
   private var deviceUsageList: some View {
     VStack(alignment: .leading, spacing: 16) {
-      Text("Device Usage")
+      Text(Strings.deviceUsage)
         .font(.headline)
         .padding(.horizontal)
 
@@ -71,21 +72,21 @@ public struct AnalyticsView: View {
 
             Spacer()
 
-            Text("\(Int(metric.consumptionPercentage))% used")
+            Text(Strings.percentUsed(Int(metric.consumptionPercentage)))
               .foregroundColor(metric.isWithinExpectedUsage ? .red : .green)
           }
 
           HStack {
             VStack(alignment: .leading) {
-              Text("Daily Rate: \(metric.dailyUsageRate.formatted(.currency(code: metric.currencyCode)))")
+              Text(Strings.dailyRate(metric.dailyUsageRate.formatted(.currency(code: metric.currencyCode))))
                 .environment(\.locale, Locale.current)
-              Text("Days Left: \(Int(metric.daysRemaining))")
+              Text(Strings.daysLeft(Int(metric.daysRemaining)))
             }
             Spacer()
             VStack(alignment: .trailing) {
-              Text("Value Left: \(metric.remainingValue.formatted(.currency(code: metric.currencyCode)))")
+              Text(Strings.valueLeft(metric.remainingValue.formatted(.currency(code: metric.currencyCode))))
                 .environment(\.locale, Locale.current)
-              Text("Expected: \(Int(metric.expectedConsumptionPercentage))%")
+              Text(Strings.expected(Int(metric.expectedConsumptionPercentage)))
             }
           }
           .font(.caption)

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Generated
 import Models
 import Utils
 import GRDB
@@ -90,21 +91,21 @@ public struct DeviceCardView: View {
     
     @ViewBuilder
     private var purchaseInfoView: some View {
-        Text("Purchased for \(data.device.purchasePrice.formatted(.currency(code: data.currency.code)))")
+        Text(Strings.purchasedFor(data.device.purchasePrice.formatted(.currency(code: data.currency.code))))
             .font(.subheadline)
             .foregroundStyle(.secondary)
     }
     
     @ViewBuilder
     private var usagePeriodView: some View {
-        Text("Used for \(data.device.elapsedDays) days (\(elapsedPeriodCount, specifier: "%.1f") \(data.usageRatePeriod.name)s)")
+        Text(Strings.usedFor(data.device.elapsedDays, String(format: "%.1f", elapsedPeriodCount), data.usageRatePeriod.name))
             .font(.subheadline)
             .foregroundStyle(.secondary)
     }
     
     @ViewBuilder
     private var rateView: some View {
-        Text("Rate: \(data.device.usageRate.formatted(.currency(code: data.currency.code)))/\(data.usageRatePeriod.name)")
+        Text(Strings.rate(data.device.usageRate.formatted(.currency(code: data.currency.code)), data.usageRatePeriod.name))
             .font(.subheadline)
             .foregroundStyle(.secondary)
     }
@@ -114,7 +115,7 @@ public struct DeviceCardView: View {
         let perDay = Double(data.device.usageRate / Double(data.usageRatePeriod.daysMultiplier))
         let days = (data.device.purchasePrice / perDay) - Double(data.device.elapsedDays)
         if days > 0 {
-            Text("Remaining days: \(days.formatted(.number))")
+            Text(Strings.remainingDays(days.formatted(.number)))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -122,7 +123,7 @@ public struct DeviceCardView: View {
     
     @ViewBuilder
     private var remainingCostView: some View {
-        Text("Remaining Cost: \(remainingCost.formatted(.currency(code: data.currency.code)))")
+        Text(Strings.remainingCost(remainingCost.formatted(.currency(code: data.currency.code))))
             .font(.headline)
             .foregroundStyle(progressColor)
     }
@@ -223,7 +224,7 @@ public struct DeviceCardView: View {
                 Text("\(Int(progress * 100))%")
                     .font(.system(.subheadline, design: .rounded).bold())
                     .foregroundStyle(progressColor)
-                Text("Used")
+                Text(Strings.used)
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
