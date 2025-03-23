@@ -12,6 +12,8 @@ import Foundation
 public enum Strings {
   /// About
   public static let about = Strings.tr("Localizable", "About", fallback: "About")
+  /// Add New Device
+  public static let addNewDevice = Strings.tr("Localizable", "AddNewDevice", fallback: "Add New Device")
   /// Appearance
   public static let appearance = Strings.tr("Localizable", "Appearance", fallback: "Appearance")
   /// App Theme
@@ -32,6 +34,8 @@ public enum Strings {
   }
   /// Daily Usage
   public static let dailyUsage = Strings.tr("Localizable", "DailyUsage", fallback: "Daily Usage")
+  /// day
+  public static let day = Strings.tr("Localizable", "day", fallback: "day")
   /// days
   public static let days = Strings.tr("Localizable", "days", fallback: "days")
   /// Days Left: %lld
@@ -42,6 +46,10 @@ public enum Strings {
   public static let defaultCurrency = Strings.tr("Localizable", "DefaultCurrency", fallback: "Default Currency")
   /// Delete
   public static let delete = Strings.tr("Localizable", "Delete", fallback: "Delete")
+  /// Device Information
+  public static let deviceInformation = Strings.tr("Localizable", "DeviceInformation", fallback: "Device Information")
+  /// Device Name
+  public static let deviceName = Strings.tr("Localizable", "DeviceName", fallback: "Device Name")
   /// Device Usage
   public static let deviceUsage = Strings.tr("Localizable", "DeviceUsage", fallback: "Device Usage")
   /// Expected: %lld%%
@@ -58,6 +66,10 @@ public enum Strings {
   public static let language = Strings.tr("Localizable", "Language", fallback: "Language")
   /// Language & Region
   public static let languageRegion = Strings.tr("Localizable", "LanguageRegion", fallback: "Language & Region")
+  /// Loading currencies...
+  public static let loadingCurrencies = Strings.tr("Localizable", "LoadingCurrencies", fallback: "Loading currencies...")
+  /// month
+  public static let month = Strings.tr("Localizable", "month", fallback: "month")
   /// Name
   public static let name = Strings.tr("Localizable", "Name", fallback: "Name")
   /// None
@@ -68,6 +80,14 @@ public enum Strings {
   public static func percentUsed(_ p1: Int) -> String {
     return Strings.tr("Localizable", "PercentUsed", p1, fallback: "%lld%% used")
   }
+  /// Period
+  public static let period = Strings.tr("Localizable", "Period", fallback: "Period")
+  /// Per %@
+  public static func perPeriod(_ p1: Any) -> String {
+    return Strings.tr("Localizable", "PerPeriod", String(describing: p1), fallback: "Per %@")
+  }
+  /// Purchase Date
+  public static let purchaseDate = Strings.tr("Localizable", "PurchaseDate", fallback: "Purchase Date")
   /// Purchased for %@
   public static func purchasedFor(_ p1: Any) -> String {
     return Strings.tr("Localizable", "PurchasedFor", String(describing: p1), fallback: "Purchased for %@")
@@ -92,6 +112,8 @@ public enum Strings {
   public static let selectCurrency = Strings.tr("Localizable", "SelectCurrency", fallback: "Select Currency")
   /// Set Default Currency
   public static let setDefaultCurrency = Strings.tr("Localizable", "SetDefaultCurrency", fallback: "Set Default Currency")
+  /// Submit
+  public static let submit = Strings.tr("Localizable", "Submit", fallback: "Submit")
   /// Theme changes will affect the app's appearance.
   public static let themeFooter = Strings.tr("Localizable", "ThemeFooter", fallback: "Theme changes will affect the app's appearance.")
   /// Total Purchase Value
@@ -100,6 +122,8 @@ public enum Strings {
   public static let updatedAt = Strings.tr("Localizable", "UpdatedAt", fallback: "Updated At")
   /// Usage Analytics
   public static let usageAnalytics = Strings.tr("Localizable", "UsageAnalytics", fallback: "Usage Analytics")
+  /// Usage Rate
+  public static let usageRate = Strings.tr("Localizable", "UsageRate", fallback: "Usage Rate")
   /// Used
   public static let used = Strings.tr("Localizable", "Used", fallback: "Used")
   /// Used for %lld days (%@ %@s)
@@ -114,6 +138,10 @@ public enum Strings {
   public static let version = Strings.tr("Localizable", "Version", fallback: "Version")
   /// View Currency Rates
   public static let viewCurrencyRates = Strings.tr("Localizable", "ViewCurrencyRates", fallback: "View Currency Rates")
+  /// week
+  public static let week = Strings.tr("Localizable", "week", fallback: "week")
+  /// year
+  public static let year = Strings.tr("Localizable", "year", fallback: "year")
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:enable nesting type_body_length type_name vertical_whitespace_opening_braces

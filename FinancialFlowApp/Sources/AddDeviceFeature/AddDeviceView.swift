@@ -2,7 +2,6 @@ import Generated
 import SwiftUI
 import ComposableArchitecture
 import Models
-
 public struct AddDeviceView: View {
     @Bindable var store: StoreOf<AddDeviceReducer>
     
@@ -13,17 +12,17 @@ public struct AddDeviceView: View {
     public var body: some View {
         Form {
             Section {
-                TextField("Device Name", text: $store.deviceName)
+                TextField(Strings.deviceName, text: $store.deviceName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 
                 if store.currencies.isEmpty {
                     HStack {
-                        Text("Loading currencies...")
+                        Text(Strings.loadingCurrencies)
                         Spacer()
                         ProgressView()
                     }
                 } else {
-                    Picker("Currency", selection: $store.selectedCurrencyId) {
+                    Picker(Strings.currency, selection: $store.selectedCurrencyId) {
                         ForEach(store.currencies, id: \.id) { currency in
                             Text("\(currency.code) (\(currency.symbol)) - \(currency.name)")
                                 .tag(currency.id!)
@@ -32,7 +31,7 @@ public struct AddDeviceView: View {
                 }
                 
                 HStack {
-                    Text("Purchase Price")
+                    Text(Strings.purchasePrice)
                     Spacer()
                     TextField("0.00", text: $store.purchasePrice)
                         .keyboardType(.decimalPad)
@@ -40,12 +39,12 @@ public struct AddDeviceView: View {
                 }
                 
                 DatePicker(
-                    "Purchase Date",
+                    Strings.purchaseDate,
                     selection: $store.purchaseDate,
                     displayedComponents: .date
                 )
             } header: {
-                Text("Device Information")
+                Text(Strings.deviceInformation)
             }
 
             Section  {
@@ -57,30 +56,30 @@ public struct AddDeviceView: View {
                         .multilineTextAlignment(.trailing)
                 }
                 
-                Picker("Period", selection: $store.selectedUsageRatePeriodId) {
+                Picker(Strings.period, selection: $store.selectedUsageRatePeriodId) {
                     ForEach(store.usageRatePeriods, id: \.id) { period in
-                        Text("Per \(period.name.capitalized)")
+                      Text(Strings.perPeriod(period.localizedName.capitalized))
                             .tag(period.id!)
                     }
                 }
             } header: {
-                Text("Usage Rate")
+                Text(Strings.usageRate)
             }
         }
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Submit") {
+                Button(Strings.submit) {
                     self.store.send(.submitButtonTapped)
                 }
                 .disabled(!store.isValid)
             }
             ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") {
+                Button(Strings.cancel) {
                     self.store.send(.cancelButtonTapped)
                 }
             }
         }
-        .navigationTitle("Add New Device")
+        .navigationTitle(Strings.addNewDevice)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
