@@ -12,7 +12,7 @@
 --closingparen balanced
 --wrapreturntype preserve
 --closurevoid remove
---exclude /Sources/Generated/CodeGen/**
+--exclude ./DeviceValueApp/Sources/Generated/CodeGen/**
 --importgrouping alpha
 --indentcase true
 --enable sortedSwitchCases
