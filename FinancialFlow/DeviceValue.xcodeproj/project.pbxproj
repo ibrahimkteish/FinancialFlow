@@ -22,19 +22,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CD2B572E2D60B0E400E18194 /* FinancialFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinancialFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		CD2B573E2D60B0E600E18194 /* FinancialFlowTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinancialFlowTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD2B572E2D60B0E400E18194 /* DeviceValue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DeviceValue.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD2B573E2D60B0E600E18194 /* DeviceValueTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeviceValueTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		CD2B57302D60B0E400E18194 /* FinancialFlow */ = {
+		CD2B57302D60B0E400E18194 /* DeviceValue */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = FinancialFlow;
+			path = DeviceValue;
 			sourceTree = "<group>";
 		};
-		CD2B57412D60B0E600E18194 /* FinancialFlowTests */ = {
+		CD2B57412D60B0E600E18194 /* DeviceValueTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = FinancialFlowTests;
+			path = DeviceValueTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -62,8 +62,8 @@
 		CD2B57252D60B0E400E18194 = {
 			isa = PBXGroup;
 			children = (
-				CD2B57302D60B0E400E18194 /* FinancialFlow */,
-				CD2B57412D60B0E600E18194 /* FinancialFlowTests */,
+				CD2B57302D60B0E400E18194 /* DeviceValue */,
+				CD2B57412D60B0E600E18194 /* DeviceValueTests */,
 				CD2B57D92D60C77900E18194 /* Frameworks */,
 				CD2B572F2D60B0E400E18194 /* Products */,
 			);
@@ -72,8 +72,8 @@
 		CD2B572F2D60B0E400E18194 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CD2B572E2D60B0E400E18194 /* FinancialFlow.app */,
-				CD2B573E2D60B0E600E18194 /* FinancialFlowTests.xctest */,
+				CD2B572E2D60B0E400E18194 /* DeviceValue.app */,
+				CD2B573E2D60B0E600E18194 /* DeviceValueTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -88,9 +88,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		CD2B572D2D60B0E400E18194 /* FinancialFlow */ = {
+		CD2B572D2D60B0E400E18194 /* DeviceValue */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CD2B57522D60B0E600E18194 /* Build configuration list for PBXNativeTarget "FinancialFlow" */;
+			buildConfigurationList = CD2B57522D60B0E600E18194 /* Build configuration list for PBXNativeTarget "DeviceValue" */;
 			buildPhases = (
 				CD2B572A2D60B0E400E18194 /* Sources */,
 				CD2B572B2D60B0E400E18194 /* Frameworks */,
@@ -101,20 +101,20 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				CD2B57302D60B0E400E18194 /* FinancialFlow */,
+				CD2B57302D60B0E400E18194 /* DeviceValue */,
 			);
-			name = FinancialFlow;
+			name = DeviceValue;
 			packageProductDependencies = (
 				CD2B57DA2D60C77900E18194 /* Models */,
 				CD2B57DC2D6265F400E18194 /* HomeFeature */,
 			);
 			productName = FinancialFlow;
-			productReference = CD2B572E2D60B0E400E18194 /* FinancialFlow.app */;
+			productReference = CD2B572E2D60B0E400E18194 /* DeviceValue.app */;
 			productType = "com.apple.product-type.application";
 		};
-		CD2B573D2D60B0E600E18194 /* FinancialFlowTests */ = {
+		CD2B573D2D60B0E600E18194 /* DeviceValueTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CD2B57552D60B0E600E18194 /* Build configuration list for PBXNativeTarget "FinancialFlowTests" */;
+			buildConfigurationList = CD2B57552D60B0E600E18194 /* Build configuration list for PBXNativeTarget "DeviceValueTests" */;
 			buildPhases = (
 				CD2B573A2D60B0E600E18194 /* Sources */,
 				CD2B573B2D60B0E600E18194 /* Frameworks */,
@@ -126,13 +126,13 @@
 				CD2B57402D60B0E600E18194 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				CD2B57412D60B0E600E18194 /* FinancialFlowTests */,
+				CD2B57412D60B0E600E18194 /* DeviceValueTests */,
 			);
-			name = FinancialFlowTests;
+			name = DeviceValueTests;
 			packageProductDependencies = (
 			);
 			productName = FinancialFlowTests;
-			productReference = CD2B573E2D60B0E600E18194 /* FinancialFlowTests.xctest */;
+			productReference = CD2B573E2D60B0E600E18194 /* DeviceValueTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -154,7 +154,7 @@
 					};
 				};
 			};
-			buildConfigurationList = CD2B57292D60B0E400E18194 /* Build configuration list for PBXProject "FinancialFlow" */;
+			buildConfigurationList = CD2B57292D60B0E400E18194 /* Build configuration list for PBXProject "DeviceValue" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -170,8 +170,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				CD2B572D2D60B0E400E18194 /* FinancialFlow */,
-				CD2B573D2D60B0E600E18194 /* FinancialFlowTests */,
+				CD2B572D2D60B0E400E18194 /* DeviceValue */,
+				CD2B573D2D60B0E600E18194 /* DeviceValueTests */,
 			);
 		};
 /* End PBXProject section */
@@ -213,7 +213,7 @@
 /* Begin PBXTargetDependency section */
 		CD2B57402D60B0E600E18194 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = CD2B572D2D60B0E400E18194 /* FinancialFlow */;
+			target = CD2B572D2D60B0E400E18194 /* DeviceValue */;
 			targetProxy = CD2B573F2D60B0E600E18194 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -415,7 +415,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FinancialFlow.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FinancialFlow";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DeviceValue.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DeviceValue";
 			};
 			name = Debug;
 		};
@@ -434,14 +434,14 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FinancialFlow.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FinancialFlow";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DeviceValue.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DeviceValue";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		CD2B57292D60B0E400E18194 /* Build configuration list for PBXProject "FinancialFlow" */ = {
+		CD2B57292D60B0E400E18194 /* Build configuration list for PBXProject "DeviceValue" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CD2B57502D60B0E600E18194 /* Debug */,
@@ -450,7 +450,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CD2B57522D60B0E600E18194 /* Build configuration list for PBXNativeTarget "FinancialFlow" */ = {
+		CD2B57522D60B0E600E18194 /* Build configuration list for PBXNativeTarget "DeviceValue" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CD2B57532D60B0E600E18194 /* Debug */,
@@ -459,7 +459,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CD2B57552D60B0E600E18194 /* Build configuration list for PBXNativeTarget "FinancialFlowTests" */ = {
+		CD2B57552D60B0E600E18194 /* Build configuration list for PBXNativeTarget "DeviceValueTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CD2B57562D60B0E600E18194 /* Debug */,

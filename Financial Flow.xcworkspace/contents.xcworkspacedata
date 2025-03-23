@@ -15,6 +15,6 @@
       location = "group:DeviceValueApp">
    </FileRef>
    <FileRef
-      location = "group:FinancialFlow/FinancialFlow.xcodeproj">
+      location = "group:FinancialFlow/DeviceValue.xcodeproj">
    </FileRef>
 </Workspace>
