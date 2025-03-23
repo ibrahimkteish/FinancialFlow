@@ -126,9 +126,9 @@ public enum Strings {
   public static let usageRate = Strings.tr("Localizable", "UsageRate", fallback: "Usage Rate")
   /// Used
   public static let used = Strings.tr("Localizable", "Used", fallback: "Used")
-  /// Used for %lld days (%@ %@s)
+  /// Used for %lld days (%@ %@)
   public static func usedFor(_ p1: Int, _ p2: Any, _ p3: Any) -> String {
-    return Strings.tr("Localizable", "UsedFor", p1, String(describing: p2), String(describing: p3), fallback: "Used for %lld days (%@ %@s)")
+    return Strings.tr("Localizable", "UsedFor", p1, String(describing: p2), String(describing: p3), fallback: "Used for %lld days (%@ %@)")
   }
   /// Value Left: %@
   public static func valueLeft(_ p1: Any) -> String {

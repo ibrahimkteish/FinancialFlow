@@ -10,7 +10,7 @@ import Models
 import SharingGRDB
 
 extension UsageRatePeriod {
-  var localizedName: String {
+  public var localizedName: String {
     switch self.name {
       case "day":
         return Strings.day
