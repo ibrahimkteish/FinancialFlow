@@ -26,14 +26,12 @@ public struct UsageRatePeriod: Equatable, Codable, FetchableRecord, PersistableR
     }
 }
 
-#if DEBUG
 extension UsageRatePeriod {
     public static let day = UsageRatePeriod(id: 1, name: "day", daysMultiplier: 1)
     public static let week = UsageRatePeriod(id: 2, name: "week", daysMultiplier: 7)
     public static let month = UsageRatePeriod(id: 3, name: "month", daysMultiplier: 30)
     public static let year = UsageRatePeriod(id: 4, name: "year", daysMultiplier: 365)
 }
-#endif
 
 public struct Device: Codable, Equatable, Identifiable, Sendable, FetchableRecord, MutablePersistableRecord {
     public static let databaseTableName = "devices"
@@ -151,9 +149,12 @@ extension AppSettings {
     public static let defaultCurrency = belongsTo(Currency.self, using: ForeignKey(["defaultCurrencyId"]))
 }
 
+extension Currency {
+  public static let usd = Currency(id: 1, code: "USD", symbol: "$", name: "US Dollar", usdRate: 1.0)
+}
+
 #if DEBUG
 extension Currency {
-    public static let usd = Currency(id: 1, code: "USD", symbol: "$", name: "US Dollar", usdRate: 1.0)
     public static let eur = Currency(id: 2, code: "EUR", symbol: "€", name: "Euro", usdRate: 0.9237)
     public static let gbp = Currency(id: 3, code: "GBP", symbol: "£", name: "British Pound", usdRate: 0.7736)
     public static let jpy = Currency(id: 4, code: "JPY", symbol: "¥", name: "Japanese Yen", usdRate: 0.0067) // 1 JPY = 0.0067 USD
@@ -253,7 +254,7 @@ extension DatabaseWriter where Self == DatabaseQueue {
                 tableau.column("createdAt", .datetime).notNull()
                 tableau.column("updatedAt", .datetime).notNull()
             }
-            
+#if DEBUG
             _ = try Device(
                 name: "iPhone 14 Pro Max",
                 currencyId: eurId.value!,
@@ -261,7 +262,8 @@ extension DatabaseWriter where Self == DatabaseQueue {
                 purchaseDate: Date(year: 2022, month: 9, day: 16),
                 usageRate: 1,
                 usageRatePeriodId: 1
-            ).inserted(db)   
+            ).inserted(db)
+#endif
         }
 
         migrator.registerMigration("Add usdRate to currencies") { db in
@@ -275,8 +277,8 @@ extension DatabaseWriter where Self == DatabaseQueue {
                 UPDATE currencies 
                 SET usdRate = CASE 
                     WHEN code = 'USD' THEN 1.0
-                    WHEN code = 'EUR' THEN 1.08
-                    WHEN code = 'GBP' THEN 1.26
+                    WHEN code = 'EUR' THEN 0.9236
+                    WHEN code = 'GBP' THEN 0.7733
                     WHEN code = 'JPY' THEN 0.0067
                     ELSE 1.0
                 END
@@ -367,9 +369,9 @@ extension DatabaseWriter where Self == DatabaseQueue {
         // Rename new table to match original
         try db.execute(sql: "ALTER TABLE \(AppSettings.databaseTableName)_new RENAME TO \(AppSettings.databaseTableName)")
       }
-
+#if DEBUG
         migrator.insertSampleData()
-
+#endif
         do {
 #if DEBUG
             migrator.eraseDatabaseOnSchemaChange = true
@@ -383,6 +385,7 @@ extension DatabaseWriter where Self == DatabaseQueue {
     }
 }
 
+#if DEBUG
 extension DatabaseMigrator {
     mutating func insertSampleData() {
         
@@ -464,3 +467,4 @@ extension DatabaseMigrator {
         }
     }
 }
+#endif
