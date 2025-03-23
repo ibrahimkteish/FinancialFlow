@@ -1,6 +1,6 @@
 //
 //  DeviceCardView.swift
-//  FinancialFlowApp
+//  DeviceValueApp
 //
 //  Created by Ibrahim Koteish on 16/2/25.
 //

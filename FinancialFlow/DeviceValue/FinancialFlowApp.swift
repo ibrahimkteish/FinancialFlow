@@ -1,6 +1,6 @@
 //
-//  FinancialFlowApp.swift
-//  FinancialFlow
+//  DeviceValueApp.swift
+//  DeviceValue
 //
 //  Created by Ibrahim Koteish on 15/2/25.
 //
@@ -13,7 +13,7 @@ import SharingGRDB
 import SwiftUI
 
 @main
-struct FinancialFlowApp: App {
+struct DeviceValueApp: App {
 
     static let store: StoreOf<HomeReducer> = .init(initialState: .init(), reducer: { HomeReducer() })
     

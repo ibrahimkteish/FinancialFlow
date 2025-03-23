@@ -1,14 +1,14 @@
 //
-//  FinancialFlowTests.swift
-//  FinancialFlowTests
+//  DeviceValueTests.swift
+//  DeviceValueTests
 //
 //  Created by Ibrahim Koteish on 15/2/25.
 //
 
 import Testing
-@testable import FinancialFlow
+@testable import DeviceValue
 
-struct FinancialFlowTests {
+struct DeviceValueTests {
 
     @Test func example() async throws {
         // Write your test here and use APIs like `#expect(...)` to check expected conditions.

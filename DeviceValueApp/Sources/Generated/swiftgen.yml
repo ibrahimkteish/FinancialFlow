@@ -15,7 +15,7 @@ strings:
         
 xcassets:
   inputs:
-   - ../../../FinancialFlow/FinancialFlow/Assets.xcassets
+   - ../../../DeviceValue/DeviceValue/Assets.xcassets
   outputs:
     - templatePath: AssetsTemplate.stencil
       output: Assets.swift
