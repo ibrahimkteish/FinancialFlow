@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "FinancialFlowApp",
+    name: "DeviceValueApp",
     platforms: [
         .iOS(.v17),
     ],
