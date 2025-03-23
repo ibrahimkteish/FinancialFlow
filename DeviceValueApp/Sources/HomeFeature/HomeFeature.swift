@@ -167,7 +167,7 @@ public struct HomeReducer: Sendable {
           )
           SELECT 
               c.code AS currency_code,
-              CASE 
+              COALESCE(CASE 
                   -- For USD, return as is
                   WHEN c.code = 'USD' THEN tu.usd_total
                   -- For other currencies, convert from USD to target currency
@@ -175,7 +175,7 @@ public struct HomeReducer: Sendable {
                   -- Then to convert USD to that currency, we multiply by usdRate:
                   -- For example: 3.18 USD * 0.92 = 2.93 EUR or 3.18 USD * 108 = 343.44 JPY
                   ELSE tu.usd_total * c.usdRate
-              END AS total_daily_cost
+              END, 0) AS total_daily_cost
           FROM total_in_usd tu
           JOIN currencies c ON c.id = ?
       """
