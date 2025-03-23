@@ -53,56 +53,74 @@ public struct HomeView: View {
     .listStyle(.plain)
     .scrollContentBackground(.hidden)
   }
+  
+  @ViewBuilder
+  private var floatingAddButton: some View {
+    Button {
+      self.store.send(.addDeviceButtonTapped)
+    } label: {
+      Image(systemName: "plus")
+        .font(.title2)
+        .fontWeight(.semibold)
+        .foregroundColor(.white)
+        .frame(width: 56, height: 56)
+        .background(
+          Circle()
+            .fill(Color.accentColor)
+            .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 2)
+        )
+    }
+    .padding(.trailing, 20)
+    .padding(.bottom, 20)
+  }
 
   public var body: some View {
     NavigationStack(path: self.$store.scope(state: \.path, action: \.path)) {
-      devices
-        .toolbar {
-          ToolbarItemGroup(placement: .topBarLeading) {
-            Button {
-              store.send(.settingsButtonTapped)
-            } label: {
-              Image(systemName: "gear")
-            }
-          }
-
-          ToolbarItemGroup(placement: .topBarTrailing) {
-            Button {
-              store.send(.analyticsButtonTapped)
-            } label: {
-              Image(systemName: "chart.bar.fill")
+      ZStack(alignment: .bottomTrailing) {
+        devices
+          .toolbar {
+            ToolbarItemGroup(placement: .topBarLeading) {
+              Button {
+                store.send(.settingsButtonTapped)
+              } label: {
+                Image(systemName: "gear")
+              }
             }
 
-            menu
+            ToolbarItemGroup(placement: .topBarTrailing) {
+              Button {
+                store.send(.analyticsButtonTapped)
+              } label: {
+                Image(systemName: "chart.bar.fill")
+              }
 
-            Button {
-              self.store.send(.addDeviceButtonTapped)
-            } label: {
-              Image(systemName: "plus")
+              menu
             }
           }
-        }
-        .onAppear {
-          store.send(.onAppear)
-        }
-        .sheet(
-          item: self.$store.scope(state: \.destination?.addDevice, action: \.destination.addDevice)
-        ) { store in
-          NavigationStack {
-            AddDeviceView(store: store)
+          .onAppear {
+            store.send(.onAppear)
           }
-          .presentationDetents([.medium])
+        
+        floatingAddButton
+      }
+      .sheet(
+        item: self.$store.scope(state: \.destination?.addDevice, action: \.destination.addDevice)
+      ) { store in
+        NavigationStack {
+          AddDeviceView(store: store)
         }
-        .sheet(
-          item: self.$store.scope(state: \.destination?.analytics, action: \.destination.analytics)
-        ) { store in
-          NavigationStack {
-            AnalyticsView(store: store)
-          }
+        .presentationDetents([.medium])
+      }
+      .sheet(
+        item: self.$store.scope(state: \.destination?.analytics, action: \.destination.analytics)
+      ) { store in
+        NavigationStack {
+          AnalyticsView(store: store)
         }
-        .navigationTitle(self.store.count.map {
-          Strings.itemsWithCost($0.totalDailyCost.formatted(.currency(code: $0.currencyCode)))
-        } ?? "")
+      }
+      .navigationTitle(self.store.count.map {
+        Strings.itemsWithCost($0.totalDailyCost.formatted(.currency(code: $0.currencyCode)))
+      } ?? "")
     } destination: { store in
       switch store.case {
         case let .settings(store):
