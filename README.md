@@ -84,8 +84,14 @@ Sort your devices by creation date, name, currency, purchase price, or last upda
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+4. (Optional) If you added localization keys/values, run the localization script:
+   ```bash
+   cd Scripts && sh local.sh
+   ```
+5. Format the code (`cd DeviceValueApp && swift package --allow-writing-to-package-directory format-source-code --config ../swiftformat`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
 
 ## License
 
