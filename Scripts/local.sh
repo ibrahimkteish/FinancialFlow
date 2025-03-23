@@ -25,7 +25,7 @@ cd ../FinancialFlowApp
 swift package --allow-writing-to-package-directory generate-code-for-resources 
 
 # remove the generated Localizable.strings
-# rm Sources/Generated/Localizable.strings
+ rm Sources/Generated/Localizable.strings
 
 # Return to original directory
 cd ../Scripts

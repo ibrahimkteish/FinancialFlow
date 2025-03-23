@@ -77,7 +77,7 @@ public struct DeviceCardView: View {
     }
     
     var progressColor: Color {
-        progress >= 1.0 ? .green : .blue
+        progress >= 1.0 ? .green : .accentColor
     }
     
     // MARK: - View Components
