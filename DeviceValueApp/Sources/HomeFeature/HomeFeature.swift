@@ -37,6 +37,7 @@ public struct HomeReducer: Sendable {
   public enum Destination {
     case addDevice(AddDeviceReducer)
     case analytics(Analytics)
+    case addCurrency(CurrencyRatesReducer)
   }
 
   @ObservableState
@@ -193,6 +194,7 @@ public struct HomeReducer: Sendable {
   public enum Action: Equatable, BindableAction {
     case analyticsButtonTapped
     case addDeviceButtonTapped
+    case addCurrencyButtonTapped
     case binding(BindingAction<State>)
     case cancelAddDeviceButtonTapped
     case destination(PresentationAction<Destination.Action>)
@@ -217,6 +219,10 @@ public struct HomeReducer: Sendable {
           return .none
         case .addDeviceButtonTapped:
           state.destination = .addDevice(AddDeviceReducer.State())
+          return .none
+
+        case .addCurrencyButtonTapped:
+          state.destination = .addCurrency(CurrencyRatesReducer.State())
           return .none
 
         case .analyticsButtonTapped:
@@ -263,6 +269,24 @@ public struct HomeReducer: Sendable {
 
         case .submitButtonTapped:
           state.destination = nil
+          return .none
+
+        case let .destination(.presented(.addDevice(.delegate(action)))):
+          switch action {
+            case .dismiss:
+              state.destination = nil
+            case .didAddDevice:
+              state.destination = nil
+            case .addCurrency:
+              state.destination = .addCurrency(CurrencyRatesReducer.State())
+          }
+          return .none
+
+        case let .destination(.presented(.addCurrency(.delegate(action)))):
+          switch action {
+            case .didSaveSuccessfully:
+              state.destination = .addDevice(AddDeviceReducer.State())
+          }
           return .none
 
         case .destination:

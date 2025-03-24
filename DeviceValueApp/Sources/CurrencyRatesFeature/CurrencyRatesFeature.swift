@@ -71,6 +71,7 @@ public struct CurrencyRatesReducer: Sendable {
   public enum Action: Equatable, BindableAction {
     case binding(BindingAction<State>)
     case destination(PresentationAction<Destination.Action>)
+    case delegate(Delegate)
     case fetchCurrencyRates
     case updateCurrencyRates([Currency])
     case addCurrencyButtonTapped
@@ -78,6 +79,10 @@ public struct CurrencyRatesReducer: Sendable {
     case addCurrencySaved(Currency)
     case deleteCurrency(Int64)
     case showAlert(String)
+
+    public enum Delegate: Equatable, Sendable {
+      case didSaveSuccessfully
+    }
   }
 
   @Dependency(\.defaultDatabase) var database
@@ -102,6 +107,9 @@ public struct CurrencyRatesReducer: Sendable {
           return .run { [state] _ in
             try await state.$currencies.load(.fetch(CurrencyFetcher(searchTerm: state.searchTerm)))
           }
+
+        case .delegate:
+          return .none
 
         case let .updateCurrencyRates(rates):
           return .concatenate(
@@ -128,10 +136,12 @@ public struct CurrencyRatesReducer: Sendable {
 
         case let .addCurrencySaved(currency):
           state.showingAddCurrency = false
-          return .run { _ in
+          return .run { send in
             try await database.write { db in
               _ = try currency.inserted(db)
             }
+
+            await send(.delegate(.didSaveSuccessfully))
           }
 
         case let .showAlert(message):

@@ -11,15 +11,18 @@ public struct AddDeviceView: View {
 
   public var body: some View {
     Form {
-      Section {
-        TextField(Strings.deviceName, text: $store.deviceName)
-          .textFieldStyle(RoundedBorderTextFieldStyle())
-
+      // Currency Section - First input
+      Section(header: Text(Strings.currency)) {
         if store.currencies.isEmpty {
           HStack {
             Text(Strings.loadingCurrencies)
             Spacer()
-            ProgressView()
+            Button {
+              store.send(.addCurrencyTapped)
+            } label: {
+              Text("Add Currency")
+                .foregroundColor(.accentColor)
+            }
           }
         } else {
           Picker(Strings.currency, selection: $store.selectedCurrencyId) {
@@ -28,7 +31,25 @@ public struct AddDeviceView: View {
                 .tag(currency.id!)
             }
           }
+          .pickerStyle(.navigationLink)
+          
+          Button {
+            store.send(.addCurrencyTapped)
+          } label: {
+            HStack {
+              Image(systemName: "plus.circle")
+              Text("Add New Currency")
+            }
+            .font(.footnote)
+            .foregroundColor(.accentColor)
+          }
         }
+      }
+      
+      // Device Information Section
+      Section(header: Text(Strings.deviceInformation)) {
+        TextField(Strings.deviceName, text: $store.deviceName)
+          .textFieldStyle(RoundedBorderTextFieldStyle())
 
         HStack {
           Text(Strings.purchasePrice)
@@ -43,11 +64,10 @@ public struct AddDeviceView: View {
           selection: $store.purchaseDate,
           displayedComponents: .date
         )
-      } header: {
-        Text(Strings.deviceInformation)
       }
 
-      Section {
+      // Usage Rate Section
+      Section(header: Text(Strings.usageRate)) {
         HStack {
           Text(Strings.justRate)
           Spacer()
@@ -62,8 +82,6 @@ public struct AddDeviceView: View {
               .tag(period.id!)
           }
         }
-      } header: {
-        Text(Strings.usageRate)
       }
     }
     .toolbar {

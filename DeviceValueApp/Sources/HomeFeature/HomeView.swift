@@ -118,6 +118,13 @@ public struct HomeView: View {
           AnalyticsView(store: store)
         }
       }
+      .sheet(
+        item: self.$store.scope(state: \.destination?.addCurrency, action: \.destination.addCurrency)
+      ) { store in
+        NavigationStack {
+          AddCurrencyView(store: store)
+        }
+      }
       .navigationTitle(self.store.count.map {
         Strings.itemsWithCost($0.totalDailyCost.formatted(.currency(code: $0.currencyCode)))
       } ?? "")

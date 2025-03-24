@@ -85,12 +85,14 @@ public struct AddDeviceReducer: Sendable {
     case binding(BindingAction<State>)
     case submitButtonTapped
     case cancelButtonTapped
+    case addCurrencyTapped
     case delegate(Delegate)
 
     @CasePathable
     public enum Delegate: Equatable, Sendable {
       case didAddDevice(Device)
       case dismiss
+      case addCurrency
     }
   }
 
@@ -110,6 +112,9 @@ public struct AddDeviceReducer: Sendable {
           return .run { _ in
             await dismiss()
           }
+
+        case .addCurrencyTapped:
+          return .send(.delegate(.addCurrency))
 
         case .submitButtonTapped:
           guard
