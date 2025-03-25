@@ -110,7 +110,7 @@ public extension DatabaseWriter where Self == DatabaseQueue {
         currencyId: eurId.value!,
         purchasePrice: 1599.99,
         purchaseDate: Date(year: 2022, month: 9, day: 16),
-        usageRate: 1,
+        usageRate: 2,
         usageRatePeriodId: 1
       ).inserted(db)
       #endif
@@ -242,78 +242,78 @@ public extension DatabaseWriter where Self == DatabaseQueue {
 extension DatabaseMigrator {
   mutating func insertSampleData() {
 
-    self.registerMigration("Add Sennheiser PXC 550") { db in
+    self.registerMigration("Add iPhone 15 Pro Max") { db in
       _ = try Device(
-        name: "Sennheiser PXC 550",
+        name: "iPhone 15 Pro Max",
         currencyId: 1,
-        purchasePrice: 500,
-        purchaseDate: Date(year: 2016, month: 7, day: 10),
+        purchasePrice: 1199.00,
+        purchaseDate: Date(year: 2023, month: 9, day: 22),
         usageRate: 10,
         usageRatePeriodId: UsageRatePeriod.month.id!
       ).inserted(db)
     }
 
-    self.registerMigration("Add Anker 737 Power Bank") { db in
+    self.registerMigration("Add MacBook Pro 16-inch") { db in
       _ = try Device(
-        name: "Anker 737 Power Bank ",
+        name: "MacBook Pro 16-inch M3",
         currencyId: 2,
-        purchasePrice: 132.00,
-        purchaseDate: Date(year: 2022, month: 11, day: 22),
+        purchasePrice: 2499.00,
+        purchaseDate: Date(year: 2023, month: 10, day: 30),
         usageRate: 0.2,
         usageRatePeriodId: UsageRatePeriod.day.id!
       ).inserted(db)
     }
 
-    self.registerMigration("Add Flow Mini Silver") { db in
+    self.registerMigration("Add iPad Pro 12.9-inch") { db in
       _ = try Device(
-        name: "Flow Mini Silver",
+        name: "iPad Pro 12.9-inch M2",
         currencyId: 1,
-        purchasePrice: 16.90,
-        purchaseDate: Date(year: 2024, month: 11, day: 20),
+        purchasePrice: 1099.00,
+        purchaseDate: Date(year: 2023, month: 6, day: 12),
         usageRate: 0.1,
         usageRatePeriodId: UsageRatePeriod.day.id!
       ).inserted(db)
     }
 
-    self.registerMigration("Add ICEMAG 2") { db in
+    self.registerMigration("Add Apple Watch Series 9") { db in
       _ = try Device(
-        name: "ICEMAG 2 MagSafe Power Bank",
+        name: "Apple Watch Series 9",
         currencyId: 1,
-        purchasePrice: 69.90,
-        purchaseDate: Date(year: 2024, month: 11, day: 20),
+        purchasePrice: 399.00,
+        purchaseDate: Date(year: 2023, month: 9, day: 22),
         usageRate: 0.1,
         usageRatePeriodId: UsageRatePeriod.day.id!
       ).inserted(db)
     }
 
-    self.registerMigration("Add ICEMAG 1") { db in
+    self.registerMigration("Add AirPods Pro 2") { db in
       _ = try Device(
-        name: "ICEMAG 1 MagSafe Power Bank",
+        name: "AirPods Pro 2",
         currencyId: 1,
-        purchasePrice: 35.90,
-        purchaseDate: Date(year: 2024, month: 11, day: 20),
+        purchasePrice: 249.00,
+        purchaseDate: Date(year: 2022, month: 9, day: 23),
         usageRate: 0.1,
         usageRatePeriodId: UsageRatePeriod.day.id!
       ).inserted(db)
     }
 
-    self.registerMigration("Add Space Elevator") { db in
+    self.registerMigration("Add Mac Studio M2 Max") { db in
       _ = try Device(
-        name: "Space Elevator Power Bank",
+        name: "Mac Studio M2 Max",
         currencyId: 1,
-        purchasePrice: 19.99,
-        purchaseDate: Date(year: 2024, month: 11, day: 20),
+        purchasePrice: 1999.00,
+        purchaseDate: Date(year: 2023, month: 6, day: 5),
         usageRate: 0.1,
         usageRatePeriodId: UsageRatePeriod.day.id!
       ).inserted(db)
     }
 
-    self.registerMigration("Add Shargeek 100") { db in
+    self.registerMigration("Add Apple Vision Pro") { db in
       _ = try Device(
-        name: "Shargeek 100",
+        name: "Apple Vision Pro",
         currencyId: 1,
-        purchasePrice: 159.00,
-        purchaseDate: Date(year: 2023, month: 12, day: 09),
+        purchasePrice: 3499.00,
+        purchaseDate: Date(year: 2024, month: 2, day: 2),
         usageRate: 0.2,
         usageRatePeriodId: UsageRatePeriod.day.id!
       ).inserted(db)

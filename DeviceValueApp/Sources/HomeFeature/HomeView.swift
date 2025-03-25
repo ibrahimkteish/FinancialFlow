@@ -53,7 +53,7 @@ public struct HomeView: View {
     .listStyle(.plain)
     .scrollContentBackground(.hidden)
   }
-  
+
   @ViewBuilder
   private var floatingAddButton: some View {
     Button {
@@ -100,7 +100,7 @@ public struct HomeView: View {
           .onAppear {
             store.send(.onAppear)
           }
-        
+
         floatingAddButton
       }
       .sheet(

@@ -32,7 +32,7 @@ public struct AddDeviceView: View {
             }
           }
           .pickerStyle(.navigationLink)
-          
+
           Button {
             store.send(.addCurrencyTapped)
           } label: {
@@ -45,7 +45,7 @@ public struct AddDeviceView: View {
           }
         }
       }
-      
+
       // Device Information Section
       Section(header: Text(Strings.deviceInformation)) {
         TextField(Strings.deviceName, text: $store.deviceName)

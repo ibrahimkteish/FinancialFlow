@@ -49,7 +49,6 @@ public struct Analytics: Sendable {
 
   public enum Action: Equatable, BindableAction {
     case binding(BindingAction<State>)
-    case refresh
   }
 
   public struct DeviceUsageMetricsRequest: FetchKeyRequest {
@@ -272,9 +271,6 @@ public struct Analytics: Sendable {
     Reduce { _, action in
       switch action {
         case .binding:
-          return .none
-
-        case .refresh:
           return .none
       }
     }

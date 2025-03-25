@@ -10,7 +10,6 @@ public struct SettingsView: View {
     self.store = store
   }
 
-
   fileprivate func makeCell(with string: String) -> some View {
     HStack {
       Text(string)
@@ -78,7 +77,6 @@ public struct SettingsView: View {
         Text(Strings.opensSettings)
       }
 
-
       Section(Strings.acknowledgements) {
         ForEach(self.store.acknowledgements) { acknowledgement in
           Link(
@@ -87,6 +85,14 @@ public struct SettingsView: View {
               self.makeCell(with: acknowledgement.name)
             }
           )
+        }
+      }
+
+      Section(Strings.legal) {
+        ForEach(["https://www.termsfeed.com/live/3d38411a-f533-4e2d-999d-e83d8eb2fe1b"], id: \.self) { url in
+          Link(destination: URL(string: url)!) {
+            Text(Strings.termsAndConditions)
+          }
         }
       }
 

@@ -68,7 +68,6 @@ public struct SettingsFeature: Sendable {
 
     var acknowledgements: IdentifiedArrayOf<Acknowledgement> = .acknowledgements
 
-
     public init() {}
 
     mutating func updatePresentation(from settings: AppSettingsWithCurrency) {

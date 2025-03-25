@@ -5,8 +5,8 @@
 //  Created by Ibrahim Kteish on 24/3/25.
 //
 
-import GRDB
 import Foundation
+import GRDB
 
 public struct AppSettings: Equatable, Codable, FetchableRecord, PersistableRecord, Sendable {
   public static let databaseTableName = "app_settings"

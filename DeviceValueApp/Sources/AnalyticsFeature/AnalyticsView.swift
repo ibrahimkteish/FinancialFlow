@@ -18,15 +18,6 @@ public struct AnalyticsView: View {
       .padding(.vertical)
     }
     .navigationTitle(Strings.usageAnalytics)
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button {
-          store.send(.refresh)
-        } label: {
-          Image(systemName: "arrow.clockwise")
-        }
-      }
-    }
   }
 
   private var portfolioOverview: some View {

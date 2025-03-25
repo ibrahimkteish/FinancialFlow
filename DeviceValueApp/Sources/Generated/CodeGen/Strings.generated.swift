@@ -90,6 +90,8 @@ public enum Strings {
   public static let language = Strings.tr("Localizable", "Language", fallback: "Language")
   /// Language & Region
   public static let languageRegion = Strings.tr("Localizable", "LanguageRegion", fallback: "Language & Region")
+  /// Legal
+  public static let legal = Strings.tr("Localizable", "Legal", fallback: "Legal")
   /// Loading currencies...
   public static let loadingCurrencies = Strings.tr("Localizable", "LoadingCurrencies", fallback: "Loading currencies...")
   /// month
@@ -150,6 +152,8 @@ public enum Strings {
   public static let settings = Strings.tr("Localizable", "Settings", fallback: "Settings")
   /// Submit
   public static let submit = Strings.tr("Localizable", "Submit", fallback: "Submit")
+  /// Terms and Conditions
+  public static let termsAndConditions = Strings.tr("Localizable", "TermsAndConditions", fallback: "Terms and Conditions")
   /// Theme changes will affect the app's appearance.
   public static let themeFooter = Strings.tr("Localizable", "ThemeFooter", fallback: "Theme changes will affect the app's appearance.")
   /// Total Purchase Value

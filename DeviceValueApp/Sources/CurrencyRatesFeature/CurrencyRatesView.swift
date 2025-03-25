@@ -1,8 +1,8 @@
 import ComposableArchitecture
+import Generated
 import Models
 import SharingGRDB
 import SwiftUI
-import Generated
 
 public struct CurrencyRatesView: View {
   @Bindable var store: StoreOf<CurrencyRatesFeature>

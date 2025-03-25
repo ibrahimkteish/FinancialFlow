@@ -314,7 +314,7 @@ public struct DeviceCardView: View {
   .preferredColorScheme(.dark)
 }
 
-public extension UsageRatePeriod {
+extension UsageRatePeriod {
   var localizedName: String {
     switch self.name {
       case "day":
