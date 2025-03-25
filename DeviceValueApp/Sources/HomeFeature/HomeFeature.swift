@@ -25,19 +25,19 @@ public struct CurrencyCost: FetchableRecord, Decodable, Equatable, Sendable {
 }
 
 @Reducer
-public struct HomeReducer: Sendable {
+public struct HomeFeature: Sendable {
 
   @Reducer(state: .equatable, .sendable, action: .equatable, .sendable)
   public enum Path {
-    case settings(SettingsReducer)
-    case currencyRates(CurrencyRatesReducer)
+    case settings(SettingsFeature)
+    case currencyRates(CurrencyRatesFeature)
   }
 
   @Reducer(state: .equatable, .sendable, action: .equatable, .sendable)
   public enum Destination {
-    case addDevice(AddDeviceReducer)
+    case addDevice(AddDeviceFeature)
     case analytics(Analytics)
-    case addCurrency(CurrencyRatesReducer)
+    case addCurrency(CurrencyRatesFeature)
   }
 
   @ObservableState
@@ -53,7 +53,7 @@ public struct HomeReducer: Sendable {
     @SharedReader(.fetch(Aggregate()))
     public var count: CurrencyCost? = nil
 
-    @SharedReader(.fetch(SettingsReducer.SettingsFetcher()))
+    @SharedReader(.fetch(SettingsFeature.SettingsFetcher()))
     public var settingsWithCurrency: AppSettingsWithCurrency = .init()
 
     var path = StackState<Path.State>()
@@ -218,11 +218,11 @@ public struct HomeReducer: Sendable {
         case .binding:
           return .none
         case .addDeviceButtonTapped:
-          state.destination = .addDevice(AddDeviceReducer.State())
+          state.destination = .addDevice(AddDeviceFeature.State())
           return .none
 
         case .addCurrencyButtonTapped:
-          state.destination = .addCurrency(CurrencyRatesReducer.State())
+          state.destination = .addCurrency(CurrencyRatesFeature.State())
           return .none
 
         case .analyticsButtonTapped:
@@ -243,7 +243,7 @@ public struct HomeReducer: Sendable {
         case .onAppear:
           return .run { [state] _ in
             // Apply theme from settings
-            let savedTheme = SettingsReducer
+            let savedTheme = SettingsFeature
               .AppTheme(rawValue: state.settingsWithCurrency.settings.themeMode) ?? .system
             await applicationClient.setUserInterfaceStyle(savedTheme.userInterfaceStyle)
           }
@@ -251,12 +251,12 @@ public struct HomeReducer: Sendable {
         case let .onSortChanged(newSort):
           state.$ordering.withLock { $0 = newSort }
           return .run { [state] _ in
-            try await state.$devices.load(.fetch(HomeReducer.Items(ordering: state.ordering)))
+            try await state.$devices.load(.fetch(HomeFeature.Items(ordering: state.ordering)))
           }
         case let .path(.element(id: _, action: .settings(.delegate(delAction)))):
           switch delAction {
             case .currencyRatesTapped:
-              state.path.append(.currencyRates(CurrencyRatesReducer.State()))
+              state.path.append(.currencyRates(CurrencyRatesFeature.State()))
           }
           return .none
 
@@ -264,7 +264,7 @@ public struct HomeReducer: Sendable {
           return .none
 
         case .settingsButtonTapped:
-          state.path.append(.settings(SettingsReducer.State()))
+          state.path.append(.settings(SettingsFeature.State()))
           return .none
 
         case .submitButtonTapped:
@@ -278,14 +278,14 @@ public struct HomeReducer: Sendable {
             case .didAddDevice:
               state.destination = nil
             case .addCurrency:
-              state.destination = .addCurrency(CurrencyRatesReducer.State())
+              state.destination = .addCurrency(CurrencyRatesFeature.State())
           }
           return .none
 
         case let .destination(.presented(.addCurrency(.delegate(action)))):
           switch action {
             case .didSaveSuccessfully:
-              state.destination = .addDevice(AddDeviceReducer.State())
+              state.destination = .addDevice(AddDeviceFeature.State())
           }
           return .none
 

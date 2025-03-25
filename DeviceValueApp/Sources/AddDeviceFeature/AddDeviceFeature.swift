@@ -27,7 +27,7 @@ extension UsageRatePeriod {
 }
 
 @Reducer
-public struct AddDeviceReducer: Sendable {
+public struct AddDeviceFeature: Sendable {
   // Define a FetchKeyRequest for currencies
   public struct CurrencyFetcher: FetchKeyRequest {
     public typealias State = [Currency]

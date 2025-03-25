@@ -23,7 +23,7 @@ public struct AppSettingsWithCurrency: Equatable, Sendable {
 }
 
 @Reducer
-public struct SettingsReducer: Sendable {
+public struct SettingsFeature: Sendable {
 
   // Define a FetchKeyRequest for settings
   public struct SettingsFetcher: FetchKeyRequest {
@@ -65,6 +65,9 @@ public struct SettingsReducer: Sendable {
 
     public var appVersion: String = ""
     public var buildNumber: String = ""
+
+    var acknowledgements: IdentifiedArrayOf<Acknowledgement> = .acknowledgements
+
 
     public init() {}
 

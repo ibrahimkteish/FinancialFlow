@@ -12,6 +12,10 @@ import Foundation
 public enum Strings {
   /// About
   public static let about = Strings.tr("Localizable", "About", fallback: "About")
+  /// Acknowledgements
+  public static let acknowledgements = Strings.tr("Localizable", "Acknowledgements", fallback: "Acknowledgements")
+  /// Acknowledgements
+  public static let acknowledgementsDescription = Strings.tr("Localizable", "AcknowledgementsDescription", fallback: "Acknowledgements")
   /// Add Currency
   public static let addCurrency = Strings.tr("Localizable", "AddCurrency", fallback: "Add Currency")
   /// Add New Device
@@ -20,6 +24,10 @@ public enum Strings {
   public static let appearance = Strings.tr("Localizable", "Appearance", fallback: "Appearance")
   /// App Theme
   public static let appTheme = Strings.tr("Localizable", "AppTheme", fallback: "App Theme")
+  /// Base
+  public static let base = Strings.tr("Localizable", "Base", fallback: "Base")
+  /// Base Currency
+  public static let baseCurrency = Strings.tr("Localizable", "BaseCurrency", fallback: "Base Currency")
   /// Cancel
   public static let cancel = Strings.tr("Localizable", "Cancel", fallback: "Cancel")
   /// Change Default Currency
@@ -34,6 +42,8 @@ public enum Strings {
   public static let currency = Strings.tr("Localizable", "Currency", fallback: "Currency")
   /// Currency Information
   public static let currencyInformation = Strings.tr("Localizable", "CurrencyInformation", fallback: "Currency Information")
+  /// Currency Rates
+  public static let currencyRates = Strings.tr("Localizable", "CurrencyRates", fallback: "Currency Rates")
   /// Symbol (e.g. £)
   public static let currencySymbol = Strings.tr("Localizable", "CurrencySymbol", fallback: "Symbol (e.g. £)")
   /// Daily Rate: %@
@@ -88,10 +98,14 @@ public enum Strings {
   public static let name = Strings.tr("Localizable", "Name", fallback: "Name")
   /// Name (e.g. British Pound)
   public static let nameOfCurrency = Strings.tr("Localizable", "NameOfCurrency", fallback: "Name (e.g. British Pound)")
+  /// No currencies match your search
+  public static let noCurrencyFound = Strings.tr("Localizable", "NoCurrencyFound", fallback: "No currencies match your search")
   /// None
   public static let `none` = Strings.tr("Localizable", "None", fallback: "None")
   /// Opens system settings to change app language.
   public static let opensSettings = Strings.tr("Localizable", "OpensSettings", fallback: "Opens system settings to change app language.")
+  /// Other Currencies
+  public static let otherCurrencies = Strings.tr("Localizable", "OtherCurrencies", fallback: "Other Currencies")
   /// %lld%% used
   public static func percentUsed(_ p1: Int) -> String {
     return Strings.tr("Localizable", "PercentUsed", p1, fallback: "%lld%% used")
@@ -126,10 +140,14 @@ public enum Strings {
   public static let remainingValue = Strings.tr("Localizable", "RemainingValue", fallback: "Remaining Value")
   /// Save
   public static let save = Strings.tr("Localizable", "Save", fallback: "Save")
+  /// Search Currencies
+  public static let searchCurrencies = Strings.tr("Localizable", "SearchCurrencies", fallback: "Search Currencies")
   /// Select Currency
   public static let selectCurrency = Strings.tr("Localizable", "SelectCurrency", fallback: "Select Currency")
   /// Set Default Currency
   public static let setDefaultCurrency = Strings.tr("Localizable", "SetDefaultCurrency", fallback: "Set Default Currency")
+  /// Settings
+  public static let settings = Strings.tr("Localizable", "Settings", fallback: "Settings")
   /// Submit
   public static let submit = Strings.tr("Localizable", "Submit", fallback: "Submit")
   /// Theme changes will affect the app's appearance.

@@ -15,7 +15,7 @@ import SwiftUI
 @main
 struct DeviceValueApp: App {
 
-    static let store: StoreOf<HomeReducer> = .init(initialState: .init(), reducer: { HomeReducer() })
+    static let store: StoreOf<HomeFeature> = .init(initialState: .init(), reducer: { HomeFeature() })
     
     init() {
         prepareDependencies {

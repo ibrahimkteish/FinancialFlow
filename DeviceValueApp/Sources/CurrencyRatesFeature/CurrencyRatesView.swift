@@ -2,13 +2,14 @@ import ComposableArchitecture
 import Models
 import SharingGRDB
 import SwiftUI
+import Generated
 
 public struct CurrencyRatesView: View {
-  @Bindable var store: StoreOf<CurrencyRatesReducer>
+  @Bindable var store: StoreOf<CurrencyRatesFeature>
   @Environment(\.dismiss) private var dismiss
   @State private var rates: [(Currency, String)] = []
 
-  public init(store: StoreOf<CurrencyRatesReducer>) {
+  public init(store: StoreOf<CurrencyRatesFeature>) {
     self.store = store
   }
 
@@ -22,7 +23,7 @@ public struct CurrencyRatesView: View {
               HStack {
                 Spacer()
                 VStack {
-                  Text("Loading currencies...")
+                  Text(Strings.loadingCurrencies)
                     .foregroundColor(.secondary)
                   ProgressView()
                     .padding()
@@ -33,7 +34,7 @@ public struct CurrencyRatesView: View {
           } else if !store.searchTerm.isEmpty {
             // Show "no results" message if searching and nothing found
             Section {
-              Text("No currencies match your search")
+              Text(Strings.noCurrencyFound)
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding()
@@ -41,20 +42,20 @@ public struct CurrencyRatesView: View {
           }
           // If totalCurrenciesCount is 0, don't show anything
         } else {
-          Section(header: Text("Base Currency")) {
+          Section(header: Text(Strings.baseCurrency)) {
             if let usdCurrency = store.currencies.first(where: { $0.code == "USD" }) {
               currencyRow(usdCurrency)
             }
           }
 
-          Section(header: Text("Other Currencies")) {
+          Section(header: Text(Strings.otherCurrencies)) {
             ForEach(store.currencies.filter { $0.code != "USD" }, id: \.id) { currency in
               currencyRow(currency)
             }
           }
         }
       }
-      .searchable(text: $store.searchTerm, prompt: "Search currencies")
+      .searchable(text: $store.searchTerm, prompt: Strings.searchCurrencies)
     }
     .sheet(
       isPresented: $store.showingAddCurrency
@@ -64,11 +65,11 @@ public struct CurrencyRatesView: View {
     .onAppear {
       store.send(.fetchCurrencyRates)
     }
-    .navigationTitle("Currency Rates")
+    .navigationTitle(Strings.currencyRates)
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItem(placement: .confirmationAction) {
-        Button("Save") {
+        Button(Strings.save) {
           let updatedCurrencies = store.currencies.map { currency in
             if let rateIndex = rates.firstIndex(where: { $0.0.id == currency.id }),
                let newRate = Double(rates[rateIndex].1) {
@@ -112,7 +113,7 @@ public struct CurrencyRatesView: View {
       Spacer()
 
       if currency.code == "USD" {
-        Text("Base")
+        Text(Strings.base)
           .foregroundColor(.secondary)
           .fontWeight(.medium)
       } else {
@@ -122,7 +123,6 @@ public struct CurrencyRatesView: View {
             if let index = rateIndex {
               return rates[index].1
             } else {
-              // Use modern formatting with proper precision
               return currency.usdRate.formatted(.number.precision(.fractionLength(0 ... 4)))
             }
           },
@@ -138,7 +138,7 @@ public struct CurrencyRatesView: View {
         .multilineTextAlignment(.trailing)
         .frame(width: 100)
         .padding(8)
-        .background(Color(.systemGray6))
+        .background(Color(.systemGray5))
         .cornerRadius(8)
       }
     }
@@ -150,7 +150,7 @@ public struct CurrencyRatesView: View {
             store.send(.deleteCurrency(id))
           }
         } label: {
-          Label("Delete", systemImage: "trash")
+          Label(Strings.delete, systemImage: "trash")
         }
       }
     }
@@ -160,9 +160,9 @@ public struct CurrencyRatesView: View {
 #Preview {
   CurrencyRatesView(
     store: Store(
-      initialState: CurrencyRatesReducer.State()
+      initialState: CurrencyRatesFeature.State()
     ) {
-      CurrencyRatesReducer()
+      CurrencyRatesFeature()
     }
   )
 }

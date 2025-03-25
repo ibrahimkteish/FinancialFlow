@@ -3,7 +3,7 @@ import Models
 import SharingGRDB
 
 @Reducer
-public struct CurrencyRatesReducer: Sendable {
+public struct CurrencyRatesFeature: Sendable {
 
   @Reducer(state: .sendable, .equatable, action: .sendable, .equatable)
   public enum Destination: Equatable, Sendable {
@@ -193,7 +193,7 @@ public struct CurrencyRatesReducer: Sendable {
   }
 }
 
-extension AlertState where Action == CurrencyRatesReducer.Destination.Alert {
+extension AlertState where Action == CurrencyRatesFeature.Destination.Alert {
   static func show(_ message: String) -> Self {
     AlertState {
       TextState(message)

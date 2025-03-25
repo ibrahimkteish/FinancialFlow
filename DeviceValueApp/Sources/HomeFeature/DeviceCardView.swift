@@ -13,7 +13,7 @@ import Utils
 
 public struct DeviceCardView: View {
 
-  public let data: HomeReducer.Items.State
+  public let data: HomeFeature.Items.State
   @State private var isPressed: Bool = false
   @Environment(\.colorScheme) private var colorScheme
 
@@ -34,7 +34,7 @@ public struct DeviceCardView: View {
     self.colorScheme == .dark ? .black.opacity(0.5) : .gray.opacity(0.3)
   }
 
-  init(data: HomeReducer.Items.State) {
+  init(data: HomeFeature.Items.State) {
     self.data = data
   }
 

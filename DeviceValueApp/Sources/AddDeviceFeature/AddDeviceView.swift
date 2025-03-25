@@ -3,9 +3,9 @@ import Generated
 import Models
 import SwiftUI
 public struct AddDeviceView: View {
-  @Bindable var store: StoreOf<AddDeviceReducer>
+  @Bindable var store: StoreOf<AddDeviceFeature>
 
-  public init(store: StoreOf<AddDeviceReducer>) {
+  public init(store: StoreOf<AddDeviceFeature>) {
     self.store = store
   }
 
@@ -106,9 +106,9 @@ public struct AddDeviceView: View {
   NavigationStack {
     AddDeviceView(
       store: Store(
-        initialState: AddDeviceReducer.State()
+        initialState: AddDeviceFeature.State()
       ) {
-        AddDeviceReducer()
+        AddDeviceFeature()
       }
     )
   }

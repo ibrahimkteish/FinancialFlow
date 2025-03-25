@@ -10,16 +10,16 @@ import SettingsFeature
 import SwiftUI
 
 public struct HomeView: View {
-  @Bindable var store: StoreOf<HomeReducer>
+  @Bindable var store: StoreOf<HomeFeature>
 
-  public init(store: StoreOf<HomeReducer>) {
+  public init(store: StoreOf<HomeFeature>) {
     self.store = store
   }
 
   @ViewBuilder
   private var menu: some View {
     Menu {
-      ForEach(HomeReducer.Ordering.allCases, id: \.self) { ordering in
+      ForEach(HomeFeature.Ordering.allCases, id: \.self) { ordering in
         Button {
           store.send(.onSortChanged(ordering))
         } label: {

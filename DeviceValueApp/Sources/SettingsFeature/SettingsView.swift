@@ -4,17 +4,27 @@ import Models
 import SwiftUI
 
 public struct SettingsView: View {
-  @Bindable var store: StoreOf<SettingsReducer>
+  @Bindable var store: StoreOf<SettingsFeature>
 
-  public init(store: StoreOf<SettingsReducer>) {
+  public init(store: StoreOf<SettingsFeature>) {
     self.store = store
+  }
+
+
+  fileprivate func makeCell(with string: String) -> some View {
+    HStack {
+      Text(string)
+      Spacer()
+      Image(systemName: "network")
+    }
+    .contentShape(Rectangle())
   }
 
   public var body: some View {
     Form {
       Section {
         Picker(Strings.appTheme, selection: $store.presentation.appTheme) {
-          ForEach(SettingsReducer.AppTheme.allCases, id: \.self) { theme in
+          ForEach(SettingsFeature.AppTheme.allCases, id: \.self) { theme in
             Text(theme.displayName)
               .tag(theme)
           }
@@ -68,6 +78,18 @@ public struct SettingsView: View {
         Text(Strings.opensSettings)
       }
 
+
+      Section(Strings.acknowledgements) {
+        ForEach(self.store.acknowledgements) { acknowledgement in
+          Link(
+            destination: acknowledgement.url,
+            label: {
+              self.makeCell(with: acknowledgement.name)
+            }
+          )
+        }
+      }
+
       Section {
         HStack {
           Text(Strings.version)
@@ -82,7 +104,7 @@ public struct SettingsView: View {
     .task {
       await store.send(.onAppear).finish()
     }
-    .navigationTitle("Settings")
+    .navigationTitle(Strings.settings)
 
     .sheet(isPresented: $store.isShowingCurrencyPicker) {
       NavigationStack {
@@ -110,19 +132,6 @@ struct CurrencyPickerView: View {
 
   var body: some View {
     List {
-      Button {
-        onSelect(nil)
-      } label: {
-        HStack {
-          Text(Strings.none)
-          Spacer()
-          if selectedCurrencyId == nil {
-            Image(systemName: "checkmark")
-              .foregroundColor(.blue)
-          }
-        }
-      }
-
       ForEach(currencies, id: \.id) { currency in
         Button {
           onSelect(currency.id)
@@ -153,9 +162,9 @@ struct CurrencyPickerView: View {
   NavigationStack {
     SettingsView(
       store: Store(
-        initialState: SettingsReducer.State()
+        initialState: SettingsFeature.State()
       ) {
-        SettingsReducer()
+        SettingsFeature()
       }
     )
   }
