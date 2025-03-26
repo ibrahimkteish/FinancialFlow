@@ -46,6 +46,12 @@ public struct HomeView: View {
             } label: {
               Label(Strings.delete, systemImage: "trash")
             }
+            Button {
+              store.send(.editDeviceTapped(device.device))
+            } label: {
+              Label(Strings.edit, systemImage: "pencil")
+            }
+            .tint(.accentColor)
           }
       }
       .listRowBackground(Color.clear)
@@ -74,33 +80,36 @@ public struct HomeView: View {
     .padding(.bottom, 20)
   }
 
+  private var devicesView: some View {
+    devices
+      .toolbar {
+        ToolbarItemGroup(placement: .topBarLeading) {
+          Button {
+            store.send(.settingsButtonTapped)
+          } label: {
+            Image(systemName: "gear")
+          }
+        }
+
+        ToolbarItemGroup(placement: .topBarTrailing) {
+          Button {
+            store.send(.analyticsButtonTapped)
+          } label: {
+            Image(systemName: "chart.bar.fill")
+          }
+
+          menu
+        }
+      }
+      .onAppear {
+        store.send(.onAppear)
+      }
+  }
+
   public var body: some View {
     NavigationStack(path: self.$store.scope(state: \.path, action: \.path)) {
       ZStack(alignment: .bottomTrailing) {
-        devices
-          .toolbar {
-            ToolbarItemGroup(placement: .topBarLeading) {
-              Button {
-                store.send(.settingsButtonTapped)
-              } label: {
-                Image(systemName: "gear")
-              }
-            }
-
-            ToolbarItemGroup(placement: .topBarTrailing) {
-              Button {
-                store.send(.analyticsButtonTapped)
-              } label: {
-                Image(systemName: "chart.bar.fill")
-              }
-
-              menu
-            }
-          }
-          .onAppear {
-            store.send(.onAppear)
-          }
-
+        devicesView
         floatingAddButton
       }
       .sheet(

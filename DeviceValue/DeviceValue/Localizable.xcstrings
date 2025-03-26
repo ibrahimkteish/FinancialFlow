@@ -1725,7 +1725,30 @@
           }
         }
       }
+    },
+    "Edit" : {
+    "extractionState" : "manual",
+    "localizations" : {
+      "en" : {
+        "stringUnit" : {
+          "state" : "translated",
+          "value" : "Edit"
+        }
+      },
+      "es" : {
+        "stringUnit" : {
+          "state" : "translated",
+          "value" : "Editar"
+        }
+      },
+      "fr" : {
+        "stringUnit" : {
+          "state" : "translated",
+          "value" : "Modifier"
+        }
+      }
     }
+  }
   },
   "version" : "1.0"
 }

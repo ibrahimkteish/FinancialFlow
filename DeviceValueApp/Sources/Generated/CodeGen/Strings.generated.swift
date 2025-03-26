@@ -70,6 +70,8 @@ public enum Strings {
   public static let deviceName = Strings.tr("Localizable", "DeviceName", fallback: "Device Name")
   /// Device Usage
   public static let deviceUsage = Strings.tr("Localizable", "DeviceUsage", fallback: "Device Usage")
+  /// Edit
+  public static let edit = Strings.tr("Localizable", "Edit", fallback: "Edit")
   /// Enter the direct exchange rate: how many units of this currency equal exactly 1 USD. Exchange rates vary over time, so enter the current market value.
   public static let enterOneUSDExplanation = Strings.tr("Localizable", "EnterOneUSDExplanation", fallback: "Enter the direct exchange rate: how many units of this currency equal exactly 1 USD. Exchange rates vary over time, so enter the current market value.")
   /// Enter how many units of this currency equals 1 USD

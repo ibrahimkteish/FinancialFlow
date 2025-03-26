@@ -70,11 +70,11 @@ public struct HomeFeature: Sendable {
 
     var orderingTerm: any SQLOrderingTerm & Sendable {
       switch self {
-        case .updatedAt: return Column("updatedAt")
-        case .created: return Column("createdAt")
-        case .name: return Column("name")
-        case .currency: return Column("currencyId")
-        case .price: return Column("purchasePrice")
+        case .updatedAt: return Column("updatedAt").desc
+        case .created: return Column("createdAt").desc
+        case .name: return Column("name").desc
+        case .currency: return Column("currencyId").desc
+        case .price: return Column("purchasePrice").desc
       }
     }
 
@@ -204,6 +204,7 @@ public struct HomeFeature: Sendable {
     case removeDevice(Int64)
     case settingsButtonTapped
     case submitButtonTapped
+    case editDeviceTapped(Device)
   }
 
   @Dependency(\.defaultDatabase) var database
@@ -290,6 +291,10 @@ public struct HomeFeature: Sendable {
           return .none
 
         case .destination:
+          return .none
+
+        case let .editDeviceTapped(device):
+          state.destination = .addDevice(AddDeviceFeature.State(with: device))
           return .none
       }
     }
