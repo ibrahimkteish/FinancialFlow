@@ -158,6 +158,8 @@ public enum Strings {
   public static let themeFooter = Strings.tr("Localizable", "ThemeFooter", fallback: "Theme changes will affect the app's appearance.")
   /// Total Purchase Value
   public static let totalPurchaseValue = Strings.tr("Localizable", "TotalPurchaseValue", fallback: "Total Purchase Value")
+  /// Update
+  public static let update = Strings.tr("Localizable", "Update", fallback: "Update")
   /// Updated At
   public static let updatedAt = Strings.tr("Localizable", "UpdatedAt", fallback: "Updated At")
   /// Usage Analytics

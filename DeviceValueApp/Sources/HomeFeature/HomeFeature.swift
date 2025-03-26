@@ -275,7 +275,7 @@ public struct HomeFeature: Sendable {
           switch action {
             case .dismiss:
               state.destination = nil
-            case .didAddDevice:
+            case .didAddDevice, .didUpdateDevice:
               state.destination = nil
             case .addCurrency:
               state.destination = .addCurrency(CurrencyRatesFeature.State())

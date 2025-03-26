@@ -86,7 +86,7 @@ public struct AddDeviceView: View {
     }
     .toolbar {
       ToolbarItem(placement: .confirmationAction) {
-        Button(Strings.submit) {
+        Button(store.mode.deviceId != nil ? Strings.update : Strings.submit) {
           self.store.send(.submitButtonTapped)
         }
         .disabled(!store.isValid)

@@ -21,9 +21,11 @@ public struct UsageRatePeriod: Equatable, Codable, FetchableRecord, PersistableR
   }
 }
 
+#if DEBUG
 public extension UsageRatePeriod {
   static let day = UsageRatePeriod(id: 1, name: "day", daysMultiplier: 1)
   static let week = UsageRatePeriod(id: 2, name: "week", daysMultiplier: 7)
   static let month = UsageRatePeriod(id: 3, name: "month", daysMultiplier: 30)
   static let year = UsageRatePeriod(id: 4, name: "year", daysMultiplier: 365)
 }
+#endif

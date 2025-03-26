@@ -28,18 +28,18 @@ extension UsageRatePeriod {
 
 @Reducer
 public struct AddDeviceFeature: Sendable {
-  // Define a FetchKeyRequest for currencies
-  public struct CurrencyFetcher: FetchKeyRequest {
-    public typealias State = [Currency]
 
-    public init() {}
+  enum Mode: Equatable, Sendable {
+    case add
+    case edit(Int64)
 
-    public func fetch(_ db: Database) throws -> [Currency] {
-      let result = try Currency.fetchAll(db, sql: """
-          SELECT * FROM currencies
-          ORDER BY code = 'USD' DESC, name
-      """)
-      return result
+    var deviceId: Int64? {
+      switch self {
+        case .add:
+          return nil
+        case .edit(let id):
+          return id
+      }
     }
   }
 
@@ -51,11 +51,14 @@ public struct AddDeviceFeature: Sendable {
     var purchaseDate: Date
     var usageRate: String
     var selectedUsageRatePeriodId: Int64
+    var mode: Mode
 
     @SharedReader(.fetchAll(sql: "SELECT * from \(Currency.databaseTableName)", animation: .default))
     public var currencies: [Currency]
-
-    var usageRatePeriods: [UsageRatePeriod]
+    
+    @SharedReader(.fetchAll(sql: "SELECT * from \(UsageRatePeriod.databaseTableName)", animation: .default))
+    public var usageRatePeriods: [UsageRatePeriod]
+    
     var isValid: Bool {
       !self.deviceName.isEmpty &&
         Double(self.purchasePrice) != nil &&
@@ -68,8 +71,7 @@ public struct AddDeviceFeature: Sendable {
       purchasePrice: String = "",
       purchaseDate: Date = .now,
       usageRate: String = "",
-      selectedUsageRatePeriodId: Int64 = 1, // Default to first period (day)
-      usageRatePeriods: [UsageRatePeriod] = [.day, .week, .month, .year]
+      selectedUsageRatePeriodId: Int64 = 1 // Default to first period (day)
     ) {
       self.deviceName = deviceName
       self.selectedCurrencyId = selectedCurrencyId
@@ -77,8 +79,19 @@ public struct AddDeviceFeature: Sendable {
       self.purchaseDate = purchaseDate
       self.usageRate = usageRate
       self.selectedUsageRatePeriodId = selectedUsageRatePeriodId
-      self.usageRatePeriods = usageRatePeriods
+      self.mode = .add
     }
+
+    public init(with device: Device) {
+      self.deviceName = device.name
+      self.selectedCurrencyId = device.currencyId
+      self.purchasePrice = String(device.purchasePrice)
+      self.purchaseDate = device.purchaseDate
+      self.usageRate = String(device.usageRate)
+      self.selectedUsageRatePeriodId = device.usageRatePeriodId
+      self.mode = .edit(device.id!)
+    }
+
   }
 
   public enum Action: BindableAction, Equatable, Sendable {
@@ -91,6 +104,7 @@ public struct AddDeviceFeature: Sendable {
     @CasePathable
     public enum Delegate: Equatable, Sendable {
       case didAddDevice(Device)
+      case didUpdateDevice(Device)
       case dismiss
       case addCurrency
     }
@@ -125,6 +139,7 @@ public struct AddDeviceFeature: Sendable {
           }
 
           let device = Device(
+            id: state.mode.deviceId,
             name: state.deviceName,
             currencyId: state.selectedCurrencyId,
             purchasePrice: price,
@@ -132,19 +147,28 @@ public struct AddDeviceFeature: Sendable {
             usageRate: rate,
             usageRatePeriodId: state.selectedUsageRatePeriodId
           )
-
+          let mode = state.mode
           return .run { send in
             try await database.write { db in
               var device_ = device
-              _ = try device_.insert(db)
+              if mode == .add {
+                _ = try device_.insert(db)
+              } else {
+                try device_.update(db)
+              }
             }
-            await send(.delegate(.didAddDevice(device)))
+            
+            if mode == .add {
+              await send(.delegate(.didAddDevice(device)))
+            } else {
+              await send(.delegate(.didUpdateDevice(device)))
+            }
             await dismiss()
           }
-
         case .delegate:
           return .none
       }
     }
   }
 }
+
