@@ -72,7 +72,7 @@ public struct HomeFeature: Sendable {
       switch self {
         case .updatedAt: return Column("updatedAt").desc
         case .created: return Column("createdAt").desc
-        case .name: return Column("name").desc
+        case .name: return Column("name").asc
         case .currency: return Column("currencyId").desc
         case .price: return Column("purchasePrice").desc
       }
@@ -205,10 +205,12 @@ public struct HomeFeature: Sendable {
     case settingsButtonTapped
     case submitButtonTapped
     case editDeviceTapped(Device)
+    case cloneDeviceTapped(Device)
   }
 
   @Dependency(\.defaultDatabase) var database
   @Dependency(\.applicationClient) var applicationClient
+  @Dependency(\.date.now) var now
 
   public init() {}
 
@@ -294,7 +296,13 @@ public struct HomeFeature: Sendable {
           return .none
 
         case let .editDeviceTapped(device):
-          state.destination = .addDevice(AddDeviceFeature.State(with: device))
+          state.destination = .addDevice(AddDeviceFeature.State(with: device, mode: AddDeviceFeature.Mode.edit(device.id!)))
+          return .none
+
+        case let .cloneDeviceTapped(deviceToClone):
+          let clonedDevice = deviceToClone.cloned(with: now)
+          // Present AddDeviceFeature pre-filled with cloned data
+          state.destination = .addDevice(AddDeviceFeature.State(with: clonedDevice, mode: .add))
           return .none
       }
     }

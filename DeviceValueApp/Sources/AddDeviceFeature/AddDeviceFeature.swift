@@ -29,7 +29,7 @@ extension UsageRatePeriod {
 @Reducer
 public struct AddDeviceFeature: Sendable {
 
-  enum Mode: Equatable, Sendable {
+  public enum Mode: Equatable, Sendable {
     case add
     case edit(Int64)
 
@@ -37,7 +37,7 @@ public struct AddDeviceFeature: Sendable {
       switch self {
         case .add:
           return nil
-        case .edit(let id):
+        case let .edit(id):
           return id
       }
     }
@@ -55,10 +55,10 @@ public struct AddDeviceFeature: Sendable {
 
     @SharedReader(.fetchAll(sql: "SELECT * from \(Currency.databaseTableName)", animation: .default))
     public var currencies: [Currency]
-    
+
     @SharedReader(.fetchAll(sql: "SELECT * from \(UsageRatePeriod.databaseTableName)", animation: .default))
     public var usageRatePeriods: [UsageRatePeriod]
-    
+
     var isValid: Bool {
       !self.deviceName.isEmpty &&
         Double(self.purchasePrice) != nil &&
@@ -82,14 +82,14 @@ public struct AddDeviceFeature: Sendable {
       self.mode = .add
     }
 
-    public init(with device: Device) {
+    public init(with device: Device, mode: Mode) {
       self.deviceName = device.name
       self.selectedCurrencyId = device.currencyId
       self.purchasePrice = String(device.purchasePrice)
       self.purchaseDate = device.purchaseDate
       self.usageRate = String(device.usageRate)
       self.selectedUsageRatePeriodId = device.usageRatePeriodId
-      self.mode = .edit(device.id!)
+      self.mode = mode
     }
 
   }
@@ -157,7 +157,7 @@ public struct AddDeviceFeature: Sendable {
                 try device_.update(db)
               }
             }
-            
+
             if mode == .add {
               await send(.delegate(.didAddDevice(device)))
             } else {
@@ -171,4 +171,3 @@ public struct AddDeviceFeature: Sendable {
     }
   }
 }
-

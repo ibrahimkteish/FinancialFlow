@@ -32,6 +32,8 @@ public enum Strings {
   public static let cancel = Strings.tr("Localizable", "Cancel", fallback: "Cancel")
   /// Change Default Currency
   public static let changeDefaultCurrency = Strings.tr("Localizable", "ChangeDefaultCurrency", fallback: "Change Default Currency")
+  /// Clone
+  public static let clone = Strings.tr("Localizable", "Clone", fallback: "Clone")
   /// Code (e.g. GBP)
   public static let codeExample = Strings.tr("Localizable", "CodeExample", fallback: "Code (e.g. GBP)")
   /// Consumed Value

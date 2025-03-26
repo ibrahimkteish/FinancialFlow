@@ -52,6 +52,13 @@ public struct HomeView: View {
               Label(Strings.edit, systemImage: "pencil")
             }
             .tint(.accentColor)
+
+            Button {
+              store.send(.cloneDeviceTapped(device.device))
+            } label: {
+              Label(Strings.clone, systemImage: "doc.on.doc")
+            }
+            .tint(.orange)
           }
       }
       .listRowBackground(Color.clear)
