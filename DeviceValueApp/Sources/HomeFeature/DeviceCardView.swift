@@ -263,7 +263,7 @@ public struct DeviceCardView: View {
     }
   }
 }
-
+#if DEBUG
 #Preview {
   VStack {
     DeviceCardView(
@@ -313,6 +313,7 @@ public struct DeviceCardView: View {
   }
   .preferredColorScheme(.dark)
 }
+#endif
 
 extension UsageRatePeriod {
   var localizedName: String {
