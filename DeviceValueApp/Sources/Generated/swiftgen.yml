@@ -1,0 +1,25 @@
+input_dir: .
+output_dir: CodeGen
+
+
+strings:
+  inputs:
+    - Localizable.strings
+  outputs:
+    - templateName: structured-swift5
+      output: Strings.generated.swift
+      params:
+        bundle: Bundle.main
+        publicAccess: true
+        enumName: Strings
+        
+xcassets:
+  inputs:
+   - ../../../DeviceValue/DeviceValue/Assets.xcassets
+  outputs:
+    - templatePath: AssetsTemplate.stencil
+      output: Assets.swift
+      params:
+        bundle: Bundle.main
+        publicAccess: true
+        enumName: Assets

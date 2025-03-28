@@ -7,19 +7,19 @@ if [ "$(dirname "$0")" != "." ]; then
 fi
 
 # Check if the Localizable.xcstrings file exists
-if [ ! -f "../FinancialFlow/FinancialFlow/Localizable.xcstrings" ]; then
+if [ ! -f "../DeviceValue/DeviceValue/Localizable.xcstrings" ]; then
     echo "Error: Localizable.xcstrings file not found"
     exit 1
 fi
 
 # create the Generated directory if it doesn't exist
-mkdir -p ../FinancialFlowApp/Sources/Generated
+mkdir -p ../DeviceValueApp/Sources/Generated
 
 # convert the xcstrings to strings using the swift script directly
-swift xcstrings-to-strings.swift ../FinancialFlow/FinancialFlow/Localizable.xcstrings ../FinancialFlowApp/Sources/Generated/Localizable.strings
+swift xcstrings-to-strings.swift ../DeviceValue/DeviceValue/Localizable.xcstrings ../DeviceValueApp/Sources/Generated/Localizable.strings
 
-# cd to the FinancialFlowApp folder
-cd ../FinancialFlowApp
+# cd to the DeviceValueApp folder
+cd ../DeviceValueApp
 
 # generate the code for the resources with the plugin
 swift package --allow-writing-to-package-directory generate-code-for-resources 

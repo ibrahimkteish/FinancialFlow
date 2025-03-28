@@ -1,15 +1,16 @@
-# FinancialFlow
+# DeviceValue
 
-FinancialFlow is an iOS application that helps you track and manage your device investments and their depreciation over time. Built with SwiftUI and The Composable Architecture (TCA), it provides a clean and intuitive interface for monitoring your device expenses and usage costs.
+DeviceValue is an iOS application that helps you track and manage your device investments and their depreciation over time. Built with SwiftUI and The Composable Architecture (TCA), it provides a clean and intuitive interface for monitoring your device expenses and usage costs.
 
 ## Features
 
 - 📱 Add and manage devices with detailed information
 - 💰 Track purchase prices and depreciation
 - 📊 Monitor usage rates and costs over time
-- 🌐 Support for multiple currencies (USD, EUR, GBP)
+- 🌐 Support for multiple currencies with automatic conversion
 - 📅 Flexible usage rate periods (daily, weekly, monthly, yearly)
 - 💾 Persistent storage using GRDB (SQLite)
+- 🌓 Support for light and dark mode
 
 ## Requirements
 
@@ -20,20 +21,29 @@ FinancialFlow is an iOS application that helps you track and manage your device 
 ## Dependencies
 
 - [The Composable Architecture](https://github.com/pointfreeco/swift-composable-architecture) (1.17.1+)
+- [Swift Dependencies](http://github.com/pointfreeco/swift-dependencies) (1.7.0+)
 - [GRDB](https://github.com/groue/GRDB.swift) (7.2.0+)
 - [Sharing GRDB](https://github.com/pointfreeco/sharing-grdb) (0.1.0+)
 
 ## Project Structure
 
 ```
-FinancialFlowApp/
+DeviceValueApp/
 ├── Sources/
+│   ├── App/                  # Main application files
 │   ├── AddDeviceFeature/     # Add device form and logic
+│   ├── AnalyticsFeature/     # Analytics dashboard and insights
+│   ├── CurrencyRatesFeature/ # Currency rates management
 │   ├── HomeFeature/          # Main home screen
 │   ├── Models/               # Data models and database setup
-│   └── Utils/               # Utility functions and extensions
+│   ├── SettingsFeature/      # App settings and preferences
+│   └── Shared/               # Shared components and utilities
+├── Resources/
+│   ├── Assets/               # Images and colors
+│   └── Localization/         # Localized strings
 └── Tests/
-    └── HomeFeatureTests/     # Tests for home feature
+    ├── UnitTests/            # Unit tests
+    └── UITests/              # UI tests
 ```
 
 ## Architecture
@@ -48,8 +58,20 @@ The project follows The Composable Architecture (TCA) pattern, providing:
 
 The application uses SQLite (via GRDB) with the following main tables:
 - `devices`: Stores device information and usage metrics
-- `currencies`: Manages supported currencies
+- `currencies`: Manages supported currencies and exchange rates
 - `usage_rate_periods`: Defines different rate periods (day, week, month, year)
+- `app_settings`: Stores application settings and preferences
+
+## Key Features
+
+### Currency Conversion
+DeviceValue automatically converts device costs between currencies using user provided exchange rates, allowing you to see your total device expenses in your preferred currency.
+
+### Cost Calculation
+The app calculates the user specified interval usage cost of all your devices, helping you understand your ongoing expenses at a glance.
+
+### Device Sorting
+Sort your devices by creation date, name, currency, purchase price, or last update to organize your inventory effectively.
 
 ## Getting Started
 
@@ -62,8 +84,14 @@ The application uses SQLite (via GRDB) with the following main tables:
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+4. (Optional) If you added localization keys/values, run the localization script:
+   ```bash
+   cd Scripts && sh local.sh
+   ```
+5. Format the code (`cd DeviceValueApp && swift package --allow-writing-to-package-directory format-source-code --config ../swiftformat`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
 
 ## License
 
