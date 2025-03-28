@@ -1,9 +1,10 @@
 import ComposableArchitecture
 import Models
 import SharingGRDB
+import Generated
 
 @Reducer
-public struct CurrencyRatesFeature: Sendable {
+public struct CurrenciesRatesFeature: Sendable {
 
   @Reducer(state: .sendable, .equatable, action: .sendable, .equatable)
   public enum Destination: Equatable, Sendable {
@@ -16,7 +17,7 @@ public struct CurrencyRatesFeature: Sendable {
   }
 
   // Define a FetchKeyRequest for currencies with filtering
-  public struct CurrencyFetcher: FetchKeyRequest {
+  public struct CurrencyRequest: FetchKeyRequest {
     public typealias State = [Currency]
 
     public let searchTerm: String
@@ -56,7 +57,7 @@ public struct CurrencyRatesFeature: Sendable {
     @Shared(.inMemory("currency_search"))
     var searchTerm: String = ""
 
-    @SharedReader(.fetch(CurrencyFetcher()))
+    @SharedReader(.fetch(CurrencyRequest()))
     public var currencies: [Currency]
 
     @SharedReader(.fetchOne(sql: "SELECT COUNT(*) FROM currencies"))
@@ -98,14 +99,14 @@ public struct CurrencyRatesFeature: Sendable {
         case .binding(\.searchTerm):
           let newFilterTerm = state.searchTerm
           return .run { [state] _ in
-            try await state.$currencies.load(.fetch(CurrencyFetcher(searchTerm: newFilterTerm)))
+            try await state.$currencies.load(.fetch(CurrencyRequest(searchTerm: newFilterTerm)))
           }
 
         case .binding:
           return .none
         case .fetchCurrencyRates:
           return .run { [state] _ in
-            try await state.$currencies.load(.fetch(CurrencyFetcher(searchTerm: state.searchTerm)))
+            try await state.$currencies.load(.fetch(CurrencyRequest(searchTerm: state.searchTerm)))
           }
 
         case .delegate:
@@ -193,7 +194,7 @@ public struct CurrencyRatesFeature: Sendable {
   }
 }
 
-extension AlertState where Action == CurrencyRatesFeature.Destination.Alert {
+extension AlertState where Action == CurrenciesRatesFeature.Destination.Alert {
   static func show(_ message: String) -> Self {
     AlertState {
       TextState(message)

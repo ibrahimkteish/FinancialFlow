@@ -8,7 +8,7 @@
 import AddDeviceFeature
 import AnalyticsFeature
 import ComposableArchitecture
-import CurrencyRatesFeature
+import CurrenciesRatesFeature
 import Generated
 import Models
 import SettingsFeature
@@ -30,14 +30,14 @@ public struct HomeFeature: Sendable {
   @Reducer(state: .equatable, .sendable, action: .equatable, .sendable)
   public enum Path {
     case settings(SettingsFeature)
-    case currencyRates(CurrencyRatesFeature)
+    case currencyRates(CurrenciesRatesFeature)
   }
 
   @Reducer(state: .equatable, .sendable, action: .equatable, .sendable)
   public enum Destination {
     case addDevice(AddDeviceFeature)
     case analytics(Analytics)
-    case addCurrency(CurrencyRatesFeature)
+    case addCurrency(CurrenciesRatesFeature)
   }
 
   @ObservableState
@@ -225,7 +225,7 @@ public struct HomeFeature: Sendable {
           return .none
 
         case .addCurrencyButtonTapped:
-          state.destination = .addCurrency(CurrencyRatesFeature.State())
+          state.destination = .addCurrency(CurrenciesRatesFeature.State())
           return .none
 
         case .analyticsButtonTapped:
@@ -259,7 +259,7 @@ public struct HomeFeature: Sendable {
         case let .path(.element(id: _, action: .settings(.delegate(delAction)))):
           switch delAction {
             case .currencyRatesTapped:
-              state.path.append(.currencyRates(CurrencyRatesFeature.State()))
+              state.path.append(.currencyRates(CurrenciesRatesFeature.State()))
           }
           return .none
 
@@ -281,7 +281,7 @@ public struct HomeFeature: Sendable {
             case .didAddDevice, .didUpdateDevice:
               state.destination = nil
             case .addCurrency:
-              state.destination = .addCurrency(CurrencyRatesFeature.State())
+              state.destination = .addCurrency(CurrenciesRatesFeature.State())
           }
           return .none
 

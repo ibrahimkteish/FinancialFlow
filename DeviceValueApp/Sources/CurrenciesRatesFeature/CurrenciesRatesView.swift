@@ -4,12 +4,12 @@ import Models
 import SharingGRDB
 import SwiftUI
 
-public struct CurrencyRatesView: View {
-  @Bindable var store: StoreOf<CurrencyRatesFeature>
+public struct CurrenciesRatesView: View {
+  @Bindable var store: StoreOf<CurrenciesRatesFeature>
   @Environment(\.dismiss) private var dismiss
   @State private var rates: [(Currency, String)] = []
 
-  public init(store: StoreOf<CurrencyRatesFeature>) {
+  public init(store: StoreOf<CurrenciesRatesFeature>) {
     self.store = store
   }
 
@@ -158,11 +158,11 @@ public struct CurrencyRatesView: View {
 }
 
 #Preview {
-  CurrencyRatesView(
+  CurrenciesRatesView(
     store: Store(
-      initialState: CurrencyRatesFeature.State()
+      initialState: CurrenciesRatesFeature.State()
     ) {
-      CurrencyRatesFeature()
+      CurrenciesRatesFeature()
     }
   )
 }

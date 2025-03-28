@@ -4,7 +4,7 @@
 import AddDeviceFeature
 import AnalyticsFeature
 import ComposableArchitecture
-import CurrencyRatesFeature
+import CurrenciesRatesFeature
 import Generated
 import SettingsFeature
 import SwiftUI
@@ -149,7 +149,7 @@ public struct HomeView: View {
         case let .settings(store):
           SettingsView(store: store)
         case let .currencyRates(store):
-          CurrencyRatesView(store: store)
+          CurrenciesRatesView(store: store)
       }
     }
   }
