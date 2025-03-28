@@ -80,6 +80,10 @@ public enum Strings {
   public static let enterOneUSDExplanation = Strings.tr("Localizable", "EnterOneUSDExplanation", fallback: "Enter the direct exchange rate: how many units of this currency equal exactly 1 USD. Exchange rates vary over time, so enter the current market value.")
   /// Enter how many units of this currency equals 1 USD
   public static let equalsOneUSD = Strings.tr("Localizable", "EqualsOneUSD", fallback: "Enter how many units of this currency equals 1 USD")
+  /// Error deleting currency: %@
+  public static func errorDeletingCurrency(_ p1: Any) -> String {
+    return Strings.tr("Localizable", "ErrorDeletingCurrency", String(describing: p1), fallback: "Error deleting currency: %@")
+  }
   /// Exchange Rate to USD
   public static let exchangeRateToUSD = Strings.tr("Localizable", "ExchangeRateToUSD", fallback: "Exchange Rate to USD")
   /// Expected: %lld%%

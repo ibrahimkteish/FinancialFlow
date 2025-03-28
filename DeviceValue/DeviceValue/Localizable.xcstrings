@@ -1817,6 +1817,29 @@
           }
         }
       }
+    },
+    "ErrorDeletingCurrency" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error deleting currency: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al eliminar la moneda: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur lors de la suppression de la devise: %@"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

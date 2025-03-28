@@ -150,7 +150,7 @@ public struct CurrencyRatesFeature: Sendable {
               TextState(message)
             } actions: {
               ButtonState(role: .cancel) {
-                TextState("OK")
+                TextState(Strings.ok)
               }
             }
           )
@@ -171,7 +171,7 @@ public struct CurrencyRatesFeature: Sendable {
               // If it's the default currency, don't proceed with deletion but show alert
               if isDefault {
                 await send(
-                  .showAlert("Cannot delete the default currency. Change the default currency in Settings first.")
+                  .showAlert(Strings.cannotDeleteDefaultCurrency)
                 )
                 return
               }
@@ -181,7 +181,7 @@ public struct CurrencyRatesFeature: Sendable {
                 _ = try Currency.deleteOne(db, key: ["id": id])
               }
             } catch {
-              await send(.showAlert("Error deleting currency: \(error.localizedDescription)"))
+              await send(.showAlert(Strings.errorDeletingCurrency(error.localizedDescription)))
             }
           }
 
@@ -199,7 +199,7 @@ extension AlertState where Action == CurrencyRatesFeature.Destination.Alert {
       TextState(message)
     } actions: {
       ButtonState(action: .alertButtonTapped) {
-        TextState("OK")
+        TextState(Strings.ok)
       }
     }
   }
