@@ -30,6 +30,8 @@ public enum Strings {
   public static let baseCurrency = Strings.tr("Localizable", "BaseCurrency", fallback: "Base Currency")
   /// Cancel
   public static let cancel = Strings.tr("Localizable", "Cancel", fallback: "Cancel")
+  /// Cannot delete the default currency. Change the default currency in Settings first.
+  public static let cannotDeleteDefaultCurrency = Strings.tr("Localizable", "CannotDeleteDefaultCurrency", fallback: "Cannot delete the default currency. Change the default currency in Settings first.")
   /// Change Default Currency
   public static let changeDefaultCurrency = Strings.tr("Localizable", "ChangeDefaultCurrency", fallback: "Change Default Currency")
   /// Clone
@@ -108,6 +110,8 @@ public enum Strings {
   public static let noCurrencyFound = Strings.tr("Localizable", "NoCurrencyFound", fallback: "No currencies match your search")
   /// None
   public static let `none` = Strings.tr("Localizable", "None", fallback: "None")
+  /// OK
+  public static let ok = Strings.tr("Localizable", "OK", fallback: "OK")
   /// Opens system settings to change app language.
   public static let opensSettings = Strings.tr("Localizable", "OpensSettings", fallback: "Opens system settings to change app language.")
   /// Other Currencies
