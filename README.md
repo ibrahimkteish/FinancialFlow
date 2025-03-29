@@ -28,22 +28,30 @@ DeviceValue is an iOS application that helps you track and manage your device in
 ## Project Structure
 
 ```
+DeviceValue/
+├── DeviceValue
+    ├── Assets.xcassets
+    ├── Preview Content
+    ├── FinancialFlowApp.swift 
+    ├── Info.plist
+    ├── Localizable.xcstrings
+    ├── DeviceValue.xcodeproj
+    └── DeviceValueTests
 DeviceValueApp/
 ├── Sources/
-│   ├── App/                  # Main application files
 │   ├── AddDeviceFeature/     # Add device form and logic
 │   ├── AnalyticsFeature/     # Analytics dashboard and insights
-│   ├── CurrencyRatesFeature/ # Currency rates management
+│   ├── BuildClient/          # Build configuration client
+│   ├── CurrenciesRatesFeature/ # Currency rates management
+│   ├── Generated/            # Generated code resources
 │   ├── HomeFeature/          # Main home screen
 │   ├── Models/               # Data models and database setup
 │   ├── SettingsFeature/      # App settings and preferences
-│   └── Shared/               # Shared components and utilities
-├── Resources/
-│   ├── Assets/               # Images and colors
-│   └── Localization/         # Localized strings
-└── Tests/
-    ├── UnitTests/            # Unit tests
-    └── UITests/              # UI tests
+│   ├── UIApplicationClient/  # UI application client utilities
+│   └── Utils/                # Shared utilities and helpers
+├── Tests/
+└── Plugins/                  # Swift package plugins
+Scripts/                      # contains usefull scripts for local-auto-gen
 ```
 
 ## Architecture
