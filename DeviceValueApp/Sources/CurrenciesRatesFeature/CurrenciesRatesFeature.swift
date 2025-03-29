@@ -214,7 +214,6 @@ public struct CurrenciesRatesFeature: Sendable {
               UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
             }
           )
-
       }
     }
     .forEach(\.rates, action: \.rates) { CurrencyRateFeature() }
