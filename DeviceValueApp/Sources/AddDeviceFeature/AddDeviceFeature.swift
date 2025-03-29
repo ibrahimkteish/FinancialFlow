@@ -61,8 +61,8 @@ public struct AddDeviceFeature: Sendable {
 
     var isValid: Bool {
       !self.deviceName.isEmpty &&
-        Double(self.purchasePrice) != nil &&
-        Double(self.usageRate) != nil
+        Double(self.purchasePrice.replacingOccurrences(of: ",", with: ".")) != nil &&
+        Double(self.usageRate.replacingOccurrences(of: ",", with: ".")) != nil
     }
 
     public init(
@@ -132,8 +132,8 @@ public struct AddDeviceFeature: Sendable {
 
         case .submitButtonTapped:
           guard
-            let price = Double(state.purchasePrice),
-            let rate = Double(state.usageRate)
+            let price = Double(state.purchasePrice.replacingOccurrences(of: ",", with: ".")),
+            let rate = Double(state.usageRate.replacingOccurrences(of: ",", with: "."))
           else {
             return .none
           }

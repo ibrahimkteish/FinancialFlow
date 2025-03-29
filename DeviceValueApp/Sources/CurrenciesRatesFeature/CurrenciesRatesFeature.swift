@@ -1,9 +1,11 @@
 import ComposableArchitecture
+import Generated
 import Models
 import SharingGRDB
+import UIKit
 
 @Reducer
-public struct CurrencyRatesFeature: Sendable {
+public struct CurrenciesRatesFeature: Sendable {
 
   @Reducer(state: .sendable, .equatable, action: .sendable, .equatable)
   public enum Destination: Equatable, Sendable {
@@ -16,7 +18,7 @@ public struct CurrencyRatesFeature: Sendable {
   }
 
   // Define a FetchKeyRequest for currencies with filtering
-  public struct CurrencyFetcher: FetchKeyRequest {
+  public struct CurrencyRequest: FetchKeyRequest {
     public typealias State = [Currency]
 
     public let searchTerm: String
@@ -56,29 +58,31 @@ public struct CurrencyRatesFeature: Sendable {
     @Shared(.inMemory("currency_search"))
     var searchTerm: String = ""
 
-    @SharedReader(.fetch(CurrencyFetcher()))
+    @SharedReader(.fetch(CurrencyRequest()))
     public var currencies: [Currency]
 
     @SharedReader(.fetchOne(sql: "SELECT COUNT(*) FROM currencies"))
     public var totalCurrenciesCount: Int = 0
 
     public var showingAddCurrency = false
-    public var isEditing = false
+
+    public var rates: IdentifiedArrayOf<CurrencyRateFeature.State> = []
 
     public init() {}
   }
 
   public enum Action: Equatable, BindableAction {
+    case addCurrencyButtonTapped
+    case addCurrencyCancelled
+    case addCurrencySaved(Currency)
     case binding(BindingAction<State>)
     case destination(PresentationAction<Destination.Action>)
     case delegate(Delegate)
     case fetchCurrencyRates
-    case updateCurrencyRates([Currency])
-    case addCurrencyButtonTapped
-    case addCurrencyCancelled
-    case addCurrencySaved(Currency)
-    case deleteCurrency(Int64)
+    case fetchedRates
+    case rates(IdentifiedActionOf<CurrencyRateFeature>)
     case showAlert(String)
+    case updateRates
 
     public enum Delegate: Equatable, Sendable {
       case didSaveSuccessfully
@@ -97,34 +101,28 @@ public struct CurrencyRatesFeature: Sendable {
 
         case .binding(\.searchTerm):
           let newFilterTerm = state.searchTerm
-          return .run { [state] _ in
-            try await state.$currencies.load(.fetch(CurrencyFetcher(searchTerm: newFilterTerm)))
+          return .run { [state] send in
+            try await state.$currencies.load(.fetch(CurrencyRequest(searchTerm: newFilterTerm)))
+            await send(.fetchedRates)
           }
 
         case .binding:
           return .none
         case .fetchCurrencyRates:
-          return .run { [state] _ in
-            try await state.$currencies.load(.fetch(CurrencyFetcher(searchTerm: state.searchTerm)))
+          return .run { [state] send in
+            try await state.$currencies.load(.fetch(CurrencyRequest(searchTerm: state.searchTerm)))
+            for await _ in state.$currencies.publisher.values {
+              await send(.fetchedRates)
+            }
           }
+
+        case .fetchedRates:
+          let mapped = state.currencies.map { CurrencyRateFeature.State(currency: $0) }
+          state.rates = .init(uniqueElements: mapped, id: \.id)
+          return .none
 
         case .delegate:
           return .none
-
-        case let .updateCurrencyRates(rates):
-          return .concatenate(
-            .run { _ in
-              try await database.write { db in
-                for rate in rates {
-                  if var currency = try Currency.fetchOne(db, key: ["id": rate.id!]) {
-                    currency.usdRate = rate.usdRate
-                    try currency.update(db)
-                  }
-                }
-              }
-            },
-            .run { _ in await dismiss() }
-          )
 
         case .addCurrencyButtonTapped:
           state.showingAddCurrency = true
@@ -150,13 +148,28 @@ public struct CurrencyRatesFeature: Sendable {
               TextState(message)
             } actions: {
               ButtonState(role: .cancel) {
-                TextState("OK")
+                TextState(Strings.ok)
               }
             }
           )
           return .none
 
-        case let .deleteCurrency(id):
+        case .destination:
+          return .none
+
+        case let .rates(.element(id: id, action: .delegate(.didChangeRate))):
+          // update the currency rate in db
+          guard let item = state.rates[id: id]?.currency else { return .none }
+          return .run { _ in
+            try await database.write { db in
+              if var currency = try Currency.fetchOne(db, key: ["id": id]) {
+                currency.usdRate = item.usdRate
+                try currency.update(db)
+              }
+            }
+          }
+        case let .rates(.element(id: id, action: .delegate(.delete))):
+
           return .run { send in
             do {
               // First check if this is the default currency in a read transaction
@@ -171,7 +184,7 @@ public struct CurrencyRatesFeature: Sendable {
               // If it's the default currency, don't proceed with deletion but show alert
               if isDefault {
                 await send(
-                  .showAlert("Cannot delete the default currency. Change the default currency in Settings first.")
+                  .showAlert(Strings.cannotDeleteDefaultCurrency)
                 )
                 return
               }
@@ -181,25 +194,40 @@ public struct CurrencyRatesFeature: Sendable {
                 _ = try Currency.deleteOne(db, key: ["id": id])
               }
             } catch {
-              await send(.showAlert("Error deleting currency: \(error.localizedDescription)"))
+              await send(.showAlert(Strings.errorDeletingCurrency(error.localizedDescription)))
             }
           }
 
-        case .destination:
+        case .rates:
           return .none
+
+        case .updateRates:
+          return .concatenate(
+            .run { [state] _ in
+              try await database.write { db in
+                for currency in state.rates.filter(\.updated).map(\.currency) {
+                  try currency.update(db)
+                }
+              }
+            },
+            .run { @MainActor _ in
+              UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
+          )
       }
     }
+    .forEach(\.rates, action: \.rates) { CurrencyRateFeature() }
     .ifLet(\.$destination, action: \.destination)
   }
 }
 
-extension AlertState where Action == CurrencyRatesFeature.Destination.Alert {
+extension AlertState where Action == CurrenciesRatesFeature.Destination.Alert {
   static func show(_ message: String) -> Self {
     AlertState {
       TextState(message)
     } actions: {
       ButtonState(action: .alertButtonTapped) {
-        TextState("OK")
+        TextState(Strings.ok)
       }
     }
   }

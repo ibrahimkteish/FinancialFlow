@@ -30,6 +30,8 @@ public enum Strings {
   public static let baseCurrency = Strings.tr("Localizable", "BaseCurrency", fallback: "Base Currency")
   /// Cancel
   public static let cancel = Strings.tr("Localizable", "Cancel", fallback: "Cancel")
+  /// Cannot delete the default currency. Change the default currency in Settings first.
+  public static let cannotDeleteDefaultCurrency = Strings.tr("Localizable", "CannotDeleteDefaultCurrency", fallback: "Cannot delete the default currency. Change the default currency in Settings first.")
   /// Change Default Currency
   public static let changeDefaultCurrency = Strings.tr("Localizable", "ChangeDefaultCurrency", fallback: "Change Default Currency")
   /// Clone
@@ -78,6 +80,10 @@ public enum Strings {
   public static let enterOneUSDExplanation = Strings.tr("Localizable", "EnterOneUSDExplanation", fallback: "Enter the direct exchange rate: how many units of this currency equal exactly 1 USD. Exchange rates vary over time, so enter the current market value.")
   /// Enter how many units of this currency equals 1 USD
   public static let equalsOneUSD = Strings.tr("Localizable", "EqualsOneUSD", fallback: "Enter how many units of this currency equals 1 USD")
+  /// Error deleting currency: %@
+  public static func errorDeletingCurrency(_ p1: Any) -> String {
+    return Strings.tr("Localizable", "ErrorDeletingCurrency", String(describing: p1), fallback: "Error deleting currency: %@")
+  }
   /// Exchange Rate to USD
   public static let exchangeRateToUSD = Strings.tr("Localizable", "ExchangeRateToUSD", fallback: "Exchange Rate to USD")
   /// Expected: %lld%%
@@ -108,6 +114,8 @@ public enum Strings {
   public static let noCurrencyFound = Strings.tr("Localizable", "NoCurrencyFound", fallback: "No currencies match your search")
   /// None
   public static let `none` = Strings.tr("Localizable", "None", fallback: "None")
+  /// OK
+  public static let ok = Strings.tr("Localizable", "OK", fallback: "OK")
   /// Opens system settings to change app language.
   public static let opensSettings = Strings.tr("Localizable", "OpensSettings", fallback: "Opens system settings to change app language.")
   /// Other Currencies

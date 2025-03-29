@@ -38,8 +38,8 @@ let package = Package(
             targets: ["AnalyticsFeature"]
         ),
         .library(
-            name: "CurrencyRatesFeature",
-            targets: ["CurrencyRatesFeature"]
+            name: "CurrenciesRatesFeature",
+            targets: ["CurrenciesRatesFeature"]
         ),
         .library(
             name: "SettingsFeature",
@@ -103,7 +103,7 @@ let package = Package(
             dependencies: [
                 "AddDeviceFeature",
                 "AnalyticsFeature",
-                "CurrencyRatesFeature",
+                "CurrenciesRatesFeature",
                 "Generated",
                 "Models",
                 "Utils",
@@ -123,7 +123,7 @@ let package = Package(
             ]
         ),
         .target(
-            name: "CurrencyRatesFeature",
+            name: "CurrenciesRatesFeature",
             dependencies: [
                 "Generated",
                 "Models",

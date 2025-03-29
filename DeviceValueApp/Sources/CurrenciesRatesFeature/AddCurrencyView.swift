@@ -4,7 +4,7 @@ import Models
 import SwiftUI
 
 public struct AddCurrencyView: View {
-  let store: StoreOf<CurrencyRatesFeature>
+  let store: StoreOf<CurrenciesRatesFeature>
   @Environment(\.dismiss) private var dismiss
 
   @State private var code = ""
@@ -12,7 +12,7 @@ public struct AddCurrencyView: View {
   @State private var name = ""
   @State private var usdRate = ""
 
-  public init(store: StoreOf<CurrencyRatesFeature>) {
+  public init(store: StoreOf<CurrenciesRatesFeature>) {
     self.store = store
   }
 
@@ -85,9 +85,9 @@ public struct AddCurrencyView: View {
 #Preview {
   AddCurrencyView(
     store: Store(
-      initialState: CurrencyRatesFeature.State()
+      initialState: CurrenciesRatesFeature.State()
     ) {
-      CurrencyRatesFeature()
+      CurrenciesRatesFeature()
     }
   )
 }
