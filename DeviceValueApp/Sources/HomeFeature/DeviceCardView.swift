@@ -263,6 +263,7 @@ public struct DeviceCardView: View {
     }
   }
 }
+
 #if DEBUG
 #Preview {
   VStack {

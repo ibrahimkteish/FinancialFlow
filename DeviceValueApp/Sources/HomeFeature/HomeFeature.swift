@@ -296,7 +296,11 @@ public struct HomeFeature: Sendable {
           return .none
 
         case let .editDeviceTapped(device):
-          state.destination = .addDevice(AddDeviceFeature.State(with: device, mode: AddDeviceFeature.Mode.edit(device.id!)))
+          state
+            .destination = .addDevice(
+              AddDeviceFeature
+                .State(with: device, mode: AddDeviceFeature.Mode.edit(device.id!))
+            )
           return .none
 
         case let .cloneDeviceTapped(deviceToClone):

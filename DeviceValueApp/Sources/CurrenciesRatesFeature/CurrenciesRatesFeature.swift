@@ -1,7 +1,8 @@
 import ComposableArchitecture
+import Generated
 import Models
 import SharingGRDB
-import Generated
+import UIKit
 
 @Reducer
 public struct CurrenciesRatesFeature: Sendable {
@@ -64,22 +65,24 @@ public struct CurrenciesRatesFeature: Sendable {
     public var totalCurrenciesCount: Int = 0
 
     public var showingAddCurrency = false
-    public var isEditing = false
+
+    public var rates: IdentifiedArrayOf<CurrencyRateFeature.State> = []
 
     public init() {}
   }
 
   public enum Action: Equatable, BindableAction {
+    case addCurrencyButtonTapped
+    case addCurrencyCancelled
+    case addCurrencySaved(Currency)
     case binding(BindingAction<State>)
     case destination(PresentationAction<Destination.Action>)
     case delegate(Delegate)
     case fetchCurrencyRates
-    case updateCurrencyRates([Currency])
-    case addCurrencyButtonTapped
-    case addCurrencyCancelled
-    case addCurrencySaved(Currency)
-    case deleteCurrency(Int64)
+    case fetchedRates
+    case rates(IdentifiedActionOf<CurrencyRateFeature>)
     case showAlert(String)
+    case updateRates
 
     public enum Delegate: Equatable, Sendable {
       case didSaveSuccessfully
@@ -98,34 +101,28 @@ public struct CurrenciesRatesFeature: Sendable {
 
         case .binding(\.searchTerm):
           let newFilterTerm = state.searchTerm
-          return .run { [state] _ in
+          return .run { [state] send in
             try await state.$currencies.load(.fetch(CurrencyRequest(searchTerm: newFilterTerm)))
+            await send(.fetchedRates)
           }
 
         case .binding:
           return .none
         case .fetchCurrencyRates:
-          return .run { [state] _ in
+          return .run { [state] send in
             try await state.$currencies.load(.fetch(CurrencyRequest(searchTerm: state.searchTerm)))
+            for await _ in state.$currencies.publisher.values {
+              await send(.fetchedRates)
+            }
           }
+
+        case .fetchedRates:
+          let mapped = state.currencies.map { CurrencyRateFeature.State(currency: $0) }
+          state.rates = .init(uniqueElements: mapped, id: \.id)
+          return .none
 
         case .delegate:
           return .none
-
-        case let .updateCurrencyRates(rates):
-          return .concatenate(
-            .run { _ in
-              try await database.write { db in
-                for rate in rates {
-                  if var currency = try Currency.fetchOne(db, key: ["id": rate.id!]) {
-                    currency.usdRate = rate.usdRate
-                    try currency.update(db)
-                  }
-                }
-              }
-            },
-            .run { _ in await dismiss() }
-          )
 
         case .addCurrencyButtonTapped:
           state.showingAddCurrency = true
@@ -157,7 +154,22 @@ public struct CurrenciesRatesFeature: Sendable {
           )
           return .none
 
-        case let .deleteCurrency(id):
+        case .destination:
+          return .none
+
+        case let .rates(.element(id: id, action: .delegate(.didChangeRate))):
+          // update the currency rate in db
+          guard let item = state.rates[id: id]?.currency else { return .none }
+          return .run { _ in
+            try await database.write { db in
+              if var currency = try Currency.fetchOne(db, key: ["id": id]) {
+                currency.usdRate = item.usdRate
+                try currency.update(db)
+              }
+            }
+          }
+        case let .rates(.element(id: id, action: .delegate(.delete))):
+
           return .run { send in
             do {
               // First check if this is the default currency in a read transaction
@@ -186,10 +198,26 @@ public struct CurrenciesRatesFeature: Sendable {
             }
           }
 
-        case .destination:
+        case .rates:
           return .none
+
+        case .updateRates:
+          return .concatenate(
+            .run { [state] _ in
+              try await database.write { db in
+                for currency in state.rates.filter(\.updated).map(\.currency) {
+                  try currency.update(db)
+                }
+              }
+            },
+            .run { @MainActor _ in
+              UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
+          )
+
       }
     }
+    .forEach(\.rates, action: \.rates) { CurrencyRateFeature() }
     .ifLet(\.$destination, action: \.destination)
   }
 }
